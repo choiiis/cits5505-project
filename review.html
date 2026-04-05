@@ -4,6 +4,13 @@
 <head>
     <title>Review Page</title>
     <style>
+        body {
+            margin: 0;
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
+            background: #f7f7f7;
+            color: #0b0b0b;
+        }
+
         .wrapper {
             width: 80%;
             margin: 40px auto;
@@ -14,22 +21,76 @@
         }
 
         .review-list {
+            display: grid;
+            gap: 16px;
             margin-top: 40px;
         }
 
         .review-element {
-            background: white;
-            border: 1px solid #ccc;
+
             padding: 16px;
-            margin-bottom: 16px;
+            font-size: 13px;
+            border-bottom: 1px solid #e5e7eb;
         }
 
         .review-header {
-            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
         }
 
         .reviewer {
-            font-weight: bold;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .review-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .review-meta {
+            display: flex;
+            gap: 3px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .review-date::after {
+            content: "·";
+            margin-left: 3px;
+        }
+
+        .review-date {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .stars {
+            color: #f59e0b;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .review-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin: 6px 0 10px;
+        }
+
+        .review-text {
+            margin: 0;
+            color: #374151;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -38,28 +99,62 @@
     <div class="wrapper">
         <h1>Reviews</h1>
         <section class="review-list">
+
             <div class="review-element">
                 <div class="review-header">
-                    <div class="reviewer">Michelle</div>
-                    <div>★★★★★</div>
+                    <div class="review-user">
+                        <img class="avatar" src="https://randomuser.me/api/portraits/women/1.jpg">
+                        <div>
+                            <div class="reviewer">Scarlett Johansson</div>
+                            <div class="review-meta">
+                                <div class="review-date">03 Apr 2026</div>
+                                <div class="review-count">12 reviews</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="stars">★★★★☆</div> -->
                 </div>
-                <p>Delicious food and nice atmosphere</p>
+                <div class="stars">★★★★☆</div>
+                <p class="review-text">Delicious food and nice atmosphere</p>
             </div>
 
             <div class="review-element">
                 <div class="review-header">
-                    <div class="reviewer">David</div>
-                    <div>★★★★☆</div>
+                    <div class="review-user">
+                        <img class="avatar" src="https://randomuser.me/api/portraits/men/2.jpg">
+                        <div>
+                            <div class="reviewer">Tom Hardy</div>
+                            <div class="review-meta">
+                                <div class="review-date">31 Mar 2026</div>
+                                <div class="review-count">8 reviews</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <div class="stars">★★★★☆</div>
+                <p class="review-text">Food was really good overall and the portion size was decent for the price. The
+                    dessert was the highlight — especially the chocolate cake, which wasn’t too sweet.
+                    Service was a bit slow during peak time, but staff were friendly and apologetic. Would definitely
+                    come back again.</p>
             </div>
 
             <div class="review-element">
                 <div class="review-header">
-                    <div class="reviewer">Sophie</div>
-                    <div>★★★★★</div>
+                    <div class="review-user">
+                        <img class="avatar" src="https://randomuser.me/api/portraits/women/3.jpg">
+                        <div>
+                            <div class="reviewer">Amy Adams</div>
+                            <div class="review-meta">
+                                <div class="review-date">28 Mar 2026</div>
+                                <div class="review-count">21 reviews</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <p>Great service!</p>
+                <div class="stars">★★★★★</div>
+                <p class="review-text">Great service!</p>
             </div>
+
         </section>
     </div>
 </body>
