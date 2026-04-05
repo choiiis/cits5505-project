@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PerthEats - Browse Restaurants</title>
+
+  <!-- Bootstrap CSS via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    .restaurant-card:hover {
+      transform: translateY(-5px);
+      transition: transform 0.3s ease;
+    }
+    .hero-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .filter-btn.active {
+      background-color: #007bff;
+      color: white;
+    }
+    #back-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">PerthEats</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Restaurants</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Reviews</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="py-5 hero-bg">
+    <div class="container text-center">
+      <h1 class="display-5 fw-bold">Discover Great Restaurants Around Perth</h1>
+      <p class="lead">Browse top-rated places, explore cuisines, and find your next meal.</p>
+      <!-- <p class="mb-4">A university restaurant review system built with HTML, CSS, JavaScript, and Bootstrap.</p> -->
+
+      <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+          <div class="input-group input-group-lg">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by restaurant name or cuisine" autocomplete="off">
+            <button class="btn btn-light" onclick="searchRestaurants()">Search</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter Tags -->
+  <section class="py-4 bg-light">
+    <div class="container text-center">
+      <h3 class="mb-3">Filter by Cuisine</h3>
+      <button class="btn btn-outline-primary m-1 filter-btn" data-cuisine="all">Show All</button>
+      <button class="btn btn-outline-primary m-1 filter-btn" data-cuisine="Chinese">Chinese</button>
+      <button class="btn btn-outline-primary m-1 filter-btn" data-cuisine="Japanese">Japanese</button>
+      <button class="btn btn-outline-primary m-1 filter-btn" data-cuisine="Italian">Italian</button>
+      <button class="btn btn-outline-primary m-1 filter-btn" data-cuisine="Korean">Korean</button>
+      <button class="btn btn-outline-primary m-1 filter-btn" data-cuisine="Cafe">Cafe</button>
+      <button class="btn btn-outline-primary m-1 filter-btn" data-cuisine="Desserts">Desserts</button>
+      <button class="btn btn-outline-primary m-1 filter-btn" data-cuisine="Thai">Thai</button>
+      <button class="btn btn-outline-primary m-1 filter-btn" data-cuisine="Mexican">Mexican</button>
+    </div>
+  </section>
+
+  <!-- Restaurant Cards -->
+  <section class="pb-5">
+    <div class="container">
+      <h2 class="mb-4 text-center">Featured Restaurants</h2>
+
+      <div class="row g-4" id="restaurantGrid">
+        <div class="col-md-4 restaurant-card" data-cuisine="Chinese">
+          <div class="card h-100 shadow-sm">
+            <img src="https://via.placeholder.com/400x250/FF6B6B/FFFFFF?text=Spicy+House" class="card-img-top" alt="Spicy House">
+            <div class="card-body">
+              <h5 class="card-title">Spicy House</h5>
+              <p class="card-text text-muted mb-1">Chinese · Perth CBD</p>
+              <p class="card-text">⭐ 4.6 | Popular for noodles and dumplings</p>
+              <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 restaurant-card" data-cuisine="Japanese">
+          <div class="card h-100 shadow-sm">
+            <img src="https://via.placeholder.com/400x250/4ECDC4/FFFFFF?text=Sakura+Kitchen" class="card-img-top" alt="Sakura Kitchen">
+            <div class="card-body">
+              <h5 class="card-title">Sakura Kitchen</h5>
+              <p class="card-text text-muted mb-1">Japanese · Northbridge</p>
+              <p class="card-text">⭐ 4.8 | Sushi, ramen, and fresh sashimi</p>
+              <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 restaurant-card" data-cuisine="Italian">
+          <div class="card h-100 shadow-sm">
+            <img src="https://via.placeholder.com/400x250/45B7D1/FFFFFF?text=Little+Napoli" class="card-img-top" alt="Little Napoli">
+            <div class="card-body">
+              <h5 class="card-title">Little Napoli</h5>
+              <p class="card-text text-muted mb-1">Italian · Subiaco</p>
+              <p class="card-text">⭐ 4.5 | Pizza, pasta, and cozy atmosphere</p>
+              <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 restaurant-card" data-cuisine="Korean">
+          <div class="card h-100 shadow-sm">
+            <img src="https://via.placeholder.com/400x250/F7DC6F/000000?text=Kimchi+Corner" class="card-img-top" alt="Kimchi Corner">
+            <div class="card-body">
+              <h5 class="card-title">Kimchi Corner</h5>
+              <p class="card-text text-muted mb-1">Korean · Fremantle</p>
+              <p class="card-text">⭐ 4.7 | Authentic Korean BBQ and bibimbap</p>
+              <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 restaurant-card" data-cuisine="Cafe">
+          <div class="card h-100 shadow-sm">
+            <img src="https://via.placeholder.com/400x250/AED581/FFFFFF?text=Campus+Cafe" class="card-img-top" alt="Campus Cafe">
+            <div class="card-body">
+              <h5 class="card-title">Campus Cafe</h5>
+              <p class="card-text text-muted mb-1">Cafe · University Area</p>
+              <p class="card-text">⭐ 4.4 | Coffee, sandwiches, and study-friendly vibes</p>
+              <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 restaurant-card" data-cuisine="Desserts">
+          <div class="card h-100 shadow-sm">
+            <img src="https://via.placeholder.com/400x250/FFB74D/FFFFFF?text=Sweet+Escape" class="card-img-top" alt="Sweet Escape">
+            <div class="card-body">
+              <h5 class="card-title">Sweet Escape</h5>
+              <p class="card-text text-muted mb-1">Desserts · Leederville</p>
+              <p class="card-text">⭐ 4.9 | Ice cream, cakes, and decadent treats</p>
+              <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 restaurant-card" data-cuisine="Thai">
+          <div class="card h-100 shadow-sm">
+            <img src="https://via.placeholder.com/400x250/81C784/FFFFFF?text=Thai+Garden" class="card-img-top" alt="Thai Garden">
+            <div class="card-body">
+              <h5 class="card-title">Thai Garden</h5>
+              <p class="card-text text-muted mb-1">Thai · Mount Lawley</p>
+              <p class="card-text">⭐ 4.6 | Pad Thai, curries, and tropical flavors</p>
+              <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 restaurant-card" data-cuisine="Mexican">
+          <div class="card h-100 shadow-sm">
+            <img src="https://via.placeholder.com/400x250/FF8A65/FFFFFF?text=Fiesta+Taco" class="card-img-top" alt="Fiesta Taco">
+            <div class="card-body">
+              <h5 class="card-title">Fiesta Taco</h5>
+              <p class="card-text text-muted mb-1">Mexican · Perth CBD</p>
+              <p class="card-text">⭐ 4.5 | Tacos, burritos, and margaritas</p>
+              <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 restaurant-card" data-cuisine="Japanese">
+          <div class="card h-100 shadow-sm">
+            <img src="https://via.placeholder.com/400x250/BA68C8/FFFFFF?text=Ramen+House" class="card-img-top" alt="Ramen House">
+            <div class="card-body">
+              <h5 class="card-title">Ramen House</h5>
+              <p class="card-text text-muted mb-1">Japanese · Shenton Park</p>
+              <p class="card-text">⭐ 4.7 | Hearty ramen bowls and gyoza</p>
+              <a href="#" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white text-center py-3">
+    <div class="container">
+      <p class="mb-2">© 2026 PerthEats - CITS5505 Group Project</p>
+      <p class="mb-0">Restaurant Review System | Built with Bootstrap</p>
+    </div>
+  </footer>
+
+  <!-- Back to Top Button -->
+  <button id="back-to-top" class="btn btn-primary btn-lg" title="Back to Top">↑</button>
+
+  <!-- Bootstrap JS via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Filter functionality
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const restaurantCards = document.querySelectorAll('.restaurant-card');
+    const searchInput = document.getElementById('searchInput');
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const cuisine = button.getAttribute('data-cuisine');
+        if (cuisine === 'all') {
+          // Single select for Show All: clear others, select all
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          filterRestaurants(['all']);
+        } else {
+          // Toggle for other buttons
+          button.classList.toggle('active');
+          // If Show All is active, remove it
+          document.querySelector('[data-cuisine="all"]').classList.remove('active');
+          // Get all selected cuisines
+          const selectedCuisines = Array.from(filterButtons)
+            .filter(btn => btn.classList.contains('active'))
+            .map(btn => btn.getAttribute('data-cuisine'));
+          filterRestaurants(selectedCuisines);
+        }
+      });
+    });
+
+    function filterRestaurants(selectedCuisines) {
+      restaurantCards.forEach(card => {
+        const cardCuisine = card.getAttribute('data-cuisine');
+        if (selectedCuisines.length === 0 || selectedCuisines.includes('all') || selectedCuisines.includes(cardCuisine)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function searchRestaurants() {
+      const query = searchInput.value.toLowerCase();
+      restaurantCards.forEach(card => {
+        const title = card.querySelector('.card-title').textContent.toLowerCase();
+        const cuisine = card.getAttribute('data-cuisine').toLowerCase();
+        if (title.includes(query) || cuisine.includes(query)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Initialize with Show All active
+    document.querySelector('[data-cuisine="all"]').classList.add('active');
+
+    // Back to Top functionality
+    const backToTopBtn = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTopBtn.style.display = 'block';
+      } else {
+        backToTopBtn.style.display = 'none';
+      }
+    });
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
