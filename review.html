@@ -7,13 +7,13 @@
         body {
             margin: 0;
             font-family: "Trebuchet MS", Helvetica, sans-serif;
-            background: #f7f7f7;
-            color: #0b0b0b;
+            background: #FAFBFC;
+            color: #1F2937;
         }
 
         .site-header {
-            background: #ffffff;
-            border-bottom: 1px solid #e5e7eb;
+            background: #FAFBFC;
+            border-bottom: 1px solid #E5E7EB;
             position: fixed;
             top: 0;
             left: 0;
@@ -34,6 +34,7 @@
         .site-logo {
             font-size: 22px;
             font-weight: 700;
+            color: #2F6B4F;
         }
 
         .site-nav {
@@ -44,12 +45,12 @@
 
         .site-nav a {
             text-decoration: none;
-            color: #374151;
+            color: #2F6B4F;
             font-size: 14px;
         }
 
         .site-nav a:hover {
-            color: #0b0b0b;
+            color: #1F2937;
         }
 
         .wrapper {
@@ -74,7 +75,7 @@
         .review-element {
             padding: 16px;
             font-size: 13px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #E5E7EB;
         }
 
         .review-header {
@@ -105,12 +106,12 @@
             display: flex;
             gap: 3px;
             font-size: 12px;
-            color: #6b7280;
+            color: #6B7280;
         }
 
         .review-date {
             font-size: 12px;
-            color: #6b7280;
+            color: #6B7280;
         }
 
         .review-date::after {
@@ -123,7 +124,7 @@
             font-size: 18px;
             letter-spacing: 0.5px;
             white-space: nowrap;
-            color: #f59e0b;
+            color: #C7A86D;
         }
 
         .review-text {
@@ -136,11 +137,15 @@
             display: inline-block;
             padding: 10px 16px;
             border-radius: 12px;
-            background: #0b0b0b;
-            color: #f7f7f7;
+            background: #2F6B4F;
+            color: #ffffff;
             font-size: 14px;
             cursor: pointer;
             font-family: inherit;
+        }
+
+        .add-review-btn:hover {
+            background: #25543E;
         }
 
         .toggle-input {
@@ -149,9 +154,10 @@
 
         .overlay {
             position: fixed;
+            top: 60px;
             inset: 0;
             z-index: 30;
-            background: rgba(17, 24, 39, 0.35);
+            background: rgba(31, 41, 55, 0.35);
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.25s ease;
@@ -159,13 +165,13 @@
 
         .side-panel {
             position: fixed;
-            top: 0;
+            top: 60px;
             right: -420px;
             z-index: 40;
             display: flex;
             flex-direction: column;
             width: min(400px, 100%);
-            height: 100vh;
+            height: calc(100vh - 60px);
             background: #ffffff;
             box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
             transition: right 0.3s ease;
@@ -196,7 +202,7 @@
             display: inline-block;
             font-size: 24px;
             line-height: 1;
-            color: #6b7280;
+            color: #6B7280;
             cursor: pointer;
         }
 
@@ -214,7 +220,7 @@
             display: block;
             font-size: 14px;
             font-weight: 600;
-            color: #0b0b0b;
+            color: #1F2937;
         }
 
         input,
@@ -222,11 +228,11 @@
             width: 100%;
             margin-top: 6px;
             padding: 12px 14px;
-            border: 1px solid #d1d5db;
+            border: 1px solid #D1D5DB;
             border-radius: 12px;
             box-sizing: border-box;
             background: #ffffff;
-            color: #111827;
+            color: #1F2937;
             font-family: inherit;
             font-size: 14px;
         }
@@ -248,18 +254,18 @@
 
         .star-rating label {
             font-size: 30px;
-            color: #d1d5db;
+            color: #D1D5DB;
             cursor: pointer;
             transition: color 0.2s;
         }
 
         .star-rating label:hover,
         .star-rating label:hover~label {
-            color: #f59e0b;
+            color: #C7A86D;
         }
 
         .star-rating input:checked~label {
-            color: #f59e0b;
+            color: #C7A86D;
         }
 
         .submit-review-btn {
@@ -267,13 +273,17 @@
             padding: 14px 16px;
             border: none;
             border-radius: 12px;
-            background: #0b0b0b;
-            color: #f7f7f7;
+            background: #2F6B4F;
+            color: #ffffff;
             font-family: inherit;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 4px;
+        }
+
+        .submit-review-btn:hover {
+            background: #25543E;
         }
 
         @media (max-width: 700px) {
@@ -371,6 +381,7 @@
                 <div class="stars">★★★★★</div>
                 <p class="review-text">Great service!</p>
             </div>
+
             <div class="review-element">
                 <div class="review-header">
                     <div class="review-user">
