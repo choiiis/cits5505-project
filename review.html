@@ -11,13 +11,55 @@
             color: #0b0b0b;
         }
 
+        .site-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .header-inner {
+            width: 80%;
+            margin: 0 auto;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .site-logo {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .site-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .site-nav a {
+            text-decoration: none;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .site-nav a:hover {
+            color: #0b0b0b;
+        }
+
         .wrapper {
             width: 80%;
             margin: 40px auto;
+            margin-top: 100px;
         }
 
         .review-page-main {
-            margin-top: 70px;
+            margin-top: 50px;
             margin-bottom: 50px;
             font-size: 35px;
             font-weight: 700;
@@ -235,8 +277,16 @@
         }
 
         @media (max-width: 700px) {
+
+            .header-inner,
             .wrapper {
                 width: calc(100% - 32px);
+            }
+
+            .site-nav {
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: flex-end;
             }
 
             .side-panel {
@@ -248,6 +298,17 @@
 
 <body>
     <input type="checkbox" id="review-toggle" class="toggle-input">
+
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="site-logo">ForkIt</div>
+            <nav class="site-nav">
+                <a href="#">Home</a>
+                <a href="#">Favorites</a>
+                <a href="#">Profile</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="wrapper">
         <div class="review-page-main">Reviews</div>
@@ -309,6 +370,48 @@
                 </div>
                 <div class="stars">★★★★★</div>
                 <p class="review-text">Great service!</p>
+            </div>
+            <div class="review-element">
+                <div class="review-header">
+                    <div class="review-user">
+                        <img class="avatar" src="https://randomuser.me/api/portraits/men/4.jpg">
+                        <div>
+                            <div class="reviewer">Chris Evans</div>
+                            <div class="review-meta">
+                                <div class="review-date">25 Mar 2026</div>
+                                <div class="review-count">5 reviews</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stars">★★★☆☆</div>
+                <p class="review-text">
+                    The food was decent overall, but I expected a bit more given the ratings. The pasta was slightly
+                    overcooked,
+                    but the sauce had a really nice flavor. Service was friendly, though it took a while to get our
+                    order.
+                </p>
+            </div>
+
+            <div class="review-element">
+                <div class="review-header">
+                    <div class="review-user">
+                        <img class="avatar" src="https://randomuser.me/api/portraits/women/5.jpg">
+                        <div>
+                            <div class="reviewer">Emma Stone</div>
+                            <div class="review-meta">
+                                <div class="review-date">20 Mar 2026</div>
+                                <div class="review-count">14 reviews</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+                <p class="review-text">
+                    Absolutely loved this place. The atmosphere was cozy and perfect for a casual dinner. Every dish we
+                    ordered
+                    was well balanced and beautifully presented. Definitely one of my favorite spots now.
+                </p>
             </div>
         </section>
     </div>
