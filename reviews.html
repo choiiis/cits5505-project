@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reviews | Food & Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="bootstrap-theme.css">
+</head>
+<body>
+  <div class="utility-bar border-bottom">
+    <div class="container d-flex justify-content-between align-items-center py-2 small text-muted">
+      <span>Community reviews</span>
+      <span>Read, write, and moderate feedback</span>
+    </div>
+  </div>
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand brand-mark" href="index.html">Food & Review</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="search.html">Restaurants</a></li>
+          <li class="nav-item"><a class="nav-link" href="restaurant.html">Details</a></li>
+          <li class="nav-item"><a class="nav-link active" href="reviews.html">Reviews</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <main class="bg-page">
+    <section class="container py-4 py-lg-5">
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="content-panel p-4 p-lg-5">
+            <h1 class="h2 fw-bold mb-2">Harbor Lantern reviews</h1>
+            <p class="text-secondary mb-4">Browse recent feedback from diners and see how moderation keeps the community safe.</p>
+            <div class="vstack gap-3">
+              <article class="review-item">
+                <div class="d-flex justify-content-between flex-wrap gap-3 mb-2">
+                  <div>
+                    <h2 class="h5 mb-1">Leah M.</h2>
+                    <p class="small text-secondary mb-0">Visited last weekend</p>
+                  </div>
+                  <div class="rating-badge">5.0</div>
+                </div>
+                <p class="fw-semibold mb-1">A memorable waterfront dinner</p>
+                <p class="mb-3 text-secondary">The tasting menu was paced well, the staff were attentive, and every course felt carefully considered.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                  <span class="photo-pill">Photo 1</span>
+                  <span class="photo-pill">Photo 2</span>
+                  <span class="photo-pill">Photo 3</span>
+                </div>
+              </article>
+              <article class="review-item">
+                <div class="d-flex justify-content-between flex-wrap gap-3 mb-2">
+                  <div>
+                    <h2 class="h5 mb-1">Daniel R.</h2>
+                    <p class="small text-secondary mb-0">Business dinner</p>
+                  </div>
+                  <div class="rating-badge">4.5</div>
+                </div>
+                <p class="fw-semibold mb-1">Great service, slightly limited dessert menu</p>
+                <p class="mb-0 text-secondary">The mains were excellent and the staff handled dietary requests very well. I would love to see more dessert choices next time.</p>
+              </article>
+              <article class="moderation-box">
+                <h2 class="h6 text-uppercase text-muted mb-2">Admin moderation</h2>
+                <p class="mb-0 text-secondary">Reviews containing inappropriate language can be flagged and removed so the platform remains welcoming and trustworthy.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <aside class="content-panel p-4">
+            <h2 class="h5 fw-semibold mb-3">Write or edit a review</h2>
+            <form id="reviewForm" class="vstack gap-3">
+              <div>
+                <label for="reviewerName" class="form-label">Your name</label>
+                <input class="form-control" type="text" id="reviewerName" placeholder="Enter your name" required>
+              </div>
+              <div>
+                <label for="reviewRating" class="form-label">Rating</label>
+                <select class="form-select" id="reviewRating" required>
+                  <option value="">Choose a rating</option>
+                  <option value="5">5 - Excellent</option>
+                  <option value="4">4 - Very Good</option>
+                  <option value="3">3 - Good</option>
+                  <option value="2">2 - Fair</option>
+                  <option value="1">1 - Poor</option>
+                </select>
+              </div>
+              <div>
+                <label for="reviewHeadline" class="form-label">Headline</label>
+                <input class="form-control" type="text" id="reviewHeadline" placeholder="Summarize your visit" required>
+              </div>
+              <div>
+                <label for="reviewBody" class="form-label">Detailed review</label>
+                <textarea class="form-control" id="reviewBody" rows="5" placeholder="Describe the food, atmosphere, and service." required></textarea>
+              </div>
+              <div>
+                <label for="reviewPhoto" class="form-label">Photo upload</label>
+                <input class="form-control" type="file" id="reviewPhoto">
+              </div>
+              <button class="btn btn-success" type="submit">Submit review</button>
+              <p class="small text-secondary mb-0" id="reviewMessage">Your review will appear after moderation in a full implementation.</p>
+            </form>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="bg-white border-top py-4">
+    <div class="container d-flex justify-content-between flex-wrap gap-2 text-secondary small">
+      <span>This page supports review writing, editing, and moderation flows.</span>
+      <a class="link-secondary text-decoration-none" href="restaurant.html">Back to restaurant</a>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
