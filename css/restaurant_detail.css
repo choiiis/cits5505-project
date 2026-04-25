@@ -1,1 +1,65 @@
-/* restaurant_detail.css */
+.restaurant-hero {
+    position: relative;
+    height: 400px;
+    overflow: hidden;
+}
+
+.restaurant-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.restaurant-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.restaurant-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 60px;
+    color: white;
+}
+
+.restaurant-category {
+    display: inline-block;
+    background: white;
+    color: #222;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.restaurant-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.restaurant-rating-line {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+#starText {
+    color: #e86f5c;
+    margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+    .restaurant-hero {
+        height: 320px;
+    }
+
+    .restaurant-hero h1 {
+        font-size: 2.4rem;
+    }
+
+}
