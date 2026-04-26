@@ -24,13 +24,13 @@
     display: flex;
     align-items: flex-end;
     padding-bottom: 60px;
-    color: white;
+    color: #ffffff;
 }
 
 .restaurant-category {
     display: inline-block;
-    background: white;
-    color: #222;
+    background: #ffffff;
+    color: var(--brand-ink);
     padding: 8px 18px;
     border-radius: 999px;
     font-weight: 700;
@@ -55,7 +55,7 @@
     border-radius: 50%;
 
     background: rgba(255, 255, 255, 0.92);
-    color: #222;
+    color: var(--brand-ink);
     font-size: 2rem;
     font-weight: 700;
     line-height: 1;
@@ -80,8 +80,153 @@
 }
 
 #starText {
-    color: #e86f5c;
+    color: #e25544;
     margin-right: 10px;
+}
+
+.restaurant-info-section {
+    background-color: #ffffff;
+}
+
+.detail-section {
+    padding: 42px 0;
+    border-bottom: 1px solid var(--brand-line);
+}
+
+.detail-section h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: var(--brand-ink);
+}
+
+.section-heading-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.section-heading-row h2 {
+    margin-bottom: 0;
+}
+
+.location-hours-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.5fr;
+    gap: 48px;
+    align-items: start;
+    max-width: 900px;
+}
+
+.location-column {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.address-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 18px 20px;
+
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.address-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+
+    background: var(--brand-mint);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.2rem;
+}
+
+.address-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--brand-green);
+    margin-bottom: 4px;
+}
+
+.restaurant-address {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--brand-ink);
+}
+
+.map-placeholder {
+    height: 230px;
+    background: var(--brand-mint);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.hours-card {
+    background: none;
+    margin-left: 20px;
+}
+
+.open-badge {
+    display: inline-block;
+    width: auto;
+    background: var(--brand-mint);
+    color: var(--brand-green);
+    padding: 10px 15px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+.hours-list {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding-left: 20px;
+}
+
+.hours-list div {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 14px;
+    border-radius: 10px;
+}
+
+.hours-list span {
+    font-weight: 700;
+}
+
+.hours-list p {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--brand-ink);
+}
+
+.hours-list .today {
+    background: var(--brand-green);
+}
+
+.hours-list .today span,
+.hours-list .today p {
+    color: #ffffff;
 }
 
 @media (max-width: 768px) {
@@ -93,4 +238,21 @@
         font-size: 2.4rem;
     }
 
+    .location-hours-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        max-width: none;
+    }
+
+    .hours-card {
+        margin: 0;
+    }
+
+    .section-heading-row {
+        align-items: flex-start;
+        gap: 12px;
+        flex-direction: column;
+    }
 }
+
+/* color-> common */
