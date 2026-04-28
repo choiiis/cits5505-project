@@ -353,12 +353,14 @@
 
 .review-photos {
     display: flex;
+    flex-wrap: wrap;
     gap: 14px;
     margin-top: 18px;
 }
 
 .review-photos img {
     width: 240px;
+    max-width: 100%;
     height: 180px;
     object-fit: cover;
     border-radius: 12px;
