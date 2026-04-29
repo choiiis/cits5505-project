@@ -366,6 +366,39 @@
     border-radius: 12px;
 }
 
+.review-pagination {
+    max-width: 900px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 22px;
+    margin-top: 36px;
+}
+
+.review-pagination button {
+    border: none;
+    background: transparent;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.review-pagination .active {
+    color: var(--brand-ink);
+}
+
+.review-pagination .page-arrow {
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--brand-ink);
+}
+
+.review-pagination .disabled {
+    color: #c7cdd3;
+    cursor: default;
+}
+
 @media (max-width: 768px) {
     .restaurant-hero {
         height: 320px;
