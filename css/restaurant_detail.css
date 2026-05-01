@@ -622,6 +622,36 @@
     opacity: 0.9;
 }
 
+.write-review-mobile {
+    display: none;
+    margin: 0;
+}
+
+.contact-review-panel-mobile {
+    display: none;
+}
+
+@media (max-width: 1200px) {
+    .restaurant-detail-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .contact-review-panel {
+        display: none;
+    }
+
+    .contact-review-panel-mobile {
+        display: block;
+    }
+
+    .write-review-mobile {
+        display: inline-block;
+        margin: 0;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}
 
 @media (max-width: 768px) {
     .restaurant-hero {
@@ -663,5 +693,9 @@
 
     .review-filter-panel {
         position: static;
+    }
+
+    .write-review-mobile {
+        margin-top: 5px;
     }
 }
