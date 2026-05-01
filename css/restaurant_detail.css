@@ -88,6 +88,18 @@
     background-color: #ffffff;
 }
 
+.restaurant-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 900px) minmax(0, 300px);
+    gap: 64px;
+    align-items: start;
+}
+
+.restaurant-detail-main {
+    min-width: 0;
+}
+
+
 .detail-section {
     padding: 42px 0;
     border-bottom: 1px solid var(--brand-line);
@@ -548,6 +560,68 @@
     color: #c7cdd3;
     cursor: default;
 }
+
+.contact-review-panel {
+    display: block;
+    position: sticky;
+    top: 96px;
+    margin-top: 24px;
+    padding: 28px 32px;
+    border: 1px solid var(--brand-line);
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.contact-review-panel h3 {
+    margin-bottom: 24px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--brand-ink);
+}
+
+.contact-label {
+    margin: 18px 0 8px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--brand-green);
+}
+
+.contact-link {
+    display: block;
+    color: var(--brand-ink);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.contact-link:hover {
+    color: var(--brand-green);
+    text-decoration: underline;
+}
+
+.contact-divider {
+    margin: 20px 0;
+    border-top: 1px solid var(--brand-line);
+    opacity: 0.5;
+}
+
+.write-review-btn {
+    display: block;
+    margin: 24px auto 0;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 999px;
+    background: var(--brand-green);
+    color: #ffffff;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.write-review-btn:hover {
+    opacity: 0.9;
+}
+
 
 @media (max-width: 768px) {
     .restaurant-hero {
