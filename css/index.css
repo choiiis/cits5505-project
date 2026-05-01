@@ -1,0 +1,34 @@
+.hero-section {
+  background: #ffffff;
+  border-bottom: 1px solid var(--brand-line);
+}
+
+.hero-copy {
+  max-width: 42rem;
+}
+
+.hero-image {
+  max-height: 360px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.hero-search {
+  margin-bottom: -3.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+main {
+  padding-bottom: 5rem;
+}
+
+@media (max-width: 991.98px) {
+  .hero-search {
+    margin-bottom: 0;
+  }
+
+  main {
+    padding-bottom: 2rem;
+  }
+}
