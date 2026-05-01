@@ -631,6 +631,132 @@
     display: none;
 }
 
+.review-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.25s ease;
+    z-index: 1000;
+}
+
+.review-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.review-slide-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    max-width: 90%;
+    height: 100vh;
+    padding: 32px;
+    background: #ffffff;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1001;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+.review-slide-panel.active {
+    transform: translateX(0);
+}
+
+.review-panel-close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    border: none;
+    background: none;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--brand-ink);
+}
+
+.review-slide-panel h2 {
+    margin-bottom: 24px;
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--brand-ink);
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.review-form label {
+    font-weight: 700;
+    color: var(--brand-ink);
+}
+
+.review-form input,
+.review-form select,
+.review-form textarea {
+    padding: 11px 12px;
+    border: 1px solid var(--brand-line);
+    border-radius: 10px;
+    font: inherit;
+}
+
+.review-form button {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 999px;
+    background: var(--brand-green);
+    color: #ffffff;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.review-login-message {
+    padding: 24px;
+    border: 1px solid var(--brand-line);
+    border-radius: 16px;
+    background: var(--brand-mint);
+    text-align: center;
+}
+
+.review-login-message p {
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: var(--brand-ink);
+}
+
+.login-review-btn {
+    display: inline-block;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: var(--brand-green);
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 800;
+}
+
+.review-user-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--brand-line);
+    border-radius: 14px;
+    background: #ffffff;
+    margin-bottom: 8px;
+}
+
+.review-user-preview img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 @media (max-width: 1200px) {
     .restaurant-detail-layout {
         grid-template-columns: 1fr;

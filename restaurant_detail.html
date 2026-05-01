@@ -14,6 +14,50 @@
 <body>
     <div id="headerInclude"></div>
 
+    <div class="review-overlay" id="reviewOverlay"></div>
+
+    <aside class="review-slide-panel" id="reviewSlidePanel">
+        <button type="button" class="review-panel-close" id="closeReviewPanel">
+            ×
+        </button>
+
+        <h2>Write a review</h2>
+
+        <!-- Not logged in -->
+        <div class="review-login-message" id="reviewLoginMessage">
+            <p>Please log in to write a review.</p>
+            <a href="./login.html" class="login-review-btn">
+                Log in
+            </a>
+        </div>
+
+        <!-- Logged in -->
+        <form class="review-form" id="reviewForm">
+            <div class="review-user-preview">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User profile">
+                <div>
+                    <strong>Alex</strong>
+                </div>
+            </div>
+
+            <label for="reviewRating">Rating</label>
+            <select id="reviewRating">
+                <option value="5">★★★★★</option>
+                <option value="4">★★★★☆</option>
+                <option value="3">★★★☆☆</option>
+                <option value="2">★★☆☆☆</option>
+                <option value="1">★☆☆☆☆</option>
+            </select>
+
+            <label for="reviewText">Review</label>
+            <textarea id="reviewText" rows="5" placeholder="Share your experience"></textarea>
+
+            <label for="reviewPhotos">Photos</label>
+            <input type="file" id="reviewPhotos" accept="image/*" multiple>
+
+            <button type="submit">Submit review</button>
+        </form>
+    </aside>
     <main>
         <!-- Hero Banner -->
         <section class="restaurant-hero">
@@ -181,7 +225,7 @@
                     <section class="detail-section reviews-section">
                         <div class="section-heading-row">
                             <h2>Reviews</h2>
-                            <button class="write-review-btn write-review-mobile">
+                            <button class="write-review-btn write-review-mobile open-review-panel">
                                 Write a review
                             </button>
                         </div>
@@ -392,7 +436,7 @@
 
                     <div class="contact-divider"></div>
 
-                    <button class="write-review-btn">
+                    <button class="write-review-btn open-review-panel">
                         Write a review
                     </button>
                 </aside>
