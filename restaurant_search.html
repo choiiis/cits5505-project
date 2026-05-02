@@ -1,1 +1,512 @@
 <!--  restaurant_search.html -->
+  <!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search Restaurants | TableTrail</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --brand-green: #15803d;
+      --brand-ink: #1f2933;
+      --brand-coral: #e25544;
+      --brand-line: #d9e2ec;
+    }
+
+    body {
+      color: var(--brand-ink);
+      background: #f7f9fb;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .brand-mark,
+    .nav-link.active {
+      color: var(--brand-green) !important;
+    }
+
+    .btn,
+    .card,
+    .form-control,
+    .form-select {
+      border-radius: 8px;
+    }
+
+    .btn-success {
+      background: var(--brand-green);
+      border-color: var(--brand-green);
+    }
+
+    .btn-outline-success {
+      border-color: var(--brand-green);
+      color: var(--brand-green);
+    }
+
+    .btn-outline-success:hover {
+      background: var(--brand-green);
+      border-color: var(--brand-green);
+    }
+
+    .search-bar,
+    .restaurant-card {
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
+      box-shadow: 0 .25rem .75rem rgba(31, 41, 51, .06);
+    }
+
+    .search-bar {
+      padding: .75rem;
+    }
+
+    .restaurant-card {
+      overflow: hidden;
+    }
+
+    .restaurant-card .card-img-top {
+      height: 190px;
+      object-fit: cover;
+    }
+
+    .rating {
+      color: var(--brand-coral);
+      font-weight: 700;
+    }
+
+    .rating span {
+      color: #4d5b68;
+      font-weight: 400;
+    }
+
+    .map-panel {
+      min-height: 340px;
+      background:
+        linear-gradient(90deg, rgba(21, 128, 61, .12) 1px, transparent 1px),
+        linear-gradient(rgba(226, 85, 68, .12) 1px, transparent 1px),
+        #ffffff;
+      background-size: 42px 42px;
+      border: 1px solid var(--brand-line);
+      border-radius: 8px;
+    }
+
+    .map-pin {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--brand-coral);
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 0 2px rgba(226, 85, 68, .35);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold brand-mark" href="index.html">TableTrail</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link active fw-semibold" href="search.html">Search</a></li>
+          <li class="nav-item"><a class="nav-link" href="bookmarks.html">Bookmarks</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="owner.html">Owner</a></li>
+          <li class="nav-item"><a class="nav-link" href="admin.html">Admin</a></li>
+          <li class="nav-item ms-lg-2"><a class="btn btn-dark btn-sm px-3" href="login.html">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <form class="search-bar row g-2 align-items-center mb-4" action="search.html">
+      <div class="col-lg-5">
+        <input class="form-control form-control-lg" id="keywordSearch" name="q" placeholder="Restaurant, cuisine, or dish" aria-label="Search restaurants">
+      </div>
+      <div class="col-lg-4">
+        <input class="form-control form-control-lg" id="locationSearch" name="location" placeholder="Suburb or city" aria-label="Search location">
+      </div>
+      <div class="col-lg-3 d-flex gap-2">
+        <button class="btn btn-success btn-lg flex-fill" type="submit">Search</button>
+        <a class="btn btn-outline-dark btn-lg" href="search.html?map=true" aria-label="Open map view">Map</a>
+      </div>
+    </form>
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-3">
+      <div>
+        <h1 class="h3 fw-bold mb-1">Search Results</h1>
+        <p class="text-secondary mb-0" id="summaryMount">Showing restaurants</p>
+      </div>
+      <div class="form-check form-switch align-self-lg-end">
+        <input class="form-check-input" type="checkbox" role="switch" id="mapToggle">
+        <label class="form-check-label" for="mapToggle">Show map</label>
+      </div>
+    </div>
+
+    <div class="row g-2 align-items-end mb-4">
+      <div class="col-md-4">
+        <label class="form-label small text-secondary" for="categoryFilter">Category</label>
+        <select class="form-select" id="categoryFilter">
+          <option value="">All categories</option>
+          <option>Healthy</option>
+          <option>Italian</option>
+          <option>Japanese</option>
+          <option>Mexican</option>
+          <option>Indian</option>
+          <option>Cafe</option>
+          <option>Korean</option>
+          <option>Seafood</option>
+          <option>Chinese</option>
+          <option>Vegan</option>
+          <option>BBQ</option>
+          <option>Dessert</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small text-secondary" for="locationFilter">Location</label>
+        <select class="form-select" id="locationFilter">
+          <option value="">All locations</option>
+          <option>Perth CBD</option>
+          <option>Northbridge</option>
+          <option>Fremantle</option>
+          <option>Subiaco</option>
+          <option>Victoria Park</option>
+          <option>Leederville</option>
+          <option>East Perth</option>
+          <option>Cottesloe</option>
+          <option>Mount Lawley</option>
+          <option>Burswood</option>
+          <option>Scarborough</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small text-secondary" for="ratingFilter">Rating</label>
+        <select class="form-select" id="ratingFilter">
+          <option value="">Any</option>
+          <option value="4.5">4.5+</option>
+          <option value="4">4.0+</option>
+          <option value="3.5">3.5+</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small text-secondary" for="sortFilter">Sort by</label>
+        <select class="form-select" id="sortFilter">
+          <option value="rating">Rating</option>
+          <option value="reviews">Reviews</option>
+          <option value="newest">Newest</option>
+        </select>
+      </div>
+    </div>
+
+    <section id="mapPreview" class="map-panel d-none p-4 mb-4 position-relative">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h2 class="h5">Map Preview</h2>
+          <p class="text-secondary mb-0">Static map-style view for comparing nearby restaurants.</p>
+        </div>
+        <span class="badge text-bg-light border">Perth area</span>
+      </div>
+      <div class="position-absolute map-pin" style="left:22%;top:56%"></div>
+      <div class="position-absolute map-pin" style="left:48%;top:42%"></div>
+      <div class="position-absolute map-pin" style="left:66%;top:65%"></div>
+      <div class="position-absolute map-pin" style="left:78%;top:35%"></div>
+    </section>
+
+    <div class="row g-3" id="resultsMount">
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Green Bowl Kitchen" data-category="Healthy" data-cuisine="Salads" data-location="Perth CBD" data-rating="4.8" data-reviews="324">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Green Bowl Kitchen" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Healthy</span><h3 class="h5 mt-2 mb-1">Green Bowl Kitchen</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="green-bowl" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Perth CBD &middot; $$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.8 (324)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Fresh bowls, cold-pressed juices, and quick lunches for city workers.</p>
+            <a href="restaurant.html?id=green-bowl" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Laneway Pizza Co." data-category="Italian" data-cuisine="Pizza" data-location="Northbridge" data-rating="4.7" data-reviews="512">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Laneway Pizza Co." loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Italian</span><h3 class="h5 mt-2 mb-1">Laneway Pizza Co.</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="laneway-pizza" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Northbridge &middot; $$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.7 (512)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Wood-fired pizza, shared plates, and a busy late-night laneway feel.</p>
+            <a href="restaurant.html?id=laneway-pizza" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Harbour Sushi Bar" data-category="Japanese" data-cuisine="Sushi" data-location="Fremantle" data-rating="4.6" data-reviews="286">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Harbour Sushi Bar" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Japanese</span><h3 class="h5 mt-2 mb-1">Harbour Sushi Bar</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="harbour-sushi" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Fremantle &middot; $$$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.6 (286)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Sashimi, hand rolls, and bento boxes close to the waterfront.</p>
+            <a href="restaurant.html?id=harbour-sushi" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Taco Yard" data-category="Mexican" data-cuisine="Tacos" data-location="Subiaco" data-rating="4.5" data-reviews="198">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Taco Yard" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Mexican</span><h3 class="h5 mt-2 mb-1">Taco Yard</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="taco-yard" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Subiaco &middot; $$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.5 (198)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Street tacos, loaded nachos, and fresh agua frescas.</p>
+            <a href="restaurant.html?id=taco-yard" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Spice Station" data-category="Indian" data-cuisine="Curry" data-location="Victoria Park" data-rating="4.9" data-reviews="641">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Spice Station" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Indian</span><h3 class="h5 mt-2 mb-1">Spice Station</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="spice-station" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Victoria Park &middot; $$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.9 (641)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Regional curries, tandoor breads, and family-style dining.</p>
+            <a href="restaurant.html?id=spice-station" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Morning Press Cafe" data-category="Cafe" data-cuisine="Brunch" data-location="Leederville" data-rating="4.4" data-reviews="154">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Morning Press Cafe" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Cafe</span><h3 class="h5 mt-2 mb-1">Morning Press Cafe</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="morning-press" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Leederville &middot; $$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9734; <span>4.4 (154)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Espresso, toasties, breakfast plates, and a sunny footpath setup.</p>
+            <a href="restaurant.html?id=morning-press" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Seoul Table BBQ" data-category="Korean" data-cuisine="BBQ" data-location="East Perth" data-rating="4.7" data-reviews="371">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Seoul Table BBQ" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Korean</span><h3 class="h5 mt-2 mb-1">Seoul Table BBQ</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="seoul-table" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">East Perth &middot; $$$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.7 (371)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Korean barbecue sets, banchan, and hot stone bibimbap.</p>
+            <a href="restaurant.html?id=seoul-table" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Coast Fish House" data-category="Seafood" data-cuisine="Seafood" data-location="Cottesloe" data-rating="4.6" data-reviews="229">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Coast Fish House" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Seafood</span><h3 class="h5 mt-2 mb-1">Coast Fish House</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="coast-fish" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Cottesloe &middot; $$$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.6 (229)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Grilled seafood, oysters, and coastal views near the beach.</p>
+            <a href="restaurant.html?id=coast-fish" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Noodle House Express" data-category="Chinese" data-cuisine="Noodles" data-location="Perth CBD" data-rating="4.3" data-reviews="267">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Noodle House Express" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Chinese</span><h3 class="h5 mt-2 mb-1">Noodle House Express</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="noodle-house" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Perth CBD &middot; $</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9734; <span>4.3 (267)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Fast noodle soups, dumplings, and takeaway bowls.</p>
+            <a href="restaurant.html?id=noodle-house" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Garden Vegan Deli" data-category="Vegan" data-cuisine="Plant-based" data-location="Mount Lawley" data-rating="4.8" data-reviews="312">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Garden Vegan Deli" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Vegan</span><h3 class="h5 mt-2 mb-1">Garden Vegan Deli</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="garden-vegan" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Mount Lawley &middot; $$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.8 (312)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Plant-based sandwiches, cakes, and colourful deli salads.</p>
+            <a href="restaurant.html?id=garden-vegan" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Smoke Yard Grill" data-category="BBQ" data-cuisine="Grill" data-location="Burswood" data-rating="4.5" data-reviews="445">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Smoke Yard Grill" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">BBQ</span><h3 class="h5 mt-2 mb-1">Smoke Yard Grill</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="smoke-yard" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Burswood &middot; $$$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.5 (445)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Slow-cooked brisket, ribs, burgers, and casual group dining.</p>
+            <a href="restaurant.html?id=smoke-yard" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-md-6 col-xl-4 restaurant-result" data-name="Sweet Street Dessert Bar" data-category="Dessert" data-cuisine="Dessert" data-location="Scarborough" data-rating="4.4" data-reviews="176">
+        <article class="card restaurant-card h-100">
+          <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=1200&q=80" class="card-img-top" alt="Sweet Street Dessert Bar" loading="lazy">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between gap-3">
+              <div><span class="badge text-bg-light border">Dessert</span><h3 class="h5 mt-2 mb-1">Sweet Street Dessert Bar</h3></div>
+              <button class="btn btn-sm btn-outline-success bookmark-toggle" data-bookmark="sweet-street" type="button">Save</button>
+            </div>
+            <p class="text-secondary mb-2">Scarborough &middot; $$</p>
+            <p class="rating mb-2">&#9733;&#9733;&#9733;&#9733;&#9734; <span>4.4 (176)</span></p>
+            <p class="card-text text-secondary flex-grow-1">Waffles, gelato, cakes, and late-night coffee near the coast.</p>
+            <a href="restaurant.html?id=sweet-street" class="btn btn-dark mt-auto">View details</a>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="alert alert-warning d-none mt-3" id="emptyState">No restaurants match these filters. Try another category or location.</div>
+  </main>
+
+  <footer class="border-top bg-white mt-5 py-4">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-2 small text-secondary">
+      <span>TableTrail restaurant discovery platform</span>
+      <span>Guest, user, owner, and admin UI flows</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const cards = Array.from(document.querySelectorAll(".restaurant-result"));
+    const keywordSearch = document.querySelector("#keywordSearch");
+    const locationSearch = document.querySelector("#locationSearch");
+    const categoryFilter = document.querySelector("#categoryFilter");
+    const locationFilter = document.querySelector("#locationFilter");
+    const ratingFilter = document.querySelector("#ratingFilter");
+    const sortFilter = document.querySelector("#sortFilter");
+    const summaryMount = document.querySelector("#summaryMount");
+    const resultsMount = document.querySelector("#resultsMount");
+    const emptyState = document.querySelector("#emptyState");
+    const mapToggle = document.querySelector("#mapToggle");
+    const mapPreview = document.querySelector("#mapPreview");
+
+    keywordSearch.value = params.get("q") || "";
+    locationSearch.value = params.get("location") || "";
+    categoryFilter.value = params.get("category") || "";
+
+    if (params.get("map") === "true") {
+      mapToggle.checked = true;
+      mapPreview.classList.remove("d-none");
+    }
+
+    function applyFilters() {
+      const query = keywordSearch.value.trim().toLowerCase();
+      const locationQuery = locationSearch.value.trim().toLowerCase();
+      const category = categoryFilter.value;
+      const location = locationFilter.value;
+      const minimumRating = Number(ratingFilter.value || 0);
+      const sortBy = sortFilter.value;
+
+      const sortedCards = cards.slice().sort((a, b) => {
+        if (sortBy === "reviews") return Number(b.dataset.reviews) - Number(a.dataset.reviews);
+        if (sortBy === "newest") return a.dataset.name.localeCompare(b.dataset.name);
+        return Number(b.dataset.rating) - Number(a.dataset.rating);
+      });
+
+      sortedCards.forEach((card) => resultsMount.appendChild(card));
+
+      let visibleCount = 0;
+      sortedCards.forEach((card) => {
+        const text = `${card.dataset.name} ${card.dataset.category} ${card.dataset.cuisine} ${card.dataset.location}`.toLowerCase();
+        const isVisible =
+          (!query || text.includes(query)) &&
+          (!locationQuery || card.dataset.location.toLowerCase().includes(locationQuery)) &&
+          (!category || card.dataset.category === category) &&
+          (!location || card.dataset.location === location) &&
+          (!minimumRating || Number(card.dataset.rating) >= minimumRating);
+
+        card.classList.toggle("d-none", !isVisible);
+        if (isVisible) visibleCount += 1;
+      });
+
+      const keyword = query || "restaurants";
+      summaryMount.textContent = `${visibleCount} results for "${keyword}"`;
+      emptyState.classList.toggle("d-none", visibleCount !== 0);
+    }
+
+    function initBookmarks() {
+      document.querySelectorAll("[data-bookmark]").forEach((button) => {
+        const id = button.dataset.bookmark;
+        const setState = () => {
+          const saved = JSON.parse(localStorage.getItem("tableTrailBookmarks") || "[]");
+          const isSaved = saved.includes(id);
+          button.textContent = isSaved ? "Saved" : "Save";
+          button.classList.toggle("btn-success", isSaved);
+          button.classList.toggle("btn-outline-success", !isSaved);
+        };
+
+        button.addEventListener("click", () => {
+          const saved = JSON.parse(localStorage.getItem("tableTrailBookmarks") || "[]");
+          const next = saved.includes(id) ? saved.filter((item) => item !== id) : [...saved, id];
+          localStorage.setItem("tableTrailBookmarks", JSON.stringify(next));
+          setState();
+        });
+
+        setState();
+      });
+    }
+
+    [keywordSearch, locationSearch].forEach((input) => input.addEventListener("input", applyFilters));
+    [categoryFilter, locationFilter, ratingFilter, sortFilter].forEach((input) => input.addEventListener("change", applyFilters));
+    mapToggle.addEventListener("change", (event) => {
+      mapPreview.classList.toggle("d-none", !event.target.checked);
+    });
+
+    initBookmarks();
+    applyFilters();
+  </script>
+</body>
+</html>
