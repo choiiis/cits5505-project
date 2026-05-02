@@ -88,6 +88,18 @@
     background-color: #ffffff;
 }
 
+.restaurant-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 900px) minmax(0, 300px);
+    gap: 64px;
+    align-items: start;
+}
+
+.restaurant-detail-main {
+    min-width: 0;
+}
+
+
 .detail-section {
     padding: 42px 0;
     border-bottom: 1px solid var(--brand-line);
@@ -245,45 +257,11 @@
     text-decoration: underline;
 }
 
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    max-width: 900px;
-}
-
-.menu-card {
-    background: #ffffff;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
-}
-
 .menu-card-image {
     width: 100%;
     height: 150px;
     object-fit: cover;
     display: block;
-}
-
-.menu-card-content {
-    padding: 16px;
-}
-
-.menu-card h3 {
-    font-size: 1.15rem;
-    font-weight: 800;
-    margin-bottom: 8px;
-}
-
-.menu-card p {
-    margin-bottom: 12px;
-    color: var(--brand-ink);
-}
-
-.menu-card span {
-    font-weight: 700;
-    color: var(--brand-green);
 }
 
 .reviews-section .section-heading-row,
@@ -333,17 +311,13 @@
     font-size: 0.9rem;
 }
 
-.rating-bar {
+.rating-progress {
     height: 8px;
-    background: #e5e7eb;
     border-radius: 999px;
-    overflow: hidden;
 }
 
-.rating-bar div {
-    height: 100%;
-    background: var(--brand-green);
-    border-radius: 999px;
+.rating-progress .progress-bar {
+    background-color: var(--brand-green);
 }
 
 .review-summary {
@@ -435,21 +409,6 @@
     color: var(--brand-green);
     font-size: 0.75rem;
     font-weight: 600;
-}
-
-.delete-review-btn {
-    padding: 7px 12px;
-    margin-left: auto;
-    border: 1px solid #fecaca;
-    border-radius: 999px;
-    background: #fff;
-    color: #dc2626;
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-
-.delete-review-btn:hover {
-    background: #fef2f2;
 }
 
 .review-user {
@@ -549,6 +508,179 @@
     cursor: default;
 }
 
+.contact-review-panel {
+    display: block;
+    position: sticky;
+    top: 96px;
+    margin-top: 24px;
+    padding: 28px 32px;
+    border: 1px solid var(--brand-line);
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.contact-review-panel h3 {
+    margin-bottom: 24px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--brand-ink);
+}
+
+.contact-label {
+    margin: 18px 0 8px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--brand-green);
+}
+
+.contact-link {
+    display: block;
+    color: var(--brand-ink);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.contact-link:hover {
+    color: var(--brand-green);
+    text-decoration: underline;
+}
+
+.contact-divider {
+    margin: 20px 0;
+    border-top: 1px solid var(--brand-line);
+    opacity: 0.5;
+}
+
+.write-review-mobile {
+    display: none;
+    margin: 0;
+}
+
+.contact-review-panel-mobile {
+    display: none;
+}
+
+.review-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.25s ease;
+    z-index: 1000;
+}
+
+.review-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.review-slide-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    max-width: 90%;
+    height: 100vh;
+    padding: 32px;
+    background: #ffffff;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1001;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+.review-slide-panel.active {
+    transform: translateX(0);
+}
+
+.review-panel-close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    border: none;
+    background: none;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--brand-ink);
+}
+
+.review-slide-panel h2 {
+    margin-bottom: 24px;
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--brand-ink);
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.review-form label {
+    font-weight: 700;
+    color: var(--brand-ink);
+}
+
+.review-login-message {
+    padding: 24px;
+    border: 1px solid var(--brand-line);
+    border-radius: 16px;
+    background: var(--brand-mint);
+    text-align: center;
+}
+
+.review-login-message p {
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: var(--brand-ink);
+}
+
+
+.review-user-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--brand-line);
+    border-radius: 14px;
+    background: #ffffff;
+    margin-bottom: 8px;
+}
+
+.review-user-preview img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+@media (max-width: 1200px) {
+    .restaurant-detail-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .contact-review-panel {
+        display: none;
+    }
+
+    .contact-review-panel-mobile {
+        display: block;
+    }
+
+    .write-review-mobile {
+        display: inline-block;
+        margin: 0;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}
+
 @media (max-width: 768px) {
     .restaurant-hero {
         height: 320px;
@@ -574,11 +706,6 @@
         flex-direction: column;
     }
 
-    .menu-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
     .review-summary {
         grid-template-columns: 1fr;
     }
@@ -589,5 +716,9 @@
 
     .review-filter-panel {
         position: static;
+    }
+
+    .write-review-mobile {
+        margin-top: 5px;
     }
 }
