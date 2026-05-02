@@ -20,13 +20,13 @@
     <!-- Not logged in -->
     <div class="review-login-message" id="reviewLoginMessage">
         <p>Please log in to write a review.</p>
-        <a href="./login.html" class="btn btn-success rounded-pill fw-bold px-4">
+        <a href="#" class="btn btn-success rounded-pill fw-bold px-4">
             Log in
         </a>
     </div>
 
     <!-- Logged in -->
-    <form class="review-form" id="reviewForm">
+    <form class="review-form" id="reviewForm" method="post" action="#">
         <div class="review-user-preview">
             <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User profile">
             <div>
@@ -35,7 +35,7 @@
         </div>
 
         <label for="reviewRating">Rating</label>
-        <select id="reviewRating" class="form-select">
+        <select id="reviewRating" name="rating" class="form-select">
             <option value="5">★★★★★</option>
             <option value="4">★★★★☆</option>
             <option value="3">★★★☆☆</option>
@@ -44,10 +44,11 @@
         </select>
 
         <label for="reviewText">Review</label>
-        <textarea id="reviewText" class="form-control" rows="5" placeholder="Share your experience"></textarea>
+        <textarea id="reviewText" name="review_text" class="form-control" rows="5"
+            placeholder="Share your experience"></textarea>
 
         <label for="reviewPhotos">Photos</label>
-        <input type="file" id="reviewPhotos" class="form-control" accept="image/*" multiple>
+        <input type="file" id="reviewPhotos" name="review_photos" class="form-control" accept="image/*" multiple>
         <button type="submit" class="btn btn-success rounded-pill fw-bold py-2 mt-3">
             Submit review
         </button>
@@ -56,8 +57,7 @@
 <main>
     <!-- Hero Banner -->
     <section class="restaurant-hero">
-        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80"
-            alt="Restaurant banner image">
+        <img src="{{ restaurant.hero_image }}" alt="{{ restaurant.name }} banner image">
 
         <!-- bookmark icon -->
         <button class="restaurant-bookmark-btn" type="button">
@@ -65,13 +65,13 @@
         </button>
         <div class="restaurant-hero-overlay">
             <div class="container">
-                <p class="restaurant-category" id="categoryBadge">Italian</p>
+                <p class="restaurant-category" id="categoryBadge">{{ restaurant.category }}</p>
 
-                <h1 id="restaurantName">Laneway Pizza Co.</h1>
+                <h1 id="restaurantName">{{ restaurant.name }}</h1>
 
                 <p class="restaurant-rating-line">
-                    <span id="starText">★★★★★</span>
-                    <span id="ratingText">4.7 · 512 reviews</span>
+                    <span id="starText">{{ restaurant.star_text }}</span>
+                    <span id="ratingText">{{ restaurant.rating }} · {{ restaurant.review_count }} reviews</span>
                 </p>
             </div>
         </div>
@@ -103,7 +103,7 @@
                                 <div>
                                     <span class="address-label">Address</span>
                                     <p class="restaurant-address">
-                                        Barrack St, Perth, WA 6000
+                                        {{ restaurant.address }}
                                     </p>
                                 </div>
                             </div>
@@ -115,40 +115,12 @@
                                 ● Open now
                             </div>
                             <div class="hours-list">
-                                <div class="today">
-                                    <span>Mon</span>
-                                    <p>7:00 AM - 11:00 PM</p>
+                                {% for item in opening_hours %}
+                                <div class="{% if item.is_today %}today{% endif %}">
+                                    <span>{{ item.day }}</span>
+                                    <p>{{ item.time }}</p>
                                 </div>
-
-                                <div>
-                                    <span>Tue</span>
-                                    <p>7:00 AM - 11:00 PM</p>
-                                </div>
-
-                                <div>
-                                    <span>Wed</span>
-                                    <p>7:00 AM - 11:00 PM</p>
-                                </div>
-
-                                <div>
-                                    <span>Thu</span>
-                                    <p>7:00 AM - 11:00 PM</p>
-                                </div>
-
-                                <div>
-                                    <span>Fri</span>
-                                    <p>7:00 AM - 12:00 AM</p>
-                                </div>
-
-                                <div>
-                                    <span>Sat</span>
-                                    <p>8:00 AM - 12:00 AM</p>
-                                </div>
-
-                                <div>
-                                    <span>Sun</span>
-                                    <p>8:00 AM - 10:00 PM</p>
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
 
@@ -161,67 +133,36 @@
                     </div>
 
                     <p class="contact-label">Phone</p>
-                    <a href="tel:+61812345678" class="contact-link">+61 8 1234 5678</a>
-
+                    <a href="tel:{{ restaurant.phone|replace(' ', '') }}" class="contact-link">
+                        {{ restaurant.phone }}
+                    </a>
                     <p class="contact-label">Website</p>
-                    <a href="https://example.com" target="_blank" class="contact-link">Visit website</a>
+                    <a href="{{ restaurant.website }}" target="_blank" class="contact-link">Visit website</a>
                 </section>
                 <!-- Menu -->
                 <section class="detail-section" id="menu-section">
                     <div class="section-heading-row" id="menu-section-heading">
                         <h2>Menu highlights</h2>
-                        <a href="./restaurant_menu.html" class="section-link">View full menu ></a>
+                        <a href="{{ url_for('restaurant_menu', restaurant_id=restaurant.id) }}" class="section-link">
+                            View full menu >
+                        </a>
                     </div>
 
                     <div class="row g-3">
+                        {% for item in menu_items %}
                         <div class="col-md-6">
                             <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                                <img class="card-img-top menu-card-image" src="./images/margherita.jpg"
-                                    alt="Margherita Pizza">
+                                <img class="card-img-top menu-card-image"
+                                    src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
 
                                 <div class="card-body">
-                                    <h3 class="card-title h5 fw-bold">Margherita Pizza</h3>
-                                    <p class="card-text mb-2">Tomato, mozzarella, basil</p>
-                                    <span class="fw-bold text-success">$22</span>
+                                    <h3 class="card-title h5 fw-bold">{{ item.name }}</h3>
+                                    <p class="card-text mb-2">{{ item.description }}</p>
+                                    <span class="fw-bold text-success">{{ item.price }}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                                <img class="card-img-top menu-card-image" src="./images/margherita.jpg"
-                                    alt="Margherita Pizza">
-
-                                <div class="card-body">
-                                    <h3 class="card-title h5 fw-bold">Margherita Pizza</h3>
-                                    <p class="card-text mb-2">Tomato, mozzarella, basil</p>
-                                    <span class="fw-bold text-success">$22</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                                <img class="card-img-top menu-card-image" src="./images/margherita.jpg"
-                                    alt="Margherita Pizza">
-
-                                <div class="card-body">
-                                    <h3 class="card-title h5 fw-bold">Margherita Pizza</h3>
-                                    <p class="card-text mb-2">Tomato, mozzarella, basil</p>
-                                    <span class="fw-bold text-success">$22</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                                <img class="card-img-top menu-card-image" src="./images/margherita.jpg"
-                                    alt="Margherita Pizza">
-
-                                <div class="card-body">
-                                    <h3 class="card-title h5 fw-bold">Margherita Pizza</h3>
-                                    <p class="card-text mb-2">Tomato, mozzarella, basil</p>
-                                    <span class="fw-bold text-success">$22</span>
-                                </div>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </section>
                 <!-- Reviews -->
@@ -236,47 +177,21 @@
                     <!-- Review summary / distribution / filters -->
                     <div class="review-summary">
                         <div class="review-score-box">
-                            <strong>4.7</strong>
-                            <span class="review-stars">★★★★★</span>
-                            <p>Based on 128 reviews</p>
+                            <strong>{{ restaurant.rating }}</strong>
+                            <span class="review-stars">{{ restaurant.star_text }}</span>
+                            <p>Based on {{ restaurant.review_count }} reviews</p>
                         </div>
 
                         <div class="rating-distribution">
+                            {% for row in review_summary.distribution %}
                             <div class="rating-row">
-                                <span>5</span>
+                                <span>{{ row.stars }}</span>
                                 <div class="progress rating-progress">
-                                    <div class="progress-bar" style="width: 72%;"></div>
+                                    <div class="progress-bar" style="--progress-width: {{ row.percentage }}%;"></div>
                                 </div>
-                                <span>92</span>
+                                <span>{{ row.count }}</span>
                             </div>
-                            <div class="rating-row">
-                                <span>4</span>
-                                <div class="progress rating-progress">
-                                    <div class="progress-bar" style="width: 18%;"></div>
-                                </div>
-                                <span>23</span>
-                            </div>
-                            <div class="rating-row">
-                                <span>3</span>
-                                <div class="progress rating-progress">
-                                    <div class="progress-bar" style="width: 6%;"></div>
-                                </div>
-                                <span>8</span>
-                            </div>
-                            <div class="rating-row">
-                                <span>2</span>
-                                <div class="progress rating-progress">
-                                    <div class="progress-bar" style="width: 3%;"></div>
-                                </div>
-                                <span>4</span>
-                            </div>
-                            <div class="rating-row">
-                                <span>1</span>
-                                <div class="progress rating-progress">
-                                    <div class="progress-bar" style="width: 1%;"></div>
-                                </div>
-                                <span>1</span>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                     <div class="reviews-content-layout">
@@ -336,88 +251,49 @@
                         </div>
                         <div class="review-main-content">
                             <div class="review-list">
+                                {% for review in reviews %}
                                 <article class="review-item">
                                     <div class="review-top-row">
                                         <div class="review-user">
-                                            <img src="https://randomuser.me/api/portraits/men/32.jpg"
-                                                alt="Reviewer profile">
+                                            <img src="{{ review.profile_image }}" alt="{{ review.username }} profile">
                                             <div class="review-user-info">
                                                 <div class="review-name-row">
-                                                    <h3>Alex</h3>
+                                                    <h3>{{ review.username }}</h3>
+
+                                                    {% if review.is_author %}
                                                     <span class="my-review-label">Your review</span>
+                                                    {% endif %}
                                                 </div>
-                                                <p>03 Apr 2026 · 12 reviews</p>
+                                                <p>{{ review.date }} · {{ review.review_count }} reviews</p>
                                             </div>
                                         </div>
+
+                                        {% if review.is_author %}
                                         <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3">
                                             Delete
                                         </button>
+                                        {% endif %}
                                     </div>
 
                                     <div class="review-rating-row">
-                                        <span class="review-stars">★★★★★</span>
+                                        <span class="review-stars">
+                                            {{ "★" * review.rating }}{{ "☆" * (5 - review.rating) }}
+                                        </span>
                                     </div>
 
                                     <p class="review-text">
-                                        Great pizza and a nice late-night atmosphere. The crust was perfectly crispy
-                                        and
-                                        the
-                                        staff were really friendly.
+                                        {{ review.content }}
                                     </p>
 
+                                    {% if review.photos %}
                                     <div class="review-photos">
-                                        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80"
-                                            alt="Pizza review photo">
-
-                                        <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=80"
-                                            alt="Dining area review photo">
-
+                                        {% for photo in review.photos %}
+                                        <img src="{{ photo }}" alt="Review photo for {{ restaurant.name }}">
+                                        {% endfor %}
                                     </div>
+                                    {% endif %}
                                 </article>
-
-                                <article class="review-item">
-                                    <div class="review-user">
-                                        <img src="https://randomuser.me/api/portraits/women/44.jpg"
-                                            alt="Reviewer profile">
-                                        <div>
-                                            <h3>Mia</h3>
-                                            <p>31 Mar 2026 · 8 reviews</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="review-rating-row">
-                                        <span class="review-stars">★★★★☆</span>
-                                    </div>
-
-                                    <p class="review-text">
-                                        Good food overall and the dessert was definitely the highlight. It gets a
-                                        little
-                                        busy on
-                                        weekends, but still worth visiting.
-                                    </p>
-                                </article>
-
-                                <article class="review-item">
-                                    <div class="review-user">
-                                        <img src="https://randomuser.me/api/portraits/men/75.jpg"
-                                            alt="Reviewer profile">
-                                        <div>
-                                            <h3>Daniel</h3>
-                                            <p>28 Mar 2026 · 15 reviews</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="review-rating-row">
-                                        <span class="review-stars">★★★★★</span>
-                                    </div>
-
-                                    <p class="review-text">
-                                        Loved the truffle mushroom pizza and tiramisu. Cozy atmosphere and quick
-                                        service
-                                        made it
-                                        a great place for dinner with friends.
-                                    </p>
-                                </article>
+                                {% endfor %}
                             </div>
                             <div class="review-pagination">
                                 <button type="button" class="page-arrow disabled">‹</button>

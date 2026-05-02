@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Menu | {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <h1>{{ restaurant.name }} Menu</h1>
+    <p>This restaurant menu page is under construction.</p>
+
+    <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}" class="btn btn-outline-success">
+        Back to restaurant
+    </a>
+</section>
+{% endblock %}

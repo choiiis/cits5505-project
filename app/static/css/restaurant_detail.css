@@ -317,6 +317,7 @@
 }
 
 .rating-progress .progress-bar {
+    width: var(--progress-width);
     background-color: var(--brand-green);
 }
 
