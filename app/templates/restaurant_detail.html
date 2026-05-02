@@ -311,11 +311,12 @@
                 <h3>Contact</h3>
 
                 <p class="contact-label">Phone</p>
-                <a href="tel:+61812345678" class="contact-link">+61 8 1234 5678</a>
+                <a href="tel:{{ restaurant.phone|replace(' ', '') }}" class="contact-link">
+                    {{ restaurant.phone }}
+                </a>
 
                 <p class="contact-label">Website</p>
-                <a href="https://example.com" target="_blank" class="contact-link">Visit website</a>
-
+                <a href="{{ restaurant.website }}" target="_blank" class="contact-link">Visit website</a>
                 <div class="contact-divider"></div>
 
                 <button class="btn btn-success rounded-pill fw-bold w-100 py-2 open-review-panel">
