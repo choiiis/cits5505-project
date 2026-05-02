@@ -26,7 +26,7 @@
         <!-- Not logged in -->
         <div class="review-login-message" id="reviewLoginMessage">
             <p>Please log in to write a review.</p>
-            <a href="./login.html" class="login-review-btn">
+            <a href="./login.html" class="btn btn-success rounded-pill fw-bold px-4">
                 Log in
             </a>
         </div>
@@ -41,7 +41,7 @@
             </div>
 
             <label for="reviewRating">Rating</label>
-            <select id="reviewRating">
+            <select id="reviewRating" class="form-select">
                 <option value="5">★★★★★</option>
                 <option value="4">★★★★☆</option>
                 <option value="3">★★★☆☆</option>
@@ -50,12 +50,13 @@
             </select>
 
             <label for="reviewText">Review</label>
-            <textarea id="reviewText" rows="5" placeholder="Share your experience"></textarea>
+            <textarea id="reviewText" class="form-control" rows="5" placeholder="Share your experience"></textarea>
 
             <label for="reviewPhotos">Photos</label>
-            <input type="file" id="reviewPhotos" accept="image/*" multiple>
-
-            <button type="submit">Submit review</button>
+            <input type="file" id="reviewPhotos" class="form-control" accept="image/*" multiple>
+            <button type="submit" class="btn btn-success rounded-pill fw-bold py-2 mt-3">
+                Submit review
+            </button>
         </form>
     </aside>
     <main>
@@ -178,45 +179,53 @@
                             <a href="./restaurant_menu.html" class="section-link">View full menu ></a>
                         </div>
 
-                        <div class="menu-grid">
-                            <div class="menu-card">
-                                <img class="menu-card-image" src="./images/margherita.jpg" alt="Margherita Pizza">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                                    <img class="card-img-top menu-card-image" src="./images/margherita.jpg"
+                                        alt="Margherita Pizza">
 
-                                <div class="menu-card-content">
-                                    <h3>Margherita Pizza</h3>
-                                    <p>Tomato, mozzarella, basil</p>
-                                    <span>$22</span>
+                                    <div class="card-body">
+                                        <h3 class="card-title h5 fw-bold">Margherita Pizza</h3>
+                                        <p class="card-text mb-2">Tomato, mozzarella, basil</p>
+                                        <span class="fw-bold text-success">$22</span>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                                    <img class="card-img-top menu-card-image" src="./images/margherita.jpg"
+                                        alt="Margherita Pizza">
 
-
-                            <div class="menu-card">
-                                <img class="menu-card-image" src="./images/margherita.jpg" alt="Truffle Mushroom Pizza">
-
-                                <div class="menu-card-content">
-
-                                    <h3>Truffle Mushroom Pizza</h3>
-                                    <p>Mushrooms, truffle oil, parmesan</p>
-                                    <span>$26</span>
+                                    <div class="card-body">
+                                        <h3 class="card-title h5 fw-bold">Margherita Pizza</h3>
+                                        <p class="card-text mb-2">Tomato, mozzarella, basil</p>
+                                        <span class="fw-bold text-success">$22</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="menu-card">
-                                <img class="menu-card-image" src="./images/margherita.jpg" alt="Garlic Bread">
+                            <div class="col-md-6">
+                                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                                    <img class="card-img-top menu-card-image" src="./images/margherita.jpg"
+                                        alt="Margherita Pizza">
 
-                                <div class="menu-card-content">
-                                    <h3>Garlic Bread</h3>
-                                    <p>Toasted bread with garlic butter</p>
-                                    <span>$12</span>
+                                    <div class="card-body">
+                                        <h3 class="card-title h5 fw-bold">Margherita Pizza</h3>
+                                        <p class="card-text mb-2">Tomato, mozzarella, basil</p>
+                                        <span class="fw-bold text-success">$22</span>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                                    <img class="card-img-top menu-card-image" src="./images/margherita.jpg"
+                                        alt="Margherita Pizza">
 
-                            <div class="menu-card">
-                                <img class="menu-card-image" src="./images/margherita.jpg" alt="Tiramisu">
-
-                                <div class="menu-card-content">
-                                    <h3>Tiramisu</h3>
-                                    <p>Coffee, mascarpone, cocoa</p>
-                                    <span>$14</span>
+                                    <div class="card-body">
+                                        <h3 class="card-title h5 fw-bold">Margherita Pizza</h3>
+                                        <p class="card-text mb-2">Tomato, mozzarella, basil</p>
+                                        <span class="fw-bold text-success">$22</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -225,7 +234,8 @@
                     <section class="detail-section reviews-section">
                         <div class="section-heading-row">
                             <h2>Reviews</h2>
-                            <button class="write-review-btn write-review-mobile open-review-panel">
+                            <button
+                                class="btn btn-success rounded-pill fw-bold px-3 py-2 write-review-mobile open-review-panel">
                                 Write a review
                             </button>
                         </div>
@@ -240,36 +250,36 @@
                             <div class="rating-distribution">
                                 <div class="rating-row">
                                     <span>5</span>
-                                    <div class="rating-bar">
-                                        <div style="width: 72%;"></div>
+                                    <div class="progress rating-progress">
+                                        <div class="progress-bar" style="width: 72%;"></div>
                                     </div>
                                     <span>92</span>
                                 </div>
                                 <div class="rating-row">
                                     <span>4</span>
-                                    <div class="rating-bar">
-                                        <div style="width: 18%;"></div>
+                                    <div class="progress rating-progress">
+                                        <div class="progress-bar" style="width: 18%;"></div>
                                     </div>
                                     <span>23</span>
                                 </div>
                                 <div class="rating-row">
                                     <span>3</span>
-                                    <div class="rating-bar">
-                                        <div style="width: 6%;"></div>
+                                    <div class="progress rating-progress">
+                                        <div class="progress-bar" style="width: 6%;"></div>
                                     </div>
                                     <span>8</span>
                                 </div>
                                 <div class="rating-row">
                                     <span>2</span>
-                                    <div class="rating-bar">
-                                        <div style="width: 3%;"></div>
+                                    <div class="progress rating-progress">
+                                        <div class="progress-bar" style="width: 3%;"></div>
                                     </div>
                                     <span>4</span>
                                 </div>
                                 <div class="rating-row">
                                     <span>1</span>
-                                    <div class="rating-bar">
-                                        <div style="width: 1%;"></div>
+                                    <div class="progress rating-progress">
+                                        <div class="progress-bar" style="width: 1%;"></div>
                                     </div>
                                     <span>1</span>
                                 </div>
@@ -345,7 +355,10 @@
                                                     <p>03 Apr 2026 · 12 reviews</p>
                                                 </div>
                                             </div>
-                                            <button type="button" class="delete-review-btn">Delete</button>
+                                            <button type="button"
+                                                class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                                Delete
+                                            </button>
                                         </div>
 
                                         <div class="review-rating-row">
@@ -436,7 +449,7 @@
 
                     <div class="contact-divider"></div>
 
-                    <button class="write-review-btn open-review-panel">
+                    <button class="btn btn-success rounded-pill fw-bold w-100 py-2 open-review-panel">
                         Write a review
                     </button>
                 </aside>
