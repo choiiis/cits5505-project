@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}{{ restaurant.name }} | TableTrail{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/restaurant_detail.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="review-overlay" id="reviewOverlay"></div>
+
+<aside class="review-slide-panel" id="reviewSlidePanel">
+    <button type="button" class="review-panel-close" id="closeReviewPanel">
+        ×
+    </button>
+
+    <h2>Write a review</h2>
+
+    <!-- Not logged in -->
+    <div class="review-login-message" id="reviewLoginMessage">
+        <p>Please log in to write a review.</p>
+        <a href="#" class="btn btn-success rounded-pill fw-bold px-4">
+            Log in
+        </a>
+    </div>
+
+    <!-- Logged in -->
+    <form class="review-form" id="reviewForm" method="post" action="#">
+        <div class="review-user-preview">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User profile">
+            <div>
+                <strong>Alex</strong>
+            </div>
+        </div>
+
+        <label for="reviewRating">Rating</label>
+        <select id="reviewRating" name="rating" class="form-select">
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="1">★☆☆☆☆</option>
+        </select>
+
+        <label for="reviewText">Review</label>
+        <textarea id="reviewText" name="review_text" class="form-control" rows="5"
+            placeholder="Share your experience"></textarea>
+
+        <label for="reviewPhotos">Photos</label>
+        <input type="file" id="reviewPhotos" name="review_photos" class="form-control" accept="image/*" multiple>
+        <button type="submit" class="btn btn-success rounded-pill fw-bold py-2 mt-3">
+            Submit review
+        </button>
+    </form>
+</aside>
+<main>
+    <!-- Hero Banner -->
+    <section class="restaurant-hero">
+        <img src="{{ restaurant.hero_image }}" alt="{{ restaurant.name }} banner image">
+
+        <!-- bookmark icon -->
+        <button class="restaurant-bookmark-btn" type="button">
+            ♡
+        </button>
+        <div class="restaurant-hero-overlay">
+            <div class="container">
+                <p class="restaurant-category" id="categoryBadge">{{ restaurant.category }}</p>
+
+                <h1 id="restaurantName">{{ restaurant.name }}</h1>
+
+                <p class="restaurant-rating-line">
+                    <span id="starText">{{ restaurant.star_text }}</span>
+                    <span id="ratingText">{{ restaurant.rating }} · {{ restaurant.review_count }} reviews</span>
+                </p>
+            </div>
+        </div>
+    </section>
+    <!-- Restaurant Info Content -->
+    <section class="restaurant-info-section">
+        <div class="container py-4 restaurant-detail-layout">
+            <div class="restaurant-detail-main">
+
+                <!-- Location & Hours -->
+                <section class="detail-section">
+                    <div class="section-heading-row">
+                        <h2>Location & Hours</h2>
+                    </div>
+
+                    <div class="location-hours-grid">
+
+                        <!-- Map and Address -->
+                        <div class="location-column">
+                            <div class="map-placeholder">
+                                Map
+                            </div>
+
+                            <div class="address-card">
+                                <div class="address-icon">
+                                    📍
+                                </div>
+
+                                <div>
+                                    <span class="address-label">Address</span>
+                                    <p class="restaurant-address">
+                                        {{ restaurant.address }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opening Hours -->
+                        <div class="hours-card">
+                            <div class="open-badge">
+                                ● Open now
+                            </div>
+                            <div class="hours-list">
+                                {% for item in opening_hours %}
+                                <div class="{% if item.is_today %}today{% endif %}">
+                                    <span>{{ item.day }}</span>
+                                    <p>{{ item.time }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+                <!-- Mobile only contact panel -->
+                <section class="detail-section contact-review-panel-mobile">
+                    <div class="section-heading-row">
+                        <h2>Contact</h2>
+                    </div>
+
+                    <p class="contact-label">Phone</p>
+                    <a href="tel:{{ restaurant.phone|replace(' ', '') }}" class="contact-link">
+                        {{ restaurant.phone }}
+                    </a>
+                    <p class="contact-label">Website</p>
+                    <a href="{{ restaurant.website }}" target="_blank" class="contact-link">Visit website</a>
+                </section>
+                <!-- Menu -->
+                <section class="detail-section" id="menu-section">
+                    <div class="section-heading-row" id="menu-section-heading">
+                        <h2>Menu highlights</h2>
+                        <a href="{{ url_for('restaurant_menu', restaurant_id=restaurant.id) }}" class="section-link">
+                            View full menu >
+                        </a>
+                    </div>
+
+                    <div class="row g-3">
+                        {% for item in menu_items %}
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                                <img class="card-img-top menu-card-image"
+                                    src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
+
+                                <div class="card-body">
+                                    <h3 class="card-title h5 fw-bold">{{ item.name }}</h3>
+                                    <p class="card-text mb-2">{{ item.description }}</p>
+                                    <span class="fw-bold text-success">{{ item.price }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                <!-- Reviews -->
+                <section class="detail-section reviews-section">
+                    <div class="section-heading-row">
+                        <h2>Reviews</h2>
+                        <button
+                            class="btn btn-success rounded-pill fw-bold px-3 py-2 write-review-mobile open-review-panel">
+                            Write a review
+                        </button>
+                    </div>
+                    <!-- Review summary / distribution / filters -->
+                    <div class="review-summary">
+                        <div class="review-score-box">
+                            <strong>{{ restaurant.rating }}</strong>
+                            <span class="review-stars">{{ restaurant.star_text }}</span>
+                            <p>Based on {{ restaurant.review_count }} reviews</p>
+                        </div>
+
+                        <div class="rating-distribution">
+                            {% for row in review_summary.distribution %}
+                            <div class="rating-row">
+                                <span>{{ row.stars }}</span>
+                                <div class="progress rating-progress">
+                                    <div class="progress-bar" style="--progress-width: {{ row.percentage }}%;"></div>
+                                </div>
+                                <span>{{ row.count }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="reviews-content-layout">
+                        <div class="review-filter-panel">
+                            <h3>Filter reviews</h3>
+
+                            <div class="filter-group">
+                                <p>Stars</p>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="star-5" name="review-stars"
+                                        value="5">
+                                    <label class="form-check-label" for="star-5">5 stars</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="star-4" name="review-stars"
+                                        value="4">
+                                    <label class="form-check-label" for="star-4">4 stars</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="star-3" name="review-stars"
+                                        value="3">
+                                    <label class="form-check-label" for="star-3">3 stars</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="star-2" name="review-stars"
+                                        value="2">
+                                    <label class="form-check-label" for="star-2">2 stars</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="star-1" name="review-stars"
+                                        value="1">
+                                    <label class="form-check-label" for="star-1">1 star</label>
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="with-photos" name="with-photos"
+                                        value="photos">
+                                    <label class="form-check-label" for="with-photos">With photos</label>
+                                </div>
+                            </div>
+
+                            <div class="filter-group">
+                                <p>Sort by</p>
+                                <select id="sort-review" name="sort-review" class="form-select form-select-sm">
+                                    <option value="newest">Newest</option>
+                                    <option value="oldest">Oldest</option>
+                                    <option value="highest">Highest rated</option>
+                                    <option value="lowest">Lowest rated</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="review-main-content">
+                            <div class="review-list">
+                                {% for review in reviews %}
+                                <article class="review-item">
+                                    <div class="review-top-row">
+                                        <div class="review-user">
+                                            <img src="{{ review.profile_image }}" alt="{{ review.username }} profile">
+                                            <div class="review-user-info">
+                                                <div class="review-name-row">
+                                                    <h3>{{ review.username }}</h3>
+
+                                                    {% if review.is_author %}
+                                                    <span class="my-review-label">Your review</span>
+                                                    {% endif %}
+                                                </div>
+                                                <p>{{ review.date }} · {{ review.review_count }} reviews</p>
+                                            </div>
+                                        </div>
+
+                                        {% if review.is_author %}
+                                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                            Delete
+                                        </button>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="review-rating-row">
+                                        <span class="review-stars">
+                                            {{ "★" * review.rating }}{{ "☆" * (5 - review.rating) }}
+                                        </span>
+                                    </div>
+
+                                    <p class="review-text">
+                                        {{ review.content }}
+                                    </p>
+
+                                    {% if review.photos %}
+                                    <div class="review-photos">
+                                        {% for photo in review.photos %}
+                                        <img src="{{ photo }}" alt="Review photo for {{ restaurant.name }}">
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </article>
+                                {% endfor %}
+                            </div>
+                            <div class="review-pagination">
+                                <button type="button" class="page-arrow disabled">‹</button>
+                                <button type="button" class="page-number active">1</button>
+                                <button type="button" class="page-number">2</button>
+                                <button type="button" class="page-number">3</button>
+                                <button type="button" class="page-number">4</button>
+                                <button type="button" class="page-arrow">›</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <aside class="contact-review-panel">
+                <h3>Contact</h3>
+
+                <p class="contact-label">Phone</p>
+                <a href="tel:{{ restaurant.phone|replace(' ', '') }}" class="contact-link">
+                    {{ restaurant.phone }}
+                </a>
+
+                <p class="contact-label">Website</p>
+                <a href="{{ restaurant.website }}" target="_blank" class="contact-link">Visit website</a>
+                <div class="contact-divider"></div>
+
+                <button class="btn btn-success rounded-pill fw-bold w-100 py-2 open-review-panel">
+                    Write a review
+                </button>
+            </aside>
+        </div>
+    </section>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/restaurant_detail.js') }}"></script>
+{% endblock %}
