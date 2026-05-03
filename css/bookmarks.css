@@ -1,0 +1,17 @@
+.bookmarks-page {
+  padding-bottom: 3rem;
+}
+
+.bookmark-stage-shell {
+  min-height: 320px;
+}
+
+@media (max-width: 767.98px) {
+  .bookmarks-page {
+    padding-bottom: 2rem;
+  }
+
+  .bookmark-stage-shell {
+    min-height: 220px;
+  }
+}
