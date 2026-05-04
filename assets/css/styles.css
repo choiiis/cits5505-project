@@ -1,0 +1,152 @@
+:root {
+  --brand-green: #15803d;
+  --brand-ink: #1f2933;
+  --brand-coral: #e25544;
+  --brand-mint: #e9f8ef;
+  --brand-line: #d9e2ec;
+}
+
+body {
+  color: var(--brand-ink);
+  background: #f7f9fb;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.brand-mark {
+  color: var(--brand-green);
+  letter-spacing: 0;
+}
+
+.nav-link.active {
+  color: var(--brand-green) !important;
+}
+
+.btn {
+  border-radius: 8px;
+}
+
+.btn-success {
+  background: var(--brand-green);
+  border-color: var(--brand-green);
+}
+
+.btn-outline-success {
+  border-color: var(--brand-green);
+  color: var(--brand-green);
+}
+
+.btn-outline-success:hover {
+  background: var(--brand-green);
+  border-color: var(--brand-green);
+}
+
+.hero-section {
+  background: #ffffff;
+  border-bottom: 1px solid var(--brand-line);
+}
+
+.search-bar {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 .25rem .75rem rgba(31, 41, 51, .06);
+}
+
+.map-btn {
+  min-width: 76px;
+}
+
+.section-band {
+  background: #ffffff;
+  border-top: 1px solid var(--brand-line);
+  border-bottom: 1px solid var(--brand-line);
+}
+
+.restaurant-card,
+.review-card,
+.metric-card {
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.restaurant-card .card-img-top {
+  height: 190px;
+  object-fit: cover;
+}
+
+.rating {
+  color: var(--brand-coral);
+  font-weight: 700;
+}
+
+.rating span {
+  color: #4d5b68;
+  font-weight: 400;
+}
+
+.detail-hero {
+  height: 420px;
+  object-fit: cover;
+}
+
+.gallery-img {
+  height: 190px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.map-panel {
+  min-height: 340px;
+  background:
+    linear-gradient(90deg, rgba(21, 128, 61, .12) 1px, transparent 1px),
+    linear-gradient(rgba(226, 85, 68, .12) 1px, transparent 1px),
+    #ffffff;
+  background-size: 42px 42px;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+}
+
+.map-pin {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand-coral);
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 2px rgba(226, 85, 68, .35);
+}
+
+.auth-shell {
+  min-height: calc(100vh - 138px);
+}
+
+.form-card {
+  max-width: 520px;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+}
+
+.table-responsive {
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: .6rem;
+  height: .6rem;
+  border-radius: 50%;
+  margin-right: .35rem;
+  background: var(--brand-green);
+}
+
+@media (max-width: 767px) {
+  .detail-hero {
+    height: 260px;
+  }
+
+  .gallery-img {
+    height: 150px;
+  }
+}
