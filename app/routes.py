@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for
 from app import app
 from app.utils import make_star_text, mark_today
+from app.models import Restaurant
 
 
 @app.route("/")
@@ -10,20 +11,8 @@ def home():
 
 @app.route("/restaurants/<int:restaurant_id>")
 def restaurant_detail(restaurant_id):
-    restaurant_rating = 4.7
-
-    restaurant = {
-        "id": restaurant_id,
-        "name": "Laneway Pizza Co.",
-        "category": "Italian",
-        "rating": restaurant_rating,
-        "review_count": 512,
-        "star_text": make_star_text(restaurant_rating),
-        "address": "Barrack St, Perth, WA 6000",
-        "phone": "+61 8 1234 5678",
-        "website": "https://example.com",
-        "hero_image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
-    }
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    star_text = make_star_text(restaurant.average_rating)
 
     opening_hours = [
         {"day": "Mon", "time": "7:00 AM - 11:00 PM"},
@@ -117,15 +106,13 @@ def restaurant_detail(restaurant_id):
         menu_items=menu_items,
         review_summary=review_summary,
         reviews=reviews,
+        star_text=star_text,
         is_logged_in=True,
     )
 
 
 @app.route("/restaurants/<int:restaurant_id>/menu")
 def restaurant_menu(restaurant_id):
-    restaurant = {
-        "id": restaurant_id,
-        "name": "Laneway Pizza Co.",
-    }
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
 
     return render_template("restaurant_menu.html", restaurant=restaurant)

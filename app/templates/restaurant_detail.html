@@ -70,8 +70,8 @@
                 <h1 id="restaurantName">{{ restaurant.name }}</h1>
 
                 <p class="restaurant-rating-line">
-                    <span id="starText">{{ restaurant.star_text }}</span>
-                    <span id="ratingText">{{ restaurant.rating }} · {{ restaurant.review_count }} reviews</span>
+                    <span id="starText">{{ star_text }}</span>
+                    <span id="ratingText">{{ restaurant.average_rating }} · {{ restaurant.review_count }} reviews</span>
                 </p>
             </div>
         </div>
@@ -177,8 +177,8 @@
                     <!-- Review summary / distribution / filters -->
                     <div class="review-summary">
                         <div class="review-score-box">
-                            <strong>{{ restaurant.rating }}</strong>
-                            <span class="review-stars">{{ restaurant.star_text }}</span>
+                            <strong>{{ restaurant.average_rating }}</strong>
+                            <span class="review-stars">{{ star_text }}</span>
                             <p>Based on {{ restaurant.review_count }} reviews</p>
                         </div>
 
