@@ -153,12 +153,14 @@
                         <div class="col-md-6">
                             <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
                                 <img class="card-img-top menu-card-image"
-                                    src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
+                                    src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
 
                                 <div class="card-body">
                                     <h3 class="card-title h5 fw-bold">{{ item.name }}</h3>
                                     <p class="card-text mb-2">{{ item.description }}</p>
-                                    <span class="fw-bold text-success">{{ item.price }}</span>
+                                    {% if item.price is not none %}
+                                    <span class="fw-bold text-success">${{ "%.2f"|format(item.price) }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

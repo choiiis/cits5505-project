@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for
 from app import app
 from app.utils import make_star_text, mark_today
-from app.models import Restaurant
+from app.models import Restaurant, MenuItem
 
 
 @app.route("/")
@@ -26,32 +26,7 @@ def restaurant_detail(restaurant_id):
 
     opening_hours = mark_today(opening_hours)
 
-    menu_items = [
-        {
-            "name": "Margherita Pizza",
-            "description": "Tomato, mozzarella, basil",
-            "price": "$22",
-            "image": "images/margherita.jpg",
-        },
-        {
-            "name": "Truffle Mushroom Pizza",
-            "description": "Mushroom, truffle oil, mozzarella",
-            "price": "$27",
-            "image": "images/margherita.jpg",
-        },
-        {
-            "name": "Pepperoni Pizza",
-            "description": "Pepperoni, mozzarella, tomato sauce",
-            "price": "$24",
-            "image": "images/margherita.jpg",
-        },
-        {
-            "name": "Tiramisu",
-            "description": "Coffee, mascarpone, cocoa",
-            "price": "$14",
-            "image": "images/margherita.jpg",
-        },
-    ]
+    menu_items = MenuItem.query.filter_by(restaurant_id=restaurant.id).all()
 
     review_summary = {
         "distribution": [
