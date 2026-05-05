@@ -116,9 +116,15 @@
                             </div>
                             <div class="hours-list">
                                 {% for item in opening_hours %}
-                                <div class="{% if item.is_today %}today{% endif %}">
-                                    <span>{{ item.day }}</span>
-                                    <p>{{ item.time }}</p>
+                                <div class="{% if item.day_of_week == today_day_of_week %}today{% endif %}">
+                                    <span>{{ item.day_label }}</span>
+                                    <p>
+                                        {% if item.is_closed %}
+                                        Closed
+                                        {% else %}
+                                        {{ item.open_time }} - {{ item.close_time }}
+                                        {% endif %}
+                                    </p>
                                 </div>
                                 {% endfor %}
                             </div>

@@ -1,7 +1,9 @@
 from flask import render_template, redirect, url_for
 from app import app
-from app.utils import make_star_text, mark_today
-from app.models import Restaurant, MenuItem
+from app.utils import make_star_text
+from app.models import Restaurant, MenuItem, OpeningHour
+
+from datetime import datetime
 
 
 @app.route("/")
@@ -11,21 +13,20 @@ def home():
 
 @app.route("/restaurants/<int:restaurant_id>")
 def restaurant_detail(restaurant_id):
+    # restaurant summary
     restaurant = Restaurant.query.get_or_404(restaurant_id)
     star_text = make_star_text(restaurant.average_rating)
 
-    opening_hours = [
-        {"day": "Mon", "time": "7:00 AM - 11:00 PM"},
-        {"day": "Tue", "time": "7:00 AM - 11:00 PM"},
-        {"day": "Wed", "time": "7:00 AM - 11:00 PM"},
-        {"day": "Thu", "time": "7:00 AM - 11:00 PM"},
-        {"day": "Fri", "time": "7:00 AM - 12:00 AM"},
-        {"day": "Sat", "time": "8:00 AM - 12:00 AM"},
-        {"day": "Sun", "time": "8:00 AM - 10:00 PM"},
-    ]
+    # restaurant opening hours
+    opening_hours = (
+        OpeningHour.query.filter_by(restaurant_id=restaurant.id)
+        .order_by(OpeningHour.day_of_week)
+        .all()
+    )
 
-    opening_hours = mark_today(opening_hours)
+    today_day_of_week = datetime.today().weekday()
 
+    # restaurant menu highlights
     menu_items = MenuItem.query.filter_by(restaurant_id=restaurant.id).all()
 
     review_summary = {
@@ -82,6 +83,7 @@ def restaurant_detail(restaurant_id):
         review_summary=review_summary,
         reviews=reviews,
         star_text=star_text,
+        today_day_of_week=today_day_of_week,
         is_logged_in=True,
     )
 
