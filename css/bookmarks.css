@@ -6,71 +6,96 @@
   min-height: 320px;
 }
 
-.bookmark-draft-card {
+.bookmark-card {
   background: #ffffff;
   border: 1px solid var(--brand-line);
   border-radius: 8px;
-  min-height: 320px;
+  box-shadow: 0 0.5rem 1.25rem rgba(31, 41, 51, 0.06);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   overflow: hidden;
 }
 
-.bookmark-draft-card__media {
-  background: linear-gradient(135deg, #dfe7ee, #eef3f7);
+.bookmark-card__image {
+  display: block;
   height: 180px;
+  object-fit: cover;
+  width: 100%;
 }
 
-.bookmark-draft-card__body {
+.bookmark-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   padding: 1rem;
 }
 
-.bookmark-draft-badge,
-.bookmark-draft-line,
-.bookmark-draft-action {
-  background: #edf2f7;
+.bookmark-card__category {
+  align-self: flex-start;
+  background: #f8fafc;
+  border: 1px solid var(--brand-line);
   border-radius: 999px;
+  color: #4d5b68;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
 }
 
-.bookmark-draft-badge {
-  height: 1.5rem;
-  width: 5.5rem;
+.bookmark-card__title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  margin: 0.85rem 0 0.35rem;
 }
 
-.bookmark-draft-line {
-  border-radius: 6px;
-  height: 0.95rem;
-  margin-top: 0.85rem;
+.bookmark-card__meta,
+.bookmark-card__description {
+  color: #5f6c7b;
 }
 
-.bookmark-draft-line--title {
-  height: 1.3rem;
-  width: 68%;
+.bookmark-card__meta {
+  margin-bottom: 0.55rem;
 }
 
-.bookmark-draft-line--meta {
-  width: 52%;
+.bookmark-card__rating {
+  color: var(--brand-coral);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
 }
 
-.bookmark-draft-line--rating {
-  width: 44%;
+.bookmark-card__rating span {
+  color: #4d5b68;
+  font-weight: 400;
 }
 
-.bookmark-draft-actions {
+.bookmark-card__description {
+  flex-grow: 1;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.bookmark-card__actions {
   display: flex;
   gap: 0.75rem;
-  margin-top: 1.25rem;
+  margin-top: auto;
 }
 
-.bookmark-draft-action {
-  height: 2.5rem;
+.bookmark-card__actions .btn {
+  border-radius: 8px;
 }
 
-.bookmark-draft-action--primary {
-  background: rgba(21, 128, 61, 0.18);
+.bookmark-card__actions .btn:first-child {
   flex: 1;
 }
 
-.bookmark-draft-action--secondary {
-  width: 6.5rem;
+.bookmark-empty-state {
+  background: #ffffff;
+  border: 1px dashed var(--brand-line);
+  border-radius: 8px;
+  color: #5f6c7b;
+  padding: 2.75rem 1.5rem;
+  text-align: center;
 }
 
 @media (max-width: 767.98px) {
@@ -82,11 +107,11 @@
     min-height: 220px;
   }
 
-  .bookmark-draft-card {
-    min-height: 280px;
+  .bookmark-card__image {
+    height: 160px;
   }
 
-  .bookmark-draft-card__media {
-    height: 160px;
+  .bookmark-card__actions {
+    flex-direction: column;
   }
 }
