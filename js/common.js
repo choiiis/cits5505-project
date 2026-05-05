@@ -28,13 +28,20 @@ async function loadPartial(targetId, fileName) {
 
 function activateHeaderLink() {
     const links = document.querySelectorAll(".site-header__link");
+    const currentPage = window.location.pathname.split("/").pop();
 
     links.forEach(link => {
-        if (
-            link.getAttribute("href") &&
-            link.getAttribute("href").includes("restaurant")
-        ) {
+        const href = link.getAttribute("href");
+        if (!href) {
+            return;
+        }
+
+        const linkPage = href.split("/").pop();
+
+        if (linkPage === currentPage) {
             link.classList.add("active");
+        } else {
+            link.classList.remove("active");
         }
     });
 }
