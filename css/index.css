@@ -1,0 +1,157 @@
+.hero-section {
+  background: #ffffff;
+  border-bottom: 1px solid var(--brand-line);
+}
+
+.hero-copy {
+  max-width: 42rem;
+}
+
+.hero-image {
+  max-height: 360px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.hero-search {
+  margin-bottom: -3.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+main {
+  padding-bottom: 5rem;
+}
+
+.home-categories-section {
+  padding: 5.5rem 0 2rem;
+}
+
+.category-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.category-pill-placeholder {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 999px;
+  color: var(--brand-ink);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+}
+
+.featured-section {
+  margin-top: 0.5rem;
+}
+
+.featured-card {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1.25rem rgba(31, 41, 51, 0.06);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.featured-card__image {
+  display: block;
+  height: 190px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.featured-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.featured-card__top {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.featured-card__category {
+  align-self: flex-start;
+  background: #f8fafc;
+  border: 1px solid var(--brand-line);
+  border-radius: 999px;
+  color: #4d5b68;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+}
+
+.featured-card__save {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 999px;
+  color: var(--brand-green);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+}
+
+.featured-card__title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  margin: 0.85rem 0 0.35rem;
+}
+
+.featured-card__meta,
+.featured-card__description {
+  color: #5f6c7b;
+}
+
+.featured-card__meta {
+  margin-bottom: 0.55rem;
+}
+
+.featured-card__rating {
+  color: var(--brand-coral);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.featured-card__rating span {
+  color: #4d5b68;
+  font-weight: 400;
+}
+
+.featured-card__description {
+  flex-grow: 1;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.featured-card__action {
+  align-self: stretch;
+  border-radius: 8px;
+  margin-top: auto;
+}
+
+@media (max-width: 991.98px) {
+  .hero-search {
+    margin-bottom: 0;
+  }
+
+  main {
+    padding-bottom: 2rem;
+  }
+
+  .home-categories-section {
+    padding-top: 2rem;
+  }
+
+  .featured-card__image {
+    height: 180px;
+  }
+}
