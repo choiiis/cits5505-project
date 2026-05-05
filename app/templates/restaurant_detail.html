@@ -71,7 +71,8 @@
 
                 <p class="restaurant-rating-line">
                     <span id="starText">{{ star_text }}</span>
-                    <span id="ratingText">{{ restaurant.average_rating }} · {{ restaurant.review_count }} reviews</span>
+                    <span id="ratingText">{{ review_summary.average_rating }} · {{ review_summary.total_reviews }}
+                        reviews</span>
                 </p>
             </div>
         </div>
@@ -185,9 +186,9 @@
                     <!-- Review summary / distribution / filters -->
                     <div class="review-summary">
                         <div class="review-score-box">
-                            <strong>{{ restaurant.average_rating }}</strong>
+                            <strong>{{ review_summary.average_rating }}</strong>
                             <span class="review-stars">{{ star_text }}</span>
-                            <p>Based on {{ restaurant.review_count }} reviews</p>
+                            <p>Based on {{ review_summary.total_reviews }} reviews</p>
                         </div>
 
                         <div class="rating-distribution">
