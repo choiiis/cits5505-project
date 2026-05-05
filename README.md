@@ -28,3 +28,13 @@ Apply database migrations:
 ```bash
 flask --app run db upgrade
 ```
+
+## Seed sample data
+
+After applying database migrations, run:
+
+```bash
+python seed.py
+```
+
+This creates sample users, restaurants, menu items, opening hours, reviews, review photos, and bookmark collections for local development and testing.
