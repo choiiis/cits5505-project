@@ -263,24 +263,26 @@
                                 <article class="review-item">
                                     <div class="review-top-row">
                                         <div class="review-user">
-                                            <img src="{{ review.profile_image }}" alt="{{ review.username }} profile">
+                                            <img src="{{ review.user.profile_image or 'https://randomuser.me/api/portraits/lego/1.jpg' }}"
+                                                alt="{{ review.user.username }} profile">
                                             <div class="review-user-info">
                                                 <div class="review-name-row">
-                                                    <h3>{{ review.username }}</h3>
-
-                                                    {% if review.is_author %}
+                                                    <h3>{{ review.user.username }}</h3>
+                                                    <!-- TODO: issue #58  -->
+                                                    <!-- {% if review.is_author %}
                                                     <span class="my-review-label">Your review</span>
-                                                    {% endif %}
+                                                    {% endif %} -->
                                                 </div>
-                                                <p>{{ review.date }} · {{ review.review_count }} reviews</p>
+                                                <!-- TODO: issue #58 : review_count  -->
+                                                <p>{{ review.created_at.strftime("%d %b %Y") }} · (n) reviews</p>
                                             </div>
                                         </div>
-
-                                        {% if review.is_author %}
+                                        <!-- TODO: issue #58  -->
+                                        <!-- {% if review.is_author %}
                                         <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3">
                                             Delete
                                         </button>
-                                        {% endif %}
+                                        {% endif %} -->
                                     </div>
 
                                     <div class="review-rating-row">
@@ -296,7 +298,7 @@
                                     {% if review.photos %}
                                     <div class="review-photos">
                                         {% for photo in review.photos %}
-                                        <img src="{{ photo }}" alt="Review photo for {{ restaurant.name }}">
+                                        <img src="{{ photo.image_url }}" alt="Review photo for {{ restaurant.name }}">
                                         {% endfor %}
                                     </div>
                                     {% endif %}

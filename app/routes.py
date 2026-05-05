@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for
 from app import app
 from app.utils import make_star_text
-from app.models import Restaurant, MenuItem, OpeningHour
+from app.models import Restaurant, MenuItem, OpeningHour, Review
 
 from datetime import datetime
 
@@ -39,41 +39,11 @@ def restaurant_detail(restaurant_id):
         ],
     }
 
-    reviews = [
-        {
-            "username": "Alex",
-            "rating": 5,
-            "date": "03 Apr 2026",
-            "review_count": 12,
-            "content": "Great pizza and a nice late-night atmosphere. The crust was perfectly crispy and the staff were really friendly.",
-            "profile_image": "https://randomuser.me/api/portraits/men/32.jpg",
-            "photos": [
-                "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=80",
-            ],
-            "is_author": True,
-        },
-        {
-            "username": "Mia",
-            "rating": 4,
-            "date": "31 Mar 2026",
-            "review_count": 8,
-            "content": "Good food overall and the dessert was definitely the highlight. It gets a little busy on weekends, but still worth visiting.",
-            "profile_image": "https://randomuser.me/api/portraits/women/44.jpg",
-            "photos": [],
-            "is_author": False,
-        },
-        {
-            "username": "Daniel",
-            "rating": 5,
-            "date": "28 Mar 2026",
-            "review_count": 15,
-            "content": "Loved the truffle mushroom pizza and tiramisu. Cozy atmosphere and quick service made it a great place for dinner with friends.",
-            "profile_image": "https://randomuser.me/api/portraits/men/75.jpg",
-            "photos": [],
-            "is_author": False,
-        },
-    ]
+    reviews = (
+        Review.query.filter_by(restaurant_id=restaurant.id)
+        .order_by(Review.created_at.desc())
+        .all()
+    )
 
     return render_template(
         "restaurant_detail.html",
