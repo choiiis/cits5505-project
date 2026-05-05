@@ -47,25 +47,95 @@ main {
   margin-top: 0.5rem;
 }
 
-.featured-card-shell {
-  background:
-    linear-gradient(180deg, rgba(217, 226, 236, 0.7) 0 44%, #ffffff 44% 100%);
+.featured-card {
+  background: #ffffff;
   border: 1px solid var(--brand-line);
   border-radius: 8px;
-  min-height: 320px;
-  position: relative;
+  box-shadow: 0 0.5rem 1.25rem rgba(31, 41, 51, 0.06);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
-.featured-card-shell::before {
-  background: rgba(255, 255, 255, 0.82);
+.featured-card__image {
+  display: block;
+  height: 190px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.featured-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.featured-card__top {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.featured-card__category {
+  align-self: flex-start;
+  background: #f8fafc;
+  border: 1px solid var(--brand-line);
   border-radius: 999px;
-  content: "Featured card";
-  color: #52606d;
+  color: #4d5b68;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+}
+
+.featured-card__save {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 999px;
+  color: var(--brand-green);
   font-size: 0.85rem;
-  left: 1rem;
-  padding: 0.35rem 0.7rem;
-  position: absolute;
-  top: 1rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+}
+
+.featured-card__title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  margin: 0.85rem 0 0.35rem;
+}
+
+.featured-card__meta,
+.featured-card__description {
+  color: #5f6c7b;
+}
+
+.featured-card__meta {
+  margin-bottom: 0.55rem;
+}
+
+.featured-card__rating {
+  color: var(--brand-coral);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.featured-card__rating span {
+  color: #4d5b68;
+  font-weight: 400;
+}
+
+.featured-card__description {
+  flex-grow: 1;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.featured-card__action {
+  align-self: stretch;
+  border-radius: 8px;
+  margin-top: auto;
 }
 
 @media (max-width: 991.98px) {
@@ -79,5 +149,9 @@ main {
 
   .home-categories-section {
     padding-top: 2rem;
+  }
+
+  .featured-card__image {
+    height: 180px;
   }
 }
