@@ -24,11 +24,16 @@ def clear_data():
 
 
 def create_opening_hours(
-    restaurant_id, weekday_hours, friday_hours=None, weekend_hours=None
+    restaurant_id,
+    weekday_hours,
+    friday_hours=None,
+    weekend_hours=None,
+    closed_days=None,
 ):
     """Create a simple 7-day opening hour schedule for a restaurant."""
     friday_hours = friday_hours or weekday_hours
     weekend_hours = weekend_hours or weekday_hours
+    closed_days = closed_days or []
 
     days = [
         (0, "Mon", weekday_hours[0], weekday_hours[1]),
@@ -45,9 +50,9 @@ def create_opening_hours(
             restaurant_id=restaurant_id,
             day_of_week=day_of_week,
             day_label=day_label,
-            open_time=open_time,
-            close_time=close_time,
-            is_closed=False,
+            open_time=None if day_of_week in closed_days else open_time,
+            close_time=None if day_of_week in closed_days else close_time,
+            is_closed=day_of_week in closed_days,
         )
         for day_of_week, day_label, open_time, close_time in days
     ]
@@ -250,6 +255,7 @@ def seed_data():
             weekday_hours=("7:00 AM", "11:00 PM"),
             friday_hours=("7:00 AM", "12:00 AM"),
             weekend_hours=("8:00 AM", "12:00 AM"),
+            closed_days=[1],  # Tuesday closed
         )
     )
 
@@ -258,6 +264,7 @@ def seed_data():
             northbridge_cafe.id,
             weekday_hours=("6:30 AM", "3:00 PM"),
             weekend_hours=("7:00 AM", "2:00 PM"),
+            closed_days=[6],  # Sunday closed
         )
     )
 
@@ -267,6 +274,7 @@ def seed_data():
             weekday_hours=("11:30 AM", "9:30 PM"),
             friday_hours=("11:30 AM", "10:30 PM"),
             weekend_hours=("11:30 AM", "10:30 PM"),
+            closed_days=[0],  # Monday closed
         )
     )
 
