@@ -11,7 +11,48 @@
 <body data-page="login">
   <div id="headerInclude"></div>
 
-  
+  <main class="auth-shell container d-flex align-items-center justify-content-center py-5">
+    <section class="form-card bg-white shadow-sm p-4 w-100">
+      <h1 class="h3 fw-bold">Welcome back</h1>
+      <p class="text-secondary">Log in to save restaurants, manage reviews, and access your profile.</p>
+
+      <form id="loginForm" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="emailInput">Email</label>
+          <input
+            class="form-control"
+            id="emailInput"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required>
+          <div class="invalid-feedback">Please enter a valid email address.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="passwordInput">Password</label>
+          <input
+            class="form-control"
+            id="passwordInput"
+            name="password"
+            type="password"
+            placeholder="Password"
+            autocomplete="current-password"
+            required>
+          <div class="invalid-feedback">Password must be at least 6 characters.</div>
+        </div>
+
+        <button class="btn btn-success w-100 login-submit" type="submit">Login</button>
+        <p class="login-message mb-0 mt-3" id="loginMessage" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="d-flex justify-content-between mt-3 small">
+        <a href="signup.html">Create account</a>
+        <a href="forgot-password.html">Forgot password?</a>
+      </div>
+    </section>
+  </main>
 
   <div id="footerInclude"></div>
 
