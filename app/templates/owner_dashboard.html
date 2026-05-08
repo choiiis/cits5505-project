@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Owner Dashboard | TableTrail{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/owner_dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="owner-page">
+    <section class="owner-hero">
+        <div class="container owner-hero__inner">
+            <div>
+                <p class="owner-label">Owner Panel</p>
+                <h1>Owner Dashboard</h1>
+                <p class="owner-subtitle">
+                    Manage restaurant information, menu items, opening hours, and listing status from one place.
+                </p>
+            </div>
+
+            <a href="{{ url_for('restaurant_detail', restaurant_id=1) }}" class="owner-view-link">
+                View public page
+            </a>
+        </div>
+    </section>
+
+    <section class="owner-dashboard-section">
+        <div class="container">
+
+            <section class="owner-stats">
+                <div class="owner-stat-card">
+                    <span>Restaurant</span>
+                    <strong>Laneway Pizza Co.</strong>
+                </div>
+
+                <div class="owner-stat-card">
+                    <span>Listing Status</span>
+                    <strong>Approved</strong>
+                </div>
+
+                <div class="owner-stat-card">
+                    <span>Rating</span>
+                    <strong>4.7</strong>
+                </div>
+
+                <div class="owner-stat-card">
+                    <span>Reviews</span>
+                    <strong>512</strong>
+                </div>
+            </section>
+
+            <section class="owner-card">
+                <div class="owner-card__heading">
+                    <h2>Restaurant Information</h2>
+                    <p>
+                        This section shows the main information that will appear on the public restaurant detail page.
+                    </p>
+                </div>
+
+                <div class="owner-info-grid">
+                    <div class="owner-info-item">
+                        <span>Restaurant Name</span>
+                        <p>Laneway Pizza Co.</p>
+                    </div>
+
+                    <div class="owner-info-item">
+                        <span>Category</span>
+                        <p>Italian</p>
+                    </div>
+
+                    <div class="owner-info-item">
+                        <span>Address</span>
+                        <p>Barrack St, Perth, WA 6000</p>
+                    </div>
+
+                    <div class="owner-info-item">
+                        <span>Phone</span>
+                        <p>+61 8 1234 5678</p>
+                    </div>
+
+                    <div class="owner-info-item">
+                        <span>Website</span>
+                        <p>https://example.com</p>
+                    </div>
+
+                    <div class="owner-info-item">
+                        <span>Opening Hours</span>
+                        <p>Mon-Sun, 7:00 AM - 11:00 PM</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="owner-card">
+                <div class="owner-card__heading">
+                    <h2>Menu Management</h2>
+                    <p>
+                        This is a frontend placeholder for managing restaurant menu items. It can be connected to the database later.
+                    </p>
+                </div>
+
+                <div class="owner-toolbar">
+                    <button type="button" class="owner-action-button">Add menu item</button>
+                    <button type="button" class="owner-action-button owner-action-button--secondary">
+                        Edit categories
+                    </button>
+                </div>
+
+                <div class="owner-table-wrap">
+                    <table class="owner-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>Margherita Pizza</td>
+                                <td>Pizza</td>
+                                <td>$22</td>
+                                <td>
+                                    <span class="owner-status owner-status--available">
+                                        Available
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="owner-table-button">Edit</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Truffle Mushroom Pizza</td>
+                                <td>Pizza</td>
+                                <td>$27</td>
+                                <td>
+                                    <span class="owner-status owner-status--available">
+                                        Available
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="owner-table-button">Edit</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Tiramisu</td>
+                                <td>Dessert</td>
+                                <td>$14</td>
+                                <td>
+                                    <span class="owner-status owner-status--hidden">
+                                        Hidden
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="owner-table-button">Edit</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="owner-card">
+                <div class="owner-card__heading">
+                    <h2>Owner Tasks</h2>
+                    <p>
+                        These cards show the owner-side functions that can be connected to backend logic later.
+                    </p>
+                </div>
+
+                <div class="owner-task-grid">
+                    <div class="owner-task-card">
+                        <h3>Edit restaurant profile</h3>
+                        <p>
+                            Update restaurant name, category, contact details, website, images, and description.
+                        </p>
+                    </div>
+
+                    <div class="owner-task-card">
+                        <h3>Manage opening hours</h3>
+                        <p>
+                            Change daily opening times and mark specific days as closed.
+                        </p>
+                    </div>
+
+                    <div class="owner-task-card">
+                        <h3>Review listing status</h3>
+                        <p>
+                            Check whether the restaurant listing is approved, pending, hidden, or reported.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </section>
+</main>
+{% endblock %}
