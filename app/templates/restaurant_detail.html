@@ -70,8 +70,9 @@
                 <h1 id="restaurantName">{{ restaurant.name }}</h1>
 
                 <p class="restaurant-rating-line">
-                    <span id="starText">{{ restaurant.star_text }}</span>
-                    <span id="ratingText">{{ restaurant.rating }} · {{ restaurant.review_count }} reviews</span>
+                    <span id="starText">{{ star_text }}</span>
+                    <span id="ratingText">{{ review_summary.average_rating }} · {{ review_summary.total_reviews }}
+                        reviews</span>
                 </p>
             </div>
         </div>
@@ -116,9 +117,15 @@
                             </div>
                             <div class="hours-list">
                                 {% for item in opening_hours %}
-                                <div class="{% if item.is_today %}today{% endif %}">
-                                    <span>{{ item.day }}</span>
-                                    <p>{{ item.time }}</p>
+                                <div class="{% if item.day_of_week == today_day_of_week %}today{% endif %}">
+                                    <span>{{ item.day_label }}</span>
+                                    <p>
+                                        {% if item.is_closed %}
+                                        Closed
+                                        {% else %}
+                                        {{ item.open_time }} - {{ item.close_time }}
+                                        {% endif %}
+                                    </p>
                                 </div>
                                 {% endfor %}
                             </div>
@@ -153,12 +160,14 @@
                         <div class="col-md-6">
                             <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
                                 <img class="card-img-top menu-card-image"
-                                    src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
+                                    src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
 
                                 <div class="card-body">
                                     <h3 class="card-title h5 fw-bold">{{ item.name }}</h3>
                                     <p class="card-text mb-2">{{ item.description }}</p>
-                                    <span class="fw-bold text-success">{{ item.price }}</span>
+                                    {% if item.price is not none %}
+                                    <span class="fw-bold text-success">${{ "%.2f"|format(item.price) }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -177,9 +186,9 @@
                     <!-- Review summary / distribution / filters -->
                     <div class="review-summary">
                         <div class="review-score-box">
-                            <strong>{{ restaurant.rating }}</strong>
-                            <span class="review-stars">{{ restaurant.star_text }}</span>
-                            <p>Based on {{ restaurant.review_count }} reviews</p>
+                            <strong>{{ review_summary.average_rating }}</strong>
+                            <span class="review-stars">{{ star_text }}</span>
+                            <p>Based on {{ review_summary.total_reviews }} reviews</p>
                         </div>
 
                         <div class="rating-distribution">
@@ -255,24 +264,26 @@
                                 <article class="review-item">
                                     <div class="review-top-row">
                                         <div class="review-user">
-                                            <img src="{{ review.profile_image }}" alt="{{ review.username }} profile">
+                                            <img src="{{ review.user.profile_image or 'https://randomuser.me/api/portraits/lego/1.jpg' }}"
+                                                alt="{{ review.user.username }} profile">
                                             <div class="review-user-info">
                                                 <div class="review-name-row">
-                                                    <h3>{{ review.username }}</h3>
-
-                                                    {% if review.is_author %}
+                                                    <h3>{{ review.user.username }}</h3>
+                                                    <!-- TODO: issue #58  -->
+                                                    <!-- {% if review.is_author %}
                                                     <span class="my-review-label">Your review</span>
-                                                    {% endif %}
+                                                    {% endif %} -->
                                                 </div>
-                                                <p>{{ review.date }} · {{ review.review_count }} reviews</p>
+                                                <!-- TODO: issue #58 : review_count  -->
+                                                <p>{{ review.created_at.strftime("%d %b %Y") }} · (n) reviews</p>
                                             </div>
                                         </div>
-
-                                        {% if review.is_author %}
+                                        <!-- TODO: issue #58  -->
+                                        <!-- {% if review.is_author %}
                                         <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3">
                                             Delete
                                         </button>
-                                        {% endif %}
+                                        {% endif %} -->
                                     </div>
 
                                     <div class="review-rating-row">
@@ -288,7 +299,7 @@
                                     {% if review.photos %}
                                     <div class="review-photos">
                                         {% for photo in review.photos %}
-                                        <img src="{{ photo }}" alt="Review photo for {{ restaurant.name }}">
+                                        <img src="{{ photo.image_url }}" alt="Review photo for {{ restaurant.name }}">
                                         {% endfor %}
                                     </div>
                                     {% endif %}

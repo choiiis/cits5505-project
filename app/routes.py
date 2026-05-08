@@ -1,6 +1,43 @@
 from flask import render_template, redirect, url_for
 from app import app
-from app.utils import make_star_text, mark_today
+from app.utils import make_star_text
+from app.models import Restaurant, MenuItem, OpeningHour, Review
+
+from datetime import datetime
+
+
+def build_review_summary(reviews):
+    total_reviews = len(reviews)
+    rating_counts = {star: 0 for star in range(1, 6)}
+
+    for review in reviews:
+        rating_counts[review.rating] += 1
+
+    average_rating = (
+        sum(review.rating for review in reviews) / total_reviews
+        if total_reviews
+        else 0.0
+    )
+
+    distribution = []
+
+    for star in range(5, 0, -1):
+        count = rating_counts[star]
+        percentage = int((count / total_reviews) * 100) if total_reviews else 0
+
+        distribution.append(
+            {
+                "stars": star,
+                "count": count,
+                "percentage": percentage,
+            }
+        )
+
+    return {
+        "average_rating": round(average_rating, 1),
+        "total_reviews": total_reviews,
+        "distribution": distribution,
+    }
 
 
 @app.route("/")
@@ -10,105 +47,29 @@ def home():
 
 @app.route("/restaurants/<int:restaurant_id>")
 def restaurant_detail(restaurant_id):
-    restaurant_rating = 4.7
+    # restaurant summary
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
 
-    restaurant = {
-        "id": restaurant_id,
-        "name": "Laneway Pizza Co.",
-        "category": "Italian",
-        "rating": restaurant_rating,
-        "review_count": 512,
-        "star_text": make_star_text(restaurant_rating),
-        "address": "Barrack St, Perth, WA 6000",
-        "phone": "+61 8 1234 5678",
-        "website": "https://example.com",
-        "hero_image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
-    }
+    # restaurant opening hours
+    opening_hours = (
+        OpeningHour.query.filter_by(restaurant_id=restaurant.id)
+        .order_by(OpeningHour.day_of_week)
+        .all()
+    )
 
-    opening_hours = [
-        {"day": "Mon", "time": "7:00 AM - 11:00 PM"},
-        {"day": "Tue", "time": "7:00 AM - 11:00 PM"},
-        {"day": "Wed", "time": "7:00 AM - 11:00 PM"},
-        {"day": "Thu", "time": "7:00 AM - 11:00 PM"},
-        {"day": "Fri", "time": "7:00 AM - 12:00 AM"},
-        {"day": "Sat", "time": "8:00 AM - 12:00 AM"},
-        {"day": "Sun", "time": "8:00 AM - 10:00 PM"},
-    ]
+    today_day_of_week = datetime.today().weekday()
 
-    opening_hours = mark_today(opening_hours)
+    # restaurant menu highlights
+    menu_items = MenuItem.query.filter_by(restaurant_id=restaurant.id).all()
 
-    menu_items = [
-        {
-            "name": "Margherita Pizza",
-            "description": "Tomato, mozzarella, basil",
-            "price": "$22",
-            "image": "images/margherita.jpg",
-        },
-        {
-            "name": "Truffle Mushroom Pizza",
-            "description": "Mushroom, truffle oil, mozzarella",
-            "price": "$27",
-            "image": "images/margherita.jpg",
-        },
-        {
-            "name": "Pepperoni Pizza",
-            "description": "Pepperoni, mozzarella, tomato sauce",
-            "price": "$24",
-            "image": "images/margherita.jpg",
-        },
-        {
-            "name": "Tiramisu",
-            "description": "Coffee, mascarpone, cocoa",
-            "price": "$14",
-            "image": "images/margherita.jpg",
-        },
-    ]
+    reviews = (
+        Review.query.filter_by(restaurant_id=restaurant.id)
+        .order_by(Review.created_at.desc())
+        .all()
+    )
 
-    review_summary = {
-        "distribution": [
-            {"stars": 5, "count": 390, "percentage": 76},
-            {"stars": 4, "count": 82, "percentage": 16},
-            {"stars": 3, "count": 26, "percentage": 5},
-            {"stars": 2, "count": 9, "percentage": 2},
-            {"stars": 1, "count": 5, "percentage": 1},
-        ],
-    }
-
-    reviews = [
-        {
-            "username": "Alex",
-            "rating": 5,
-            "date": "03 Apr 2026",
-            "review_count": 12,
-            "content": "Great pizza and a nice late-night atmosphere. The crust was perfectly crispy and the staff were really friendly.",
-            "profile_image": "https://randomuser.me/api/portraits/men/32.jpg",
-            "photos": [
-                "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
-                "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=80",
-            ],
-            "is_author": True,
-        },
-        {
-            "username": "Mia",
-            "rating": 4,
-            "date": "31 Mar 2026",
-            "review_count": 8,
-            "content": "Good food overall and the dessert was definitely the highlight. It gets a little busy on weekends, but still worth visiting.",
-            "profile_image": "https://randomuser.me/api/portraits/women/44.jpg",
-            "photos": [],
-            "is_author": False,
-        },
-        {
-            "username": "Daniel",
-            "rating": 5,
-            "date": "28 Mar 2026",
-            "review_count": 15,
-            "content": "Loved the truffle mushroom pizza and tiramisu. Cozy atmosphere and quick service made it a great place for dinner with friends.",
-            "profile_image": "https://randomuser.me/api/portraits/men/75.jpg",
-            "photos": [],
-            "is_author": False,
-        },
-    ]
+    review_summary = build_review_summary(reviews)
+    star_text = make_star_text(review_summary["average_rating"])
 
     return render_template(
         "restaurant_detail.html",
@@ -117,15 +78,14 @@ def restaurant_detail(restaurant_id):
         menu_items=menu_items,
         review_summary=review_summary,
         reviews=reviews,
+        star_text=star_text,
+        today_day_of_week=today_day_of_week,
         is_logged_in=True,
     )
 
 
 @app.route("/restaurants/<int:restaurant_id>/menu")
 def restaurant_menu(restaurant_id):
-    restaurant = {
-        "id": restaurant_id,
-        "name": "Laneway Pizza Co.",
-    }
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
 
     return render_template("restaurant_menu.html", restaurant=restaurant)
