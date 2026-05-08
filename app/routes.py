@@ -89,3 +89,7 @@ def restaurant_menu(restaurant_id):
     restaurant = Restaurant.query.get_or_404(restaurant_id)
 
     return render_template("restaurant_menu.html", restaurant=restaurant)
+
+@app.route("/owner")
+def owner_dashboard():
+    return render_template("owner_dashboard.html")
