@@ -377,3 +377,37 @@
     flex-direction: column;
   }
 }
+
+.owner-hours-table input[type="time"] {
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  color: var(--brand-ink);
+  min-height: 38px;
+  padding: 0.35rem 0.55rem;
+  width: 150px;
+}
+
+.owner-hours-table input[type="time"]:disabled {
+  background: #f0f1f2;
+  color: #8a94a0;
+}
+
+.owner-checkbox-label {
+  align-items: center;
+  color: var(--brand-ink);
+  display: inline-flex;
+  font-weight: 700;
+  gap: 0.45rem;
+}
+
+.owner-closed-checkbox {
+  accent-color: var(--brand-green);
+  height: 16px;
+  width: 16px;
+}
+
+@media (max-width: 575.98px) {
+  .owner-hours-table input[type="time"] {
+    width: 120px;
+  }
+}
