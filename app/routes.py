@@ -140,4 +140,88 @@ def admin_dashboard():
 
 @app.route("/owner")
 def owner_dashboard():
-    return render_template("owner_dashboard.html")
+    restaurant = {
+        "id": 1,
+        "name": "Laneway Pizza Co.",
+        "category": "Italian",
+        "address": "Barrack St, Perth, WA 6000",
+        "phone": "+61 8 1234 5678",
+        "website": "https://example.com",
+        "status": "Approved",
+        "rating": "4.7",
+        "review_count": "512",
+    }
+
+    owner_stats = [
+        {"label": "Restaurant", "value": restaurant["name"]},
+        {"label": "Listing Status", "value": restaurant["status"]},
+        {"label": "Rating", "value": restaurant["rating"]},
+        {"label": "Reviews", "value": restaurant["review_count"]},
+    ]
+
+    restaurant_info = [
+        {"label": "Restaurant Name", "field": "name", "value": restaurant["name"]},
+        {"label": "Category", "field": "category", "value": restaurant["category"]},
+        {"label": "Address", "field": "address", "value": restaurant["address"]},
+        {"label": "Phone", "field": "phone", "value": restaurant["phone"]},
+        {"label": "Website", "field": "website", "value": restaurant["website"]},
+    ]
+
+    opening_hours = [
+        {"day": "Monday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
+        {"day": "Tuesday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
+        {"day": "Wednesday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
+        {"day": "Thursday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
+        {"day": "Friday", "open_time": "07:00", "close_time": "00:00", "is_closed": False},
+        {"day": "Saturday", "open_time": "08:00", "close_time": "00:00", "is_closed": False},
+        {"day": "Sunday", "open_time": "", "close_time": "", "is_closed": True},
+    ]
+
+    menu_items = [
+        {
+            "name": "Margherita Pizza",
+            "category": "Pizza",
+            "price": "$22",
+            "status": "Available",
+            "status_class": "owner-status--available",
+        },
+        {
+            "name": "Truffle Mushroom Pizza",
+            "category": "Pizza",
+            "price": "$27",
+            "status": "Available",
+            "status_class": "owner-status--available",
+        },
+        {
+            "name": "Tiramisu",
+            "category": "Dessert",
+            "price": "$14",
+            "status": "Hidden",
+            "status_class": "owner-status--hidden",
+        },
+    ]
+
+    owner_tasks = [
+        {
+            "title": "Edit restaurant profile",
+            "description": "Update restaurant name, category, contact details, website, images, and description.",
+        },
+        {
+            "title": "Manage opening hours",
+            "description": "Change daily opening times and mark specific days as closed.",
+        },
+        {
+            "title": "Review listing status",
+            "description": "Check whether the restaurant listing is approved, pending, hidden, or reported.",
+        },
+    ]
+
+    return render_template(
+        "owner_dashboard.html",
+        restaurant=restaurant,
+        owner_stats=owner_stats,
+        restaurant_info=restaurant_info,
+        opening_hours=opening_hours,
+        menu_items=menu_items,
+        owner_tasks=owner_tasks,
+    )
