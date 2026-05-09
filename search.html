@@ -57,228 +57,235 @@
                     </div>
                 </div>
 
-                <div class="search-filter-toggle-row mb-3">
-                    <button class="btn btn-outline-dark search-filter-toggle" id="filterToggle" type="button"
-                        aria-expanded="false" aria-controls="filterPanel">
-                        Show filters
-                    </button>
-                </div>
+                <div class="search-content-layout">
+                    <aside class="search-filter-sidebar">
+                        <button class="btn btn-outline-dark search-filter-toggle" id="filterToggle" type="button"
+                            aria-expanded="false" aria-controls="filterPanel">
+                            Show filters
+                        </button>
 
-                <div class="search-filter-wrapper d-none" id="filterPanel">
-                    <div class="search-filter-panel mb-4">
-                        <div class="row g-2 align-items-end">
-                            <div class="col-md-4">
-                                <label class="form-label small text-secondary" for="categoryFilter">
-                                    Category
-                                </label>
-                                <select class="form-select" id="categoryFilter" name="category">
-                                    <option value="">All categories</option>
-                                    <option value="Italian">Italian</option>
-                                    <option value="Japanese">Japanese</option>
-                                    <option value="Mexican">Mexican</option>
-                                    <option value="Cafe">Cafe</option>
-                                </select>
-                            </div>
+                        <div class="search-filter-panel" id="filterPanel">
+                            <h2 class="search-filter-title">Filter results</h2>
 
-                            <div class="col-md-3">
-                                <label class="form-label small text-secondary" for="locationFilter">
-                                    Location
-                                </label>
-                                <select class="form-select" id="locationFilter" name="filter_location">
-                                    <option value="">All locations</option>
-                                    <option value="Northbridge">Northbridge</option>
-                                    <option value="Fremantle">Fremantle</option>
-                                    <option value="Subiaco">Subiaco</option>
-                                    <option value="Perth CBD">Perth CBD</option>
-                                </select>
-                            </div>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label small text-secondary" for="categoryFilter">
+                                        Category
+                                    </label>
+                                    <select class="form-select" id="categoryFilter" name="category">
+                                        <option value="">All categories</option>
+                                        <option value="Italian">Italian</option>
+                                        <option value="Japanese">Japanese</option>
+                                        <option value="Mexican">Mexican</option>
+                                        <option value="Cafe">Cafe</option>
+                                    </select>
+                                </div>
 
-                            <div class="col-md-2">
-                                <label class="form-label small text-secondary" for="ratingFilter">
-                                    Rating
-                                </label>
-                                <select class="form-select" id="ratingFilter" name="rating">
-                                    <option value="">Any</option>
-                                    <option value="4.5">4.5+</option>
-                                    <option value="4">4.0+</option>
-                                    <option value="3.5">3.5+</option>
-                                </select>
-                            </div>
+                                <div class="col-12">
+                                    <label class="form-label small text-secondary" for="locationFilter">
+                                        Location
+                                    </label>
+                                    <select class="form-select" id="locationFilter" name="filter_location">
+                                        <option value="">All locations</option>
+                                        <option value="Northbridge">Northbridge</option>
+                                        <option value="Fremantle">Fremantle</option>
+                                        <option value="Subiaco">Subiaco</option>
+                                        <option value="Perth CBD">Perth CBD</option>
+                                    </select>
+                                </div>
 
-                            <div class="col-md-3">
-                                <label class="form-label small text-secondary" for="sortFilter">
-                                    Sort by
-                                </label>
-                                <select class="form-select" id="sortFilter" name="sort">
-                                    <option value="rating">Highest rating</option>
-                                    <option value="reviews">Most reviewed</option>
-                                    <option value="newest">Newest</option>
-                                </select>
+                                <div class="col-12">
+                                    <label class="form-label small text-secondary" for="ratingFilter">
+                                        Rating
+                                    </label>
+                                    <select class="form-select" id="ratingFilter" name="rating">
+                                        <option value="">Any</option>
+                                        <option value="4.5">4.5+</option>
+                                        <option value="4">4.0+</option>
+                                        <option value="3.5">3.5+</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label small text-secondary" for="sortFilter">
+                                        Sort by
+                                    </label>
+                                    <select class="form-select" id="sortFilter" name="sort">
+                                        <option value="rating">Highest rating</option>
+                                        <option value="reviews">Most reviewed</option>
+                                        <option value="newest">Newest</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </aside>
 
-                <section id="mapPreview" class="search-map-panel d-none p-4 mb-4 position-relative">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h2 class="h5">Map Preview</h2>
-                            <p class="text-secondary mb-0">
-                                Static map-style view for comparing nearby restaurants.
-                            </p>
+                    <div class="search-results-main">
+                        <section id="mapPreview" class="search-map-panel d-none p-4 mb-4 position-relative">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h2 class="h5">Map Preview</h2>
+                                    <p class="text-secondary mb-0">
+                                        Static map-style view for comparing nearby restaurants.
+                                    </p>
+                                </div>
+
+                                <span class="badge text-bg-light border">Perth area</span>
+                            </div>
+
+                            <div class="map-pin position-absolute" style="left:22%;top:56%"></div>
+                            <div class="map-pin position-absolute" style="left:48%;top:42%"></div>
+                            <div class="map-pin position-absolute" style="left:66%;top:65%"></div>
+                            <div class="map-pin position-absolute" style="left:78%;top:35%"></div>
+                        </section>
+
+                        <div class="search-results-list row g-3" id="resultsList">
+                            <div class="col-12">
+                                <article class="search-restaurant-card h-100">
+                                    <img class="search-restaurant-image"
+                                        src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80"
+                                        alt="Laneway Pizza Co." loading="lazy">
+
+                                    <div class="search-restaurant-card__body">
+                                        <div class="d-flex justify-content-between gap-3">
+                                            <div>
+                                                <span class="badge text-bg-light border">Italian</span>
+                                                <h2>Laneway Pizza Co.</h2>
+                                            </div>
+
+                                            <button class="search-bookmark-btn bookmark-toggle"
+                                                data-bookmark="laneway-pizza" type="button"
+                                                aria-label="Save restaurant">
+                                                ♡
+                                            </button>
+                                        </div>
+
+                                        <p class="search-restaurant-meta">
+                                            Northbridge · $$
+                                        </p>
+
+                                        <p class="search-rating" aria-label="4.7 out of 5">
+                                            ★★★★★
+                                            <span>4.7 (512)</span>
+                                        </p>
+
+                                        <p class="search-restaurant-description">
+                                            Wood-fired pizza, shared plates, and a busy late-night laneway feel.
+                                        </p>
+
+                                        <a href="./restaurant_detail.html?id=laneway-pizza"
+                                            class="btn btn-dark align-self-start mt-auto">
+                                            View details
+                                        </a>
+                                    </div>
+                                </article>
+                            </div>
+
+                            <div class="col-12">
+                                <article class="search-restaurant-card h-100">
+                                    <img class="search-restaurant-image"
+                                        src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80"
+                                        alt="Harbour Sushi Bar" loading="lazy">
+
+                                    <div class="search-restaurant-card__body">
+                                        <div class="d-flex justify-content-between gap-3">
+                                            <div>
+                                                <span class="badge text-bg-light border">Japanese</span>
+                                                <h2>Harbour Sushi Bar</h2>
+                                            </div>
+
+                                            <button class="search-bookmark-btn bookmark-toggle"
+                                                data-bookmark="harbour-sushi" type="button"
+                                                aria-label="Save restaurant">
+                                                ♡
+                                            </button>
+                                        </div>
+
+                                        <p class="search-restaurant-meta">
+                                            Fremantle · $$$
+                                        </p>
+
+                                        <p class="search-rating" aria-label="4.6 out of 5">
+                                            ★★★★★
+                                            <span>4.6 (286)</span>
+                                        </p>
+
+                                        <p class="search-restaurant-description">
+                                            Sashimi, hand rolls, and bento boxes close to the waterfront.
+                                        </p>
+
+                                        <a href="./restaurant_detail.html?id=harbour-sushi"
+                                            class="btn btn-dark align-self-start mt-auto">
+                                            View details
+                                        </a>
+                                    </div>
+                                </article>
+                            </div>
+
+                            <div class="col-12">
+                                <article class="search-restaurant-card h-100">
+                                    <img class="search-restaurant-image"
+                                        src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&q=80"
+                                        alt="Taco Yard" loading="lazy">
+
+                                    <div class="search-restaurant-card__body">
+                                        <div class="d-flex justify-content-between gap-3">
+                                            <div>
+                                                <span class="badge text-bg-light border">Mexican</span>
+                                                <h2>Taco Yard</h2>
+                                            </div>
+
+                                            <button class="search-bookmark-btn bookmark-toggle"
+                                                data-bookmark="taco-yard" type="button" aria-label="Save restaurant">
+                                                ♡
+                                            </button>
+                                        </div>
+
+                                        <p class="search-restaurant-meta">
+                                            Subiaco · $$
+                                        </p>
+
+                                        <p class="search-rating" aria-label="4.5 out of 5">
+                                            ★★★★★
+                                            <span>4.5 (198)</span>
+                                        </p>
+
+                                        <p class="search-restaurant-description">
+                                            Street tacos, loaded nachos, and fresh agua frescas.
+                                        </p>
+
+                                        <a href="./restaurant_detail.html?id=taco-yard"
+                                            class="btn btn-dark align-self-start mt-auto">
+                                            View details
+                                        </a>
+                                    </div>
+                                </article>
+                            </div>
                         </div>
 
-                        <span class="badge text-bg-light border">Perth area</span>
-                    </div>
+                        <nav class="search-pagination" aria-label="Search results pagination">
+                            <button class="pagination-arrow disabled" type="button" aria-label="Previous page">
+                                ‹
+                            </button>
 
-                    <div class="map-pin position-absolute" style="left:22%;top:56%"></div>
-                    <div class="map-pin position-absolute" style="left:48%;top:42%"></div>
-                    <div class="map-pin position-absolute" style="left:66%;top:65%"></div>
-                    <div class="map-pin position-absolute" style="left:78%;top:35%"></div>
-                </section>
+                            <button class="pagination-number active" type="button" aria-current="page">
+                                1
+                            </button>
 
-                <div class="search-results-list row g-3" id="resultsList">
-                    <div class="col-12">
-                        <article class="search-restaurant-card h-100">
-                            <img class="search-restaurant-image"
-                                src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80"
-                                alt="Laneway Pizza Co." loading="lazy">
+                            <button class="pagination-number" type="button">
+                                2
+                            </button>
 
-                            <div class="search-restaurant-card__body">
-                                <div class="d-flex justify-content-between gap-3">
-                                    <div>
-                                        <span class="badge text-bg-light border">Italian</span>
-                                        <h2>Laneway Pizza Co.</h2>
-                                    </div>
+                            <button class="pagination-number" type="button">
+                                3
+                            </button>
 
-                                    <button class="search-bookmark-btn bookmark-toggle" data-bookmark="laneway-pizza"
-                                        type="button" aria-label="Save restaurant">
-                                        ♡
-                                    </button>
-                                </div>
-
-                                <p class="search-restaurant-meta">
-                                    Northbridge · $$
-                                </p>
-
-                                <p class="search-rating" aria-label="4.7 out of 5">
-                                    ★★★★★
-                                    <span>4.7 (512)</span>
-                                </p>
-
-                                <p class="search-restaurant-description">
-                                    Wood-fired pizza, shared plates, and a busy late-night laneway feel.
-                                </p>
-
-                                <a href="./restaurant_detail.html?id=laneway-pizza"
-                                    class="btn btn-dark align-self-start mt-auto">
-                                    View details
-                                </a>
-                            </div>
-                        </article>
-                    </div>
-
-                    <div class="col-12">
-                        <article class="search-restaurant-card h-100">
-                            <img class="search-restaurant-image"
-                                src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80"
-                                alt="Harbour Sushi Bar" loading="lazy">
-
-                            <div class="search-restaurant-card__body">
-                                <div class="d-flex justify-content-between gap-3">
-                                    <div>
-                                        <span class="badge text-bg-light border">Japanese</span>
-                                        <h2>Harbour Sushi Bar</h2>
-                                    </div>
-
-                                    <button class="search-bookmark-btn bookmark-toggle" data-bookmark="harbour-sushi"
-                                        type="button" aria-label="Save restaurant">
-                                        ♡
-                                    </button>
-                                </div>
-
-                                <p class="search-restaurant-meta">
-                                    Fremantle · $$$
-                                </p>
-
-                                <p class="search-rating" aria-label="4.6 out of 5">
-                                    ★★★★★
-                                    <span>4.6 (286)</span>
-                                </p>
-
-                                <p class="search-restaurant-description">
-                                    Sashimi, hand rolls, and bento boxes close to the waterfront.
-                                </p>
-
-                                <a href="./restaurant_detail.html?id=harbour-sushi"
-                                    class="btn btn-dark align-self-start mt-auto">
-                                    View details
-                                </a>
-                            </div>
-                        </article>
-                    </div>
-
-                    <div class="col-12">
-                        <article class="search-restaurant-card h-100">
-                            <img class="search-restaurant-image"
-                                src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&q=80"
-                                alt="Taco Yard" loading="lazy">
-
-                            <div class="search-restaurant-card__body">
-                                <div class="d-flex justify-content-between gap-3">
-                                    <div>
-                                        <span class="badge text-bg-light border">Mexican</span>
-                                        <h2>Taco Yard</h2>
-                                    </div>
-
-                                    <button class="search-bookmark-btn bookmark-toggle" data-bookmark="taco-yard"
-                                        type="button" aria-label="Save restaurant">
-                                        ♡
-                                    </button>
-                                </div>
-
-                                <p class="search-restaurant-meta">
-                                    Subiaco · $$
-                                </p>
-
-                                <p class="search-rating" aria-label="4.5 out of 5">
-                                    ★★★★★
-                                    <span>4.5 (198)</span>
-                                </p>
-
-                                <p class="search-restaurant-description">
-                                    Street tacos, loaded nachos, and fresh agua frescas.
-                                </p>
-
-                                <a href="./restaurant_detail.html?id=taco-yard"
-                                    class="btn btn-dark align-self-start mt-auto">
-                                    View details
-                                </a>
-                            </div>
-                        </article>
+                            <button class="pagination-arrow" type="button" aria-label="Next page">
+                                ›
+                            </button>
+                        </nav>
                     </div>
                 </div>
-                <nav class="search-pagination" aria-label="Search results pagination">
-                    <button class="pagination-arrow disabled" type="button" aria-label="Previous page">
-                        ‹
-                    </button>
-
-                    <button class="pagination-number active" type="button" aria-current="page">
-                        1
-                    </button>
-
-                    <button class="pagination-number" type="button">
-                        2
-                    </button>
-
-                    <button class="pagination-number" type="button">
-                        3
-                    </button>
-
-                    <button class="pagination-arrow" type="button" aria-label="Next page">
-                        ›
-                    </button>
-                </nav>
             </div>
         </section>
     </main>

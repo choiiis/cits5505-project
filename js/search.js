@@ -85,12 +85,12 @@ function initFilterToggle() {
     }
 
     filterToggle.addEventListener("click", () => {
-        const isHidden = filterPanel.classList.toggle("d-none");
+        const isOpen = filterPanel.classList.toggle("active");
 
-        filterToggle.textContent = isHidden ? "Show filters" : "Hide filters";
-        filterToggle.setAttribute("aria-expanded", String(!isHidden));
-        filterToggle.classList.toggle("btn-outline-dark", isHidden);
-        filterToggle.classList.toggle("btn-dark", !isHidden);
+        filterToggle.textContent = isOpen ? "Hide filters" : "Show filters";
+        filterToggle.setAttribute("aria-expanded", String(isOpen));
+        filterToggle.classList.toggle("btn-outline-dark", !isOpen);
+        filterToggle.classList.toggle("btn-dark", isOpen);
     });
 }
 
