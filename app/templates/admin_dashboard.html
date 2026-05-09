@@ -28,25 +28,12 @@
         <div class="container">
 
             <section class="admin-stats">
+                {% for stat in admin_stats %}
                 <div class="admin-stat-card">
-                    <span>Total Users</span>
-                    <strong>1,248</strong>
+                    <span>{{ stat.label }}</span>
+                    <strong>{{ stat.value }}</strong>
                 </div>
-
-                <div class="admin-stat-card">
-                    <span>Total Restaurants</span>
-                    <strong>86</strong>
-                </div>
-
-                <div class="admin-stat-card">
-                    <span>Pending Approval</span>
-                    <strong>7</strong>
-                </div>
-
-                <div class="admin-stat-card">
-                    <span>Reported Listings</span>
-                    <strong>3</strong>
-                </div>
+                {% endfor %}
             </section>
 
             <section class="admin-card">
@@ -78,50 +65,24 @@
                         </thead>
 
                         <tbody>
+                            {% for restaurant in restaurants %}
                             <tr>
-                                <td>Laneway Pizza Co.</td>
-                                <td>Italian</td>
-                                <td>Mia Chen</td>
+                                <td>{{ restaurant.name }}</td>
+                                <td>{{ restaurant.category }}</td>
+                                <td>{{ restaurant.owner }}</td>
                                 <td>
-                                    <span class="admin-status admin-status--approved">
-                                        Approved
+                                    <span class="admin-status {{ restaurant.status_class }}">
+                                        {{ restaurant.status }}
                                     </span>
                                 </td>
-                                <td>4.7</td>
+                                <td>{{ restaurant.rating }}</td>
                                 <td>
-                                    <button type="button" class="admin-table-button">View</button>
+                                    <button type="button" class="admin-table-button">
+                                        {{ restaurant.action }}
+                                    </button>
                                 </td>
                             </tr>
-
-                            <tr>
-                                <td>Ocean View Cafe</td>
-                                <td>Modern Australian</td>
-                                <td>David Lee</td>
-                                <td>
-                                    <span class="admin-status admin-status--pending">
-                                        Pending
-                                    </span>
-                                </td>
-                                <td>4.3</td>
-                                <td>
-                                    <button type="button" class="admin-table-button">Review</button>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>Green Garden Bistro</td>
-                                <td>Vegetarian</td>
-                                <td>Sarah Green</td>
-                                <td>
-                                    <span class="admin-status admin-status--reported">
-                                        Reported
-                                    </span>
-                                </td>
-                                <td>3.9</td>
-                                <td>
-                                    <button type="button" class="admin-table-button">Check</button>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -148,47 +109,23 @@
                         </thead>
 
                         <tbody>
+                            {% for user in users %}
                             <tr>
-                                <td>Alex Wong</td>
-                                <td>alex@example.com</td>
-                                <td>Customer</td>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.role }}</td>
                                 <td>
-                                    <span class="admin-status admin-status--approved">
-                                        Active
+                                    <span class="admin-status {{ user.status_class }}">
+                                        {{ user.status }}
                                     </span>
                                 </td>
                                 <td>
-                                    <button type="button" class="admin-table-button">View</button>
+                                    <button type="button" class="admin-table-button">
+                                        {{ user.action }}
+                                    </button>
                                 </td>
                             </tr>
-
-                            <tr>
-                                <td>Mia Chen</td>
-                                <td>mia@example.com</td>
-                                <td>Owner</td>
-                                <td>
-                                    <span class="admin-status admin-status--approved">
-                                        Active
-                                    </span>
-                                </td>
-                                <td>
-                                    <button type="button" class="admin-table-button">View</button>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>Jordan Smith</td>
-                                <td>jordan@example.com</td>
-                                <td>Customer</td>
-                                <td>
-                                    <span class="admin-status admin-status--pending">
-                                        Under Review
-                                    </span>
-                                </td>
-                                <td>
-                                    <button type="button" class="admin-table-button">Check</button>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -203,26 +140,12 @@
                 </div>
 
                 <div class="admin-task-grid">
+                    {% for task in admin_tasks %}
                     <div class="admin-task-card">
-                        <h3>Approve restaurants</h3>
-                        <p>
-                            Review new restaurant submissions and approve listings that meet the platform requirements.
-                        </p>
+                        <h3>{{ task.title }}</h3>
+                        <p>{{ task.description }}</p>
                     </div>
-
-                    <div class="admin-task-card">
-                        <h3>Manage reports</h3>
-                        <p>
-                            Check reported restaurants, reviews, or users and decide whether action is needed.
-                        </p>
-                    </div>
-
-                    <div class="admin-task-card">
-                        <h3>Monitor users</h3>
-                        <p>
-                            View user roles, account status, and activity before connecting full admin controls.
-                        </p>
-                    </div>
+                    {% endfor %}
                 </div>
             </section>
 

@@ -59,7 +59,7 @@ def home():
 
 @app.route("/home-test")
 def home_test():
-    return render_template("home.html")
+    return render_template("index.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -78,7 +78,6 @@ def login():
         flash("Invalid email or password.", "danger")
 
     return render_template("login.html")
-
 
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
@@ -111,7 +110,9 @@ def signup():
             flash("Passwords do not match.", "danger")
             return render_template("signup.html")
 
-        if User.query.filter_by(email=email).first():
+        existing_user = User.query.filter_by(email=email).first()
+
+        if existing_user:
             flash("An account with that email already exists.", "danger")
             return render_template("signup.html")
 
@@ -189,8 +190,178 @@ def restaurant_menu(restaurant_id):
 
 @app.route("/admin")
 def admin_dashboard():
-    return render_template("admin_dashboard.html")
+    admin_stats = [
+        {"label": "Total Users", "value": "1,248"},
+        {"label": "Total Restaurants", "value": "86"},
+        {"label": "Pending Approval", "value": "7"},
+        {"label": "Reported Listings", "value": "3"},
+    ]
 
+    restaurants = [
+        {
+            "name": "Laneway Pizza Co.",
+            "category": "Italian",
+            "owner": "Mia Chen",
+            "status": "Approved",
+            "status_class": "admin-status--approved",
+            "rating": "4.7",
+            "action": "View",
+        },
+        {
+            "name": "Ocean View Cafe",
+            "category": "Modern Australian",
+            "owner": "David Lee",
+            "status": "Pending",
+            "status_class": "admin-status--pending",
+            "rating": "4.3",
+            "action": "Review",
+        },
+        {
+            "name": "Green Garden Bistro",
+            "category": "Vegetarian",
+            "owner": "Sarah Green",
+            "status": "Reported",
+            "status_class": "admin-status--reported",
+            "rating": "3.9",
+            "action": "Check",
+        },
+    ]
+
+    users = [
+        {
+            "name": "Alex Wong",
+            "email": "alex@example.com",
+            "role": "Customer",
+            "status": "Active",
+            "status_class": "admin-status--approved",
+            "action": "View",
+        },
+        {
+            "name": "Mia Chen",
+            "email": "mia@example.com",
+            "role": "Owner",
+            "status": "Active",
+            "status_class": "admin-status--approved",
+            "action": "View",
+        },
+        {
+            "name": "Jordan Smith",
+            "email": "jordan@example.com",
+            "role": "Customer",
+            "status": "Under Review",
+            "status_class": "admin-status--pending",
+            "action": "Check",
+        },
+    ]
+
+    admin_tasks = [
+        {
+            "title": "Approve restaurants",
+            "description": "Review new restaurant submissions and approve listings that meet the platform requirements.",
+        },
+        {
+            "title": "Manage reports",
+            "description": "Check reported restaurants, reviews, or users and decide whether action is needed.",
+        },
+        {
+            "title": "Monitor users",
+            "description": "View user roles, account status, and activity before connecting full admin controls.",
+        },
+    ]
+
+    return render_template(
+        "admin_dashboard.html",
+        admin_stats=admin_stats,
+        restaurants=restaurants,
+        users=users,
+        admin_tasks=admin_tasks,
+    )
+    
 @app.route("/owner")
 def owner_dashboard():
-    return render_template("owner_dashboard.html")
+    restaurant = {
+        "id": 1,
+        "name": "Laneway Pizza Co.",
+        "category": "Italian",
+        "address": "Barrack St, Perth, WA 6000",
+        "phone": "+61 8 1234 5678",
+        "website": "https://example.com",
+        "status": "Approved",
+        "rating": "4.7",
+        "review_count": "512",
+    }
+
+    owner_stats = [
+        {"label": "Restaurant", "value": restaurant["name"]},
+        {"label": "Listing Status", "value": restaurant["status"]},
+        {"label": "Rating", "value": restaurant["rating"]},
+        {"label": "Reviews", "value": restaurant["review_count"]},
+    ]
+
+    restaurant_info = [
+        {"label": "Restaurant Name", "field": "name", "value": restaurant["name"]},
+        {"label": "Category", "field": "category", "value": restaurant["category"]},
+        {"label": "Address", "field": "address", "value": restaurant["address"]},
+        {"label": "Phone", "field": "phone", "value": restaurant["phone"]},
+        {"label": "Website", "field": "website", "value": restaurant["website"]},
+    ]
+
+    opening_hours = [
+        {"day": "Monday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
+        {"day": "Tuesday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
+        {"day": "Wednesday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
+        {"day": "Thursday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
+        {"day": "Friday", "open_time": "07:00", "close_time": "00:00", "is_closed": False},
+        {"day": "Saturday", "open_time": "08:00", "close_time": "00:00", "is_closed": False},
+        {"day": "Sunday", "open_time": "", "close_time": "", "is_closed": True},
+    ]
+
+    menu_items = [
+        {
+            "name": "Margherita Pizza",
+            "category": "Pizza",
+            "price": "$22",
+            "status": "Available",
+            "status_class": "owner-status--available",
+        },
+        {
+            "name": "Truffle Mushroom Pizza",
+            "category": "Pizza",
+            "price": "$27",
+            "status": "Available",
+            "status_class": "owner-status--available",
+        },
+        {
+            "name": "Tiramisu",
+            "category": "Dessert",
+            "price": "$14",
+            "status": "Hidden",
+            "status_class": "owner-status--hidden",
+        },
+    ]
+
+    owner_tasks = [
+        {
+            "title": "Edit restaurant profile",
+            "description": "Update restaurant name, category, contact details, website, images, and description.",
+        },
+        {
+            "title": "Manage opening hours",
+            "description": "Change daily opening times and mark specific days as closed.",
+        },
+        {
+            "title": "Review listing status",
+            "description": "Check whether the restaurant listing is approved, pending, hidden, or reported.",
+        },
+    ]
+
+    return render_template(
+        "owner_dashboard.html",
+        restaurant=restaurant,
+        owner_stats=owner_stats,
+        restaurant_info=restaurant_info,
+        opening_hours=opening_hours,
+        menu_items=menu_items,
+        owner_tasks=owner_tasks,
+    )
+
