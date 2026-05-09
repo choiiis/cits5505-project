@@ -13,7 +13,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoryInput = document.getElementById("menuItemCategory");
   const priceInput = document.getElementById("menuItemPrice");
   const statusInput = document.getElementById("menuItemStatus");
+const closedCheckboxes = document.querySelectorAll(".owner-closed-checkbox");
 
+closedCheckboxes.forEach((checkbox) => {
+  checkbox.addEventListener("change", () => {
+    const row = checkbox.closest("tr");
+    const timeInputs = row.querySelectorAll(".owner-time-input");
+
+    timeInputs.forEach((input) => {
+      input.disabled = checkbox.checked;
+
+      if (checkbox.checked) {
+        input.value = "";
+      }
+    });
+  });
+});
   let restaurantEditMode = false;
   let editingRow = null;
 

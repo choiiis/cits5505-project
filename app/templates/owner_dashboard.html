@@ -14,13 +14,13 @@
                 <p class="owner-label">Owner Panel</p>
                 <h1>Owner Dashboard</h1>
                 <p class="owner-subtitle">
-                    Manage restaurant information, menu items, opening hours, and listing status from one place.
+    Manage {{ restaurant.name }} information, menu items, opening hours, and listing status from one place.
                 </p>
             </div>
 
-            <a href="{{ url_for('restaurant_detail', restaurant_id=1) }}" class="owner-view-link">
-                View public page
-            </a>
+            <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}" class="owner-view-link">
+    View public page
+</a>
         </div>
     </section>
 
@@ -28,26 +28,13 @@
         <div class="container">
 
             <section class="owner-stats">
-                <div class="owner-stat-card">
-                    <span>Restaurant</span>
-                    <strong>Laneway Pizza Co.</strong>
-                </div>
-
-                <div class="owner-stat-card">
-                    <span>Listing Status</span>
-                    <strong>Approved</strong>
-                </div>
-
-                <div class="owner-stat-card">
-                    <span>Rating</span>
-                    <strong>4.7</strong>
-                </div>
-
-                <div class="owner-stat-card">
-                    <span>Reviews</span>
-                    <strong>512</strong>
-                </div>
-            </section>
+    {% for stat in owner_stats %}
+    <div class="owner-stat-card">
+        <span>{{ stat.label }}</span>
+        <strong>{{ stat.value }}</strong>
+    </div>
+    {% endfor %}
+</section>
 
             <section class="owner-card">
                 <div class="owner-card__heading owner-card__heading--with-action">
@@ -64,37 +51,71 @@
                 </div>
 
                 <div class="owner-info-grid">
-                    <div class="owner-info-item">
-                        <span>Restaurant Name</span>
-                        <p data-info-field="name">Laneway Pizza Co.</p>
-                    </div>
+    {% for info in restaurant_info %}
+    <div class="owner-info-item">
+        <span>{{ info.label }}</span>
+        <p data-info-field="{{ info.field }}">{{ info.value }}</p>
+    </div>
+    {% endfor %}
 
-                    <div class="owner-info-item">
-                        <span>Category</span>
-                        <p data-info-field="category">Italian</p>
-                    </div>
-
-                    <div class="owner-info-item">
-                        <span>Address</span>
-                        <p data-info-field="address">Barrack St, Perth, WA 6000</p>
-                    </div>
-
-                    <div class="owner-info-item">
-                        <span>Phone</span>
-                        <p data-info-field="phone">+61 8 1234 5678</p>
-                    </div>
-
-                    <div class="owner-info-item">
-                        <span>Website</span>
-                        <p data-info-field="website">https://example.com</p>
-                    </div>
-
-                    <div class="owner-info-item">
-                        <span>Opening Hours</span>
-                        <p data-info-field="hours">Mon-Sun, 7:00 AM - 11:00 PM</p>
-                    </div>
-                </div>
+        </div>
             </section>
+
+            <section class="owner-card">
+    <div class="owner-card__heading">
+        <h2>Opening Hours</h2>
+        <p>
+            Set opening and closing times for each day. Tick closed if the restaurant does not open on that day.
+        </p>
+    </div>
+
+    <div class="owner-table-wrap">
+        <table class="owner-table owner-hours-table">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Open time</th>
+                    <th>Close time</th>
+                    <th>Closed</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for hour in opening_hours %}
+                <tr>
+                    <td>{{ hour.day }}</td>
+                    <td>
+                        <input
+                            type="time"
+                            class="owner-time-input"
+                            value="{{ hour.open_time }}"
+                            {% if hour.is_closed %}disabled{% endif %}
+                        >
+                    </td>
+                    <td>
+                        <input
+                            type="time"
+                            class="owner-time-input"
+                            value="{{ hour.close_time }}"
+                            {% if hour.is_closed %}disabled{% endif %}
+                        >
+                    </td>
+                    <td>
+                        <label class="owner-checkbox-label">
+                            <input
+                                type="checkbox"
+                                class="owner-closed-checkbox"
+                                {% if hour.is_closed %}checked{% endif %}
+                            >
+                            Closed
+                        </label>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
 
             <section class="owner-card">
                 <div class="owner-card__heading">
@@ -166,54 +187,24 @@
                         </thead>
 
                         <tbody id="menuTableBody">
-                            <tr>
-                                <td>Margherita Pizza</td>
-                                <td>Pizza</td>
-                                <td>$22</td>
-                                <td>
-                                    <span class="owner-status owner-status--available">
-                                        Available
-                                    </span>
-                                </td>
-                                <td>
-                                    <button type="button" class="owner-table-button" data-action="edit-menu">
-                                        Edit
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>Truffle Mushroom Pizza</td>
-                                <td>Pizza</td>
-                                <td>$27</td>
-                                <td>
-                                    <span class="owner-status owner-status--available">
-                                        Available
-                                    </span>
-                                </td>
-                                <td>
-                                    <button type="button" class="owner-table-button" data-action="edit-menu">
-                                        Edit
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>Tiramisu</td>
-                                <td>Dessert</td>
-                                <td>$14</td>
-                                <td>
-                                    <span class="owner-status owner-status--hidden">
-                                        Hidden
-                                    </span>
-                                </td>
-                                <td>
-                                    <button type="button" class="owner-table-button" data-action="edit-menu">
-                                        Edit
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
+    {% for item in menu_items %}
+    <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.price }}</td>
+        <td>
+            <span class="owner-status {{ item.status_class }}">
+                {{ item.status }}
+            </span>
+        </td>
+        <td>
+            <button type="button" class="owner-table-button" data-action="edit-menu">
+                Edit
+            </button>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
                     </table>
                 </div>
             </section>
@@ -227,12 +218,13 @@
                 </div>
 
                 <div class="owner-task-grid">
-                    <div class="owner-task-card">
-                        <h3>Edit restaurant profile</h3>
-                        <p>
-                            Update restaurant name, category, contact details, website, images, and description.
-                        </p>
-                    </div>
+    {% for task in owner_tasks %}
+    <div class="owner-task-card">
+        <h3>{{ task.title }}</h3>
+        <p>{{ task.description }}</p>
+    </div>
+    {% endfor %}
+</div>
 
                     <div class="owner-task-card">
                         <h3>Manage opening hours</h3>
