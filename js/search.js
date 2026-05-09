@@ -14,8 +14,8 @@ function updateSearchSummary() {
     const keyword = params.get("q") || "restaurants";
     const totalResults = document.querySelectorAll(".search-restaurant-card").length;
 
-    document.getElementById("summaryText").textContent =
-        `${totalResults} results for "${keyword}"`;
+    document.getElementById("summaryText").innerHTML =
+        `${totalResults} results for "<strong>${keyword}</strong>"`;
 }
 
 function initBookmarks() {
@@ -53,7 +53,6 @@ function initBookmarks() {
 
 function initMapToggle() {
     const mapToggle = document.getElementById("mapToggle");
-    const mapButton = document.getElementById("mapButton");
     const mapPreview = document.getElementById("mapPreview");
 
     if (!mapToggle || !mapPreview) {
@@ -69,11 +68,7 @@ function initMapToggle() {
         setMapVisible(event.target.checked);
     });
 
-    if (mapButton) {
-        mapButton.addEventListener("click", () => {
-            setMapVisible(!mapToggle.checked);
-        });
-    }
+    setMapVisible(true);
 }
 
 function initFilterToggle() {
