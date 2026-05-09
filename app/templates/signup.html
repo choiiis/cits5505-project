@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up | TableTrail{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+{% endblock %}
+
+{% block body_attrs %}data-page="signup"{% endblock %}
+
+{% block content %}
+<main class="auth-shell container d-flex align-items-center justify-content-center py-5">
+    <section class="form-card bg-white shadow-sm p-4 w-100">
+        <h1 class="h3 fw-bold">Create account</h1>
+        <p class="text-secondary">Join TableTrail to save restaurants, write reviews, and build your profile.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="auth-alerts" aria-live="polite">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} py-2" role="alert">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form id="signupForm" method="post" action="{{ url_for('signup') }}" novalidate>
+            <div class="mb-3">
+                <label class="form-label" for="usernameInput">Name</label>
+                <input
+                    class="form-control"
+                    id="usernameInput"
+                    name="username"
+                    type="text"
+                    placeholder="Your name"
+                    autocomplete="name"
+                    required>
+                <div class="invalid-feedback">Please enter your name.</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="emailInput">Email</label>
+                <input
+                    class="form-control"
+                    id="emailInput"
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required>
+                <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="passwordInput">Password</label>
+                <input
+                    class="form-control"
+                    id="passwordInput"
+                    name="password"
+                    type="password"
+                    placeholder="Password"
+                    autocomplete="new-password"
+                    required>
+                <div class="invalid-feedback">Password must be at least 6 characters.</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="confirmPasswordInput">Confirm password</label>
+                <input
+                    class="form-control"
+                    id="confirmPasswordInput"
+                    name="confirm_password"
+                    type="password"
+                    placeholder="Confirm password"
+                    autocomplete="new-password"
+                    required>
+                <div class="invalid-feedback">Passwords must match.</div>
+            </div>
+
+            <button class="btn btn-success w-100 signup-submit" type="submit">Create account</button>
+            <p class="signup-message mb-0 mt-3" id="signupMessage" role="status" aria-live="polite"></p>
+        </form>
+
+        <div class="d-flex justify-content-center mt-3 small">
+            <a href="{{ url_for('login') }}">Already have an account? Login</a>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+{% endblock %}
