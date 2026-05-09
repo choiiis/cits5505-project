@@ -13,7 +13,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoryInput = document.getElementById("menuItemCategory");
   const priceInput = document.getElementById("menuItemPrice");
   const statusInput = document.getElementById("menuItemStatus");
+const closedCheckboxes = document.querySelectorAll(".owner-closed-checkbox");
+const saveOpeningHoursBtn = document.getElementById("saveOpeningHoursBtn");
+const ownerHoursMessage = document.getElementById("ownerHoursMessage");
 
+closedCheckboxes.forEach((checkbox) => {
+  checkbox.addEventListener("change", () => {
+    const row = checkbox.closest("tr");
+    const timeInputs = row.querySelectorAll(".owner-time-input");
+
+    timeInputs.forEach((input) => {
+      input.disabled = checkbox.checked;
+
+      if (checkbox.checked) {
+        input.value = "";
+      }
+    });
+  });
+});
   let restaurantEditMode = false;
   let editingRow = null;
 
@@ -26,6 +43,17 @@ document.addEventListener("DOMContentLoaded", () => {
       message.textContent = "";
     }, 3000);
   }
+
+  function showHoursMessage(text) {
+  if (!ownerHoursMessage) return;
+
+  ownerHoursMessage.textContent = text;
+
+  window.clearTimeout(showHoursMessage.timer);
+  showHoursMessage.timer = window.setTimeout(() => {
+    ownerHoursMessage.textContent = "";
+  }, 3000);
+}
 
   function setRestaurantEditMode(isEditing) {
     restaurantEditMode = isEditing;
@@ -164,4 +192,25 @@ document.addEventListener("DOMContentLoaded", () => {
       resetMenuForm();
     });
   }
+  if (saveOpeningHoursBtn) {
+  saveOpeningHoursBtn.addEventListener("click", () => {
+    const openingHoursRows = document.querySelectorAll(".owner-hours-table tbody tr");
+
+    const openingHoursData = Array.from(openingHoursRows).map((row) => {
+      const day = row.children[0].textContent.trim();
+      const timeInputs = row.querySelectorAll(".owner-time-input");
+      const closedCheckbox = row.querySelector(".owner-closed-checkbox");
+
+      return {
+        day,
+        openTime: timeInputs[0].value,
+        closeTime: timeInputs[1].value,
+        closed: closedCheckbox.checked,
+      };
+    });
+
+    console.log("Opening hours updated on this page:", openingHoursData);
+    showHoursMessage("Opening hours updated on this page. Database saving can be connected later.");
+  });
+}
 });
