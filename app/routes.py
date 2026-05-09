@@ -1,8 +1,8 @@
 from flask import flash, redirect, render_template, request, session, url_for
-from app import app
+from app import app, db
 from app.utils import make_star_text
 from app.models import Restaurant, MenuItem, OpeningHour, Review, User
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import datetime
 
@@ -78,6 +78,59 @@ def login():
         flash("Invalid email or password.", "danger")
 
     return render_template("login.html")
+
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+
+        if not email:
+            flash("Please enter your email address.", "danger")
+            return render_template("forgot_password.html")
+
+        User.query.filter_by(email=email).first()
+        flash("If an account exists for that email, reset instructions will be sent.", "success")
+
+    return render_template("forgot_password.html")
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not username or not email or not password:
+            flash("Please complete all required fields.", "danger")
+            return render_template("signup.html")
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return render_template("signup.html")
+
+        if User.query.filter_by(email=email).first():
+            flash("An account with that email already exists.", "danger")
+            return render_template("signup.html")
+
+        user = User(
+            username=username,
+            email=email,
+            password_hash=generate_password_hash(password),
+            role="customer",
+        )
+
+        db.session.add(user)
+        db.session.commit()
+
+        session["user_id"] = user.id
+        session["username"] = user.username
+        flash(f"Welcome to TableTrail, {user.username}.", "success")
+        return redirect(url_for("restaurant_detail", restaurant_id=1))
+
+    return render_template("signup.html")
 
 
 @app.route("/logout")
