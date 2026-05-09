@@ -45,6 +45,11 @@ def home():
     return redirect(url_for("restaurant_detail", restaurant_id=1))
 
 
+@app.route("/home-test")
+def home_test():
+    return render_template("home.html")
+
+
 @app.route("/restaurants/<int:restaurant_id>")
 def restaurant_detail(restaurant_id):
     # restaurant summary
