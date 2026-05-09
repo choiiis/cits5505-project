@@ -56,6 +56,11 @@ def home():
     return redirect(url_for("restaurant_detail", restaurant_id=1))
 
 
+
+@app.route("/home-test")
+def home_test():
+    return render_template("home.html")
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -80,6 +85,7 @@ def logout():
     session.clear()
     flash("You have been logged out.", "info")
     return redirect(url_for("login"))
+
 
 
 @app.route("/restaurants/<int:restaurant_id>")
