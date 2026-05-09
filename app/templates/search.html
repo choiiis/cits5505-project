@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Search Restaurants | TableTrail{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<main class="search-page">
+    <section class="search-hero-section">
+        <div class="container py-3">
+            <form class="search-bar shared-search-bar row g-2 align-items-center" id="searchForm" method="get"
+                action="{{ url_for('search') }}">
+
+                <div class="col-lg-5">
+                    <div class="search-input-wrap">
+                        <span class="search-input-icon" aria-hidden="true">⌕</span>
+                        <input class="form-control form-control-lg" id="keywordSearch" name="q"
+                            value="{{ request.args.get('q', '') }}" placeholder="Restaurant, cuisine, or dish"
+                            aria-label="Search restaurants">
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="search-input-wrap">
+                        <span class="search-input-icon" aria-hidden="true">⌖</span>
+                        <input class="form-control form-control-lg" id="locationSearch" name="location"
+                            value="{{ request.args.get('location', '') }}" placeholder="Suburb or city"
+                            aria-label="Search location">
+                    </div>
+                </div>
+
+                <div class="col-lg-2">
+                    <button class="btn btn-success btn-lg w-100 search-submit-btn" type="submit">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="search-results-section">
+        <div class="container py-4">
+            <div class="search-content-layout">
+
+                <aside class="search-filter-sidebar">
+                    <button class="btn btn-outline-dark search-filter-toggle" id="filterToggle" type="button"
+                        aria-expanded="false" aria-controls="filterPanel">
+                        Show filters
+                    </button>
+
+                    <form class="search-filter-panel" id="filterPanel" method="get" action="{{ url_for('search') }}">
+
+                        <input type="hidden" name="q" value="{{ request.args.get('q', '') }}">
+                        <input type="hidden" name="location" value="{{ request.args.get('location', '') }}">
+
+                        <div class="search-filter-header">
+                            <div>
+                                <h2 class="search-filter-title">Filter results</h2>
+                                <p class="search-filter-subtitle">
+                                    Refine restaurants by category, area, and rating.
+                                </p>
+                            </div>
+
+                            <a href="{{ url_for('search') }}" class="search-filter-reset">Reset</a>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label" for="categoryFilter">Category</label>
+                                <select class="form-select" id="categoryFilter" name="category">
+                                    <option value="">All categories</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category }}" {% if request.args.get('category')==category
+                                        %}selected{% endif %}>
+                                        {{ category }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label" for="locationFilter">Location</label>
+                                <select class="form-select" id="locationFilter" name="filter_location">
+                                    <option value="">All locations</option>
+                                    {% for location in locations %}
+                                    <option value="{{ location }}" {% if request.args.get('filter_location')==location
+                                        %}selected{% endif %}>
+                                        {{ location }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label" for="ratingFilter">Rating</label>
+                                <select class="form-select" id="ratingFilter" name="rating">
+                                    <option value="">Any</option>
+                                    <option value="4.5" {% if request.args.get('rating')=='4.5' %}selected{% endif %}>
+                                        4.5+</option>
+                                    <option value="4" {% if request.args.get('rating')=='4' %}selected{% endif %}>4.0+
+                                    </option>
+                                    <option value="3.5" {% if request.args.get('rating')=='3.5' %}selected{% endif %}>
+                                        3.5+</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label" for="sortFilter">Sort by</label>
+                                <select class="form-select" id="sortFilter" name="sort">
+                                    <option value="rating" {% if request.args.get('sort', 'rating' )=='rating'
+                                        %}selected{% endif %}>
+                                        Highest rating
+                                    </option>
+                                    <option value="reviews" {% if request.args.get('sort')=='reviews' %}selected{% endif
+                                        %}>
+                                        Most reviewed
+                                    </option>
+                                    <option value="newest" {% if request.args.get('sort')=='newest' %}selected{% endif
+                                        %}>
+                                        Newest
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <button class="btn btn-success w-100 search-apply-btn" type="submit">
+                                    Apply filters
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </aside>
+
+                <div class="search-results-main">
+                    <div class="search-results-header mb-3">
+                        <div>
+                            <h1 class="search-results-title">Search Results</h1>
+                            <p class="search-summary" id="summaryText">
+                                {{ restaurants|length }} results for
+                                "<strong>{{ request.args.get('q', 'restaurants') }}</strong>"
+                            </p>
+                        </div>
+
+                        <div class="search-results-actions">
+                            <div class="form-check form-switch search-map-toggle">
+                                <input class="form-check-input" type="checkbox" role="switch" id="mapToggle">
+                                <label class="form-check-label" for="mapToggle">Show map</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <section id="mapPreview" class="search-map-panel p-4 mb-3 position-relative">
+                        <div class="search-map-content">
+                            <h2>Map preview</h2>
+                            <p>Explore restaurants nearby on the map.</p>
+                        </div>
+                    </section>
+
+                    <div class="search-results-list row g-3" id="resultsList">
+                        {% for restaurant in restaurants %}
+                        <div class="col-12">
+                            <article class="search-restaurant-card h-100">
+                                <div class="search-image-wrap">
+                                    <img class="search-restaurant-image" src="{{ restaurant.image_url }}"
+                                        alt="{{ restaurant.name }}" loading="lazy">
+                                    <span class="search-image-rating">{{ restaurant.rating }}</span>
+                                </div>
+
+                                <div class="search-restaurant-card__body">
+                                    <div>
+                                        <h2>{{ restaurant.name }}</h2>
+
+                                        <p class="search-restaurant-meta">
+                                            {{ restaurant.category }} · {{ restaurant.location }}
+                                        </p>
+
+                                        <p class="search-rating" aria-label="{{ restaurant.rating }} out of 5">
+                                            <span class="search-star">★</span>
+                                            <span>{{ restaurant.rating }} ({{ restaurant.review_count }} reviews)</span>
+                                        </p>
+
+                                        <p class="search-restaurant-description">
+                                            {{ restaurant.description }}
+                                        </p>
+
+                                        <div class="search-tag-list">
+                                            {% for tag in restaurant.tags %}
+                                            <span>{{ tag }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}"
+                                        class="btn btn-dark search-details-btn">
+                                        View details
+                                    </a>
+
+                                    <button class="search-bookmark-btn bookmark-toggle"
+                                        data-bookmark="{{ restaurant.id }}" type="button" aria-label="Save restaurant">
+                                        ♡
+                                    </button>
+                                </div>
+                            </article>
+                        </div>
+                        {% else %}
+                        <div class="col-12">
+                            <div class="search-empty-message">
+                                No restaurants found.
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <nav class="search-pagination" aria-label="Search results pagination">
+                        <button class="pagination-arrow disabled" type="button" aria-label="Previous page">
+                            ‹
+                        </button>
+
+                        <button class="pagination-number active" type="button" aria-current="page">
+                            1
+                        </button>
+
+                        <button class="pagination-number" type="button">
+                            2
+                        </button>
+
+                        <button class="pagination-arrow" type="button" aria-label="Next page">
+                            ›
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% endblock %}

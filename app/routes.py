@@ -56,10 +56,10 @@ def home():
     return redirect(url_for("restaurant_detail", restaurant_id=1))
 
 
-
 @app.route("/home-test")
 def home_test():
     return render_template("home.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -86,6 +86,54 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for("login"))
 
+
+@app.route("/search")
+def search():
+    restaurants = [
+        {
+            "id": 1,
+            "name": "Little Italy",
+            "category": "Italian",
+            "location": "Northbridge",
+            "rating": 4.6,
+            "review_count": 128,
+            "description": "Authentic Italian cuisine in the heart of Northbridge. Fresh pasta, wood-fired pizza, and a great wine list.",
+            "image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+            "tags": ["$$", "Vegetarian options", "Outdoor seating"],
+        },
+        {
+            "id": 2,
+            "name": "Sakura Sushi",
+            "category": "Japanese",
+            "location": "Subiaco",
+            "rating": 4.4,
+            "review_count": 96,
+            "description": "Fresh and authentic Japanese cuisine. Sushi, sashimi and more.",
+            "image_url": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80",
+            "tags": ["$$", "Gluten-free options", "Takeaway"],
+        },
+        {
+            "id": 3,
+            "name": "Greenhouse Cafe",
+            "category": "Cafe",
+            "location": "Fremantle",
+            "rating": 4.3,
+            "review_count": 72,
+            "description": "Relaxed cafe with excellent coffee, brunch, and house-made pastries.",
+            "image_url": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+            "tags": ["$", "Vegan options", "Outdoor seating"],
+        },
+    ]
+
+    categories = ["Italian", "Japanese", "Mexican", "Cafe"]
+    locations = ["Northbridge", "Fremantle", "Subiaco", "Perth CBD"]
+
+    return render_template(
+        "search.html",
+        restaurants=restaurants,
+        categories=categories,
+        locations=locations,
+    )
 
 
 @app.route("/restaurants/<int:restaurant_id>")
@@ -137,6 +185,7 @@ def restaurant_menu(restaurant_id):
 @app.route("/admin")
 def admin_dashboard():
     return render_template("admin_dashboard.html")
+
 
 @app.route("/owner")
 def owner_dashboard():
