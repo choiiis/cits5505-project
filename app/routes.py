@@ -59,7 +59,9 @@ def home():
 
 @app.route("/home-test")
 def home_test():
-    return render_template("index.html")
+    home_categories = ["Italian", "Japanese", "Cafe", "Thai", "Dessert"]
+
+    return render_template("index.html", home_categories=home_categories)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

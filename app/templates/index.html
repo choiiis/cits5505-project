@@ -50,11 +50,9 @@
     <section class="home-categories-section">
         <div class="container">
             <div class="category-pills-wrap" id="categoryMount" aria-label="Restaurant categories">
-                <div class="category-pill-placeholder">Italian</div>
-                <div class="category-pill-placeholder">Japanese</div>
-                <div class="category-pill-placeholder">Cafe</div>
-                <div class="category-pill-placeholder">Thai</div>
-                <div class="category-pill-placeholder">Dessert</div>
+                {% for category in home_categories %}
+                <div class="category-pill-placeholder">{{ category }}</div>
+                {% endfor %}
             </div>
         </div>
     </section>
