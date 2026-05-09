@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Login | TableTrail{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
+{% block body_attrs %}data-page="login"{% endblock %}
+
+{% block content %}
+<main class="auth-shell container d-flex align-items-center justify-content-center py-5">
+    <section class="form-card bg-white shadow-sm p-4 w-100">
+        <h1 class="h3 fw-bold">Welcome back</h1>
+        <p class="text-secondary">Log in to save restaurants, manage reviews, and access your profile.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="auth-alerts" aria-live="polite">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} py-2" role="alert">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form id="loginForm" method="post" action="{{ url_for('login') }}" novalidate>
+            <div class="mb-3">
+                <label class="form-label" for="emailInput">Email</label>
+                <input
+                    class="form-control"
+                    id="emailInput"
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required>
+                <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="passwordInput">Password</label>
+                <input
+                    class="form-control"
+                    id="passwordInput"
+                    name="password"
+                    type="password"
+                    placeholder="Password"
+                    autocomplete="current-password"
+                    required>
+                <div class="invalid-feedback">Password must be at least 6 characters.</div>
+            </div>
+
+            <button class="btn btn-success w-100 login-submit" type="submit">Login</button>
+            <p class="login-message mb-0 mt-3" id="loginMessage" role="status" aria-live="polite"></p>
+        </form>
+
+        <div class="d-flex justify-content-between mt-3 small">
+            <a href="#">Create account</a>
+            <a href="#">Forgot password?</a>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}
