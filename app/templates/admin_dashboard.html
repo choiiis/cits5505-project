@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | TableTrail{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="admin-page">
+    <section class="admin-hero">
+        <div class="container admin-hero__inner">
+            <div>
+                <p class="admin-label">Admin Panel</p>
+                <h1>Admin Dashboard</h1>
+                <p class="admin-subtitle">
+                    Manage restaurant listings, user accounts, approval status, and reported content from one place.
+                </p>
+            </div>
+
+            <a href="{{ url_for('home') }}" class="admin-view-link">
+                Back to home
+            </a>
+        </div>
+    </section>
+
+    <section class="admin-dashboard-section">
+        <div class="container">
+
+            <section class="admin-stats">
+                <div class="admin-stat-card">
+                    <span>Total Users</span>
+                    <strong>1,248</strong>
+                </div>
+
+                <div class="admin-stat-card">
+                    <span>Total Restaurants</span>
+                    <strong>86</strong>
+                </div>
+
+                <div class="admin-stat-card">
+                    <span>Pending Approval</span>
+                    <strong>7</strong>
+                </div>
+
+                <div class="admin-stat-card">
+                    <span>Reported Listings</span>
+                    <strong>3</strong>
+                </div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-card__heading">
+                    <h2>Restaurant Management</h2>
+                    <p>
+                        Review restaurant listings, check their current status, and prepare them for approval or further review.
+                    </p>
+                </div>
+
+                <div class="admin-toolbar">
+                    <button type="button" class="admin-action-button">Review pending</button>
+                    <button type="button" class="admin-action-button admin-action-button--secondary">
+                        View all restaurants
+                    </button>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Restaurant</th>
+                                <th>Category</th>
+                                <th>Owner</th>
+                                <th>Status</th>
+                                <th>Rating</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>Laneway Pizza Co.</td>
+                                <td>Italian</td>
+                                <td>Mia Chen</td>
+                                <td>
+                                    <span class="admin-status admin-status--approved">
+                                        Approved
+                                    </span>
+                                </td>
+                                <td>4.7</td>
+                                <td>
+                                    <button type="button" class="admin-table-button">View</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Ocean View Cafe</td>
+                                <td>Modern Australian</td>
+                                <td>David Lee</td>
+                                <td>
+                                    <span class="admin-status admin-status--pending">
+                                        Pending
+                                    </span>
+                                </td>
+                                <td>4.3</td>
+                                <td>
+                                    <button type="button" class="admin-table-button">Review</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Green Garden Bistro</td>
+                                <td>Vegetarian</td>
+                                <td>Sarah Green</td>
+                                <td>
+                                    <span class="admin-status admin-status--reported">
+                                        Reported
+                                    </span>
+                                </td>
+                                <td>3.9</td>
+                                <td>
+                                    <button type="button" class="admin-table-button">Check</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-card__heading">
+                    <h2>User Management</h2>
+                    <p>
+                        View customer, owner, and admin accounts. This frontend layout can later connect to role-based backend logic.
+                    </p>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>Alex Wong</td>
+                                <td>alex@example.com</td>
+                                <td>Customer</td>
+                                <td>
+                                    <span class="admin-status admin-status--approved">
+                                        Active
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="admin-table-button">View</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Mia Chen</td>
+                                <td>mia@example.com</td>
+                                <td>Owner</td>
+                                <td>
+                                    <span class="admin-status admin-status--approved">
+                                        Active
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="admin-table-button">View</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Jordan Smith</td>
+                                <td>jordan@example.com</td>
+                                <td>Customer</td>
+                                <td>
+                                    <span class="admin-status admin-status--pending">
+                                        Under Review
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="admin-table-button">Check</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-card__heading">
+                    <h2>Admin Tasks</h2>
+                    <p>
+                        These cards show the main admin-side features that can be connected to database logic later.
+                    </p>
+                </div>
+
+                <div class="admin-task-grid">
+                    <div class="admin-task-card">
+                        <h3>Approve restaurants</h3>
+                        <p>
+                            Review new restaurant submissions and approve listings that meet the platform requirements.
+                        </p>
+                    </div>
+
+                    <div class="admin-task-card">
+                        <h3>Manage reports</h3>
+                        <p>
+                            Check reported restaurants, reviews, or users and decide whether action is needed.
+                        </p>
+                    </div>
+
+                    <div class="admin-task-card">
+                        <h3>Monitor users</h3>
+                        <p>
+                            View user roles, account status, and activity before connecting full admin controls.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </section>
+</main>
+{% endblock %}

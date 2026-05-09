@@ -127,6 +127,11 @@ def restaurant_menu(restaurant_id):
 
     return render_template("restaurant_menu.html", restaurant=restaurant)
 
+
+@app.route("/admin")
+def admin_dashboard():
+    return render_template("admin_dashboard.html")
+
 @app.route("/owner")
 def owner_dashboard():
     return render_template("owner_dashboard.html")
