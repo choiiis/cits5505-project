@@ -60,8 +60,58 @@ def home():
 @app.route("/home-test")
 def home_test():
     home_categories = ["Italian", "Japanese", "Cafe", "Thai", "Dessert"]
+    featured_restaurants = [
+        {
+            "name": "Green Bowl Kitchen",
+            "category": "Healthy",
+            "location": "Perth CBD",
+            "price": "$$",
+            "rating": 4.8,
+            "star_text": make_star_text(4.8),
+            "review_count": 324,
+            "description": "Fresh bowls, cold-pressed juices, and quick lunches for busy city workers.",
+            "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Laneway Pizza Co.",
+            "category": "Italian",
+            "location": "Northbridge",
+            "price": "$$",
+            "rating": 4.7,
+            "star_text": make_star_text(4.7),
+            "review_count": 512,
+            "description": "Wood-fired pizza, shared plates, and a lively dinner atmosphere in the laneway.",
+            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Harbour Sushi Bar",
+            "category": "Japanese",
+            "location": "Fremantle",
+            "price": "$$$",
+            "rating": 4.6,
+            "star_text": make_star_text(4.6),
+            "review_count": 286,
+            "description": "Fresh sashimi, hand rolls, and tidy bento sets close to the waterfront.",
+            "image": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Taco Yard",
+            "category": "Mexican",
+            "location": "Subiaco",
+            "price": "$$",
+            "rating": 4.5,
+            "star_text": make_star_text(4.5),
+            "review_count": 198,
+            "description": "Street-style tacos, loaded nachos, and colourful drinks for a casual meal.",
+            "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&q=80",
+        },
+    ]
 
-    return render_template("index.html", home_categories=home_categories)
+    return render_template(
+        "index.html",
+        home_categories=home_categories,
+        featured_restaurants=featured_restaurants,
+    )
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
