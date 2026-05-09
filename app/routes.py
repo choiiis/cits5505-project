@@ -1,8 +1,8 @@
 from flask import flash, redirect, render_template, request, session, url_for
-from app import app
+from app import app, db
 from app.utils import make_star_text
 from app.models import Restaurant, MenuItem, OpeningHour, Review, User
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import datetime
 
@@ -78,6 +78,46 @@ def login():
         flash("Invalid email or password.", "danger")
 
     return render_template("login.html")
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not username or not email or not password:
+            flash("Please complete all required fields.", "danger")
+            return render_template("signup.html")
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return render_template("signup.html")
+
+        existing_user = User.query.filter_by(email=email).first()
+
+        if existing_user:
+            flash("An account with that email already exists.", "danger")
+            return render_template("signup.html")
+
+        user = User(
+            username=username,
+            email=email,
+            password_hash=generate_password_hash(password),
+            role="customer",
+        )
+
+        db.session.add(user)
+        db.session.commit()
+
+        session["user_id"] = user.id
+        session["username"] = user.username
+        flash(f"Welcome to TableTrail, {user.username}.", "success")
+        return redirect(url_for("restaurant_detail", restaurant_id=1))
+
+    return render_template("signup.html")
 
 
 @app.route("/logout")
