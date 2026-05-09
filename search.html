@@ -56,13 +56,148 @@
                     Filters will be added here.
                 </div>
 
-                <div class="row g-3" id="resultsList">
+                <div class="search-results-list row g-3" id="resultsList">
                     <div class="col-12">
-                        <div class="search-empty-message">
-                            Restaurant cards will be added here.
-                        </div>
+                        <article class="search-restaurant-card h-100">
+                            <img class="search-restaurant-image"
+                                src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80"
+                                alt="Laneway Pizza Co." loading="lazy">
+
+                            <div class="search-restaurant-card__body">
+                                <div class="d-flex justify-content-between gap-3">
+                                    <div>
+                                        <span class="badge text-bg-light border">Italian</span>
+                                        <h2>Laneway Pizza Co.</h2>
+                                    </div>
+
+                                    <button class="search-bookmark-btn bookmark-toggle" data-bookmark="laneway-pizza"
+                                        type="button" aria-label="Save restaurant">
+                                        ♡
+                                    </button>
+                                </div>
+
+                                <p class="search-restaurant-meta">
+                                    Northbridge · $$
+                                </p>
+
+                                <p class="search-rating" aria-label="4.7 out of 5">
+                                    ★★★★★
+                                    <span>4.7 (512)</span>
+                                </p>
+
+                                <p class="search-restaurant-description">
+                                    Wood-fired pizza, shared plates, and a busy late-night laneway feel.
+                                </p>
+
+                                <a href="./restaurant_detail.html?id=laneway-pizza"
+                                    class="btn btn-dark align-self-start mt-auto">
+                                    View details
+                                </a>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12">
+                        <article class="search-restaurant-card h-100">
+                            <img class="search-restaurant-image"
+                                src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80"
+                                alt="Harbour Sushi Bar" loading="lazy">
+
+                            <div class="search-restaurant-card__body">
+                                <div class="d-flex justify-content-between gap-3">
+                                    <div>
+                                        <span class="badge text-bg-light border">Japanese</span>
+                                        <h2>Harbour Sushi Bar</h2>
+                                    </div>
+
+                                    <button class="search-bookmark-btn bookmark-toggle" data-bookmark="harbour-sushi"
+                                        type="button" aria-label="Save restaurant">
+                                        ♡
+                                    </button>
+                                </div>
+
+                                <p class="search-restaurant-meta">
+                                    Fremantle · $$$
+                                </p>
+
+                                <p class="search-rating" aria-label="4.6 out of 5">
+                                    ★★★★★
+                                    <span>4.6 (286)</span>
+                                </p>
+
+                                <p class="search-restaurant-description">
+                                    Sashimi, hand rolls, and bento boxes close to the waterfront.
+                                </p>
+
+                                <a href="./restaurant_detail.html?id=harbour-sushi"
+                                    class="btn btn-dark align-self-start mt-auto">
+                                    View details
+                                </a>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-12">
+                        <article class="search-restaurant-card h-100">
+                            <img class="search-restaurant-image"
+                                src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&q=80"
+                                alt="Taco Yard" loading="lazy">
+
+                            <div class="search-restaurant-card__body">
+                                <div class="d-flex justify-content-between gap-3">
+                                    <div>
+                                        <span class="badge text-bg-light border">Mexican</span>
+                                        <h2>Taco Yard</h2>
+                                    </div>
+
+                                    <button class="search-bookmark-btn bookmark-toggle" data-bookmark="taco-yard"
+                                        type="button" aria-label="Save restaurant">
+                                        ♡
+                                    </button>
+                                </div>
+
+                                <p class="search-restaurant-meta">
+                                    Subiaco · $$
+                                </p>
+
+                                <p class="search-rating" aria-label="4.5 out of 5">
+                                    ★★★★★
+                                    <span>4.5 (198)</span>
+                                </p>
+
+                                <p class="search-restaurant-description">
+                                    Street tacos, loaded nachos, and fresh agua frescas.
+                                </p>
+
+                                <a href="./restaurant_detail.html?id=taco-yard"
+                                    class="btn btn-dark align-self-start mt-auto">
+                                    View details
+                                </a>
+                            </div>
+                        </article>
                     </div>
                 </div>
+                <nav class="search-pagination" aria-label="Search results pagination">
+                    <button class="pagination-arrow disabled" type="button" aria-label="Previous page">
+                        ‹
+                    </button>
+
+                    <button class="pagination-number active" type="button" aria-current="page">
+                        1
+                    </button>
+
+                    <button class="pagination-number" type="button">
+                        2
+                    </button>
+
+                    <button class="pagination-number" type="button">
+                        3
+                    </button>
+
+                    <button class="pagination-arrow" type="button" aria-label="Next page">
+                        ›
+                    </button>
+                </nav>
             </div>
         </section>
     </main>
