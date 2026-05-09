@@ -130,8 +130,93 @@ def restaurant_menu(restaurant_id):
 
 @app.route("/admin")
 def admin_dashboard():
-    return render_template("admin_dashboard.html")
+    admin_stats = [
+        {"label": "Total Users", "value": "1,248"},
+        {"label": "Total Restaurants", "value": "86"},
+        {"label": "Pending Approval", "value": "7"},
+        {"label": "Reported Listings", "value": "3"},
+    ]
 
+    restaurants = [
+        {
+            "name": "Laneway Pizza Co.",
+            "category": "Italian",
+            "owner": "Mia Chen",
+            "status": "Approved",
+            "status_class": "admin-status--approved",
+            "rating": "4.7",
+            "action": "View",
+        },
+        {
+            "name": "Ocean View Cafe",
+            "category": "Modern Australian",
+            "owner": "David Lee",
+            "status": "Pending",
+            "status_class": "admin-status--pending",
+            "rating": "4.3",
+            "action": "Review",
+        },
+        {
+            "name": "Green Garden Bistro",
+            "category": "Vegetarian",
+            "owner": "Sarah Green",
+            "status": "Reported",
+            "status_class": "admin-status--reported",
+            "rating": "3.9",
+            "action": "Check",
+        },
+    ]
+
+    users = [
+        {
+            "name": "Alex Wong",
+            "email": "alex@example.com",
+            "role": "Customer",
+            "status": "Active",
+            "status_class": "admin-status--approved",
+            "action": "View",
+        },
+        {
+            "name": "Mia Chen",
+            "email": "mia@example.com",
+            "role": "Owner",
+            "status": "Active",
+            "status_class": "admin-status--approved",
+            "action": "View",
+        },
+        {
+            "name": "Jordan Smith",
+            "email": "jordan@example.com",
+            "role": "Customer",
+            "status": "Under Review",
+            "status_class": "admin-status--pending",
+            "action": "Check",
+        },
+    ]
+
+    admin_tasks = [
+        {
+            "title": "Approve restaurants",
+            "description": "Review new restaurant submissions and approve listings that meet the platform requirements.",
+        },
+        {
+            "title": "Manage reports",
+            "description": "Check reported restaurants, reviews, or users and decide whether action is needed.",
+        },
+        {
+            "title": "Monitor users",
+            "description": "View user roles, account status, and activity before connecting full admin controls.",
+        },
+    ]
+
+    return render_template(
+        "admin_dashboard.html",
+        admin_stats=admin_stats,
+        restaurants=restaurants,
+        users=users,
+        admin_tasks=admin_tasks,
+    )
+    
 @app.route("/owner")
 def owner_dashboard():
     return render_template("owner_dashboard.html")
