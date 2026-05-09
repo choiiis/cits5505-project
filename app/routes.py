@@ -79,6 +79,20 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+
+        if not email:
+            flash("Please enter your email address.", "danger")
+            return render_template("forgot_password.html")
+
+        User.query.filter_by(email=email).first()
+        flash("If an account exists for that email, reset instructions will be sent.", "success")
+
+    return render_template("forgot_password.html")
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -350,3 +364,4 @@ def owner_dashboard():
         menu_items=menu_items,
         owner_tasks=owner_tasks,
     )
+
