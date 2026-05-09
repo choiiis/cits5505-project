@@ -51,10 +51,55 @@ function initBookmarks() {
     });
 }
 
+function initMapToggle() {
+    const mapToggle = document.getElementById("mapToggle");
+    const mapButton = document.getElementById("mapButton");
+    const mapPreview = document.getElementById("mapPreview");
+
+    if (!mapToggle || !mapPreview) {
+        return;
+    }
+
+    function setMapVisible(isVisible) {
+        mapToggle.checked = isVisible;
+        mapPreview.classList.toggle("d-none", !isVisible);
+    }
+
+    mapToggle.addEventListener("change", event => {
+        setMapVisible(event.target.checked);
+    });
+
+    if (mapButton) {
+        mapButton.addEventListener("click", () => {
+            setMapVisible(!mapToggle.checked);
+        });
+    }
+}
+
+function initFilterToggle() {
+    const filterToggle = document.getElementById("filterToggle");
+    const filterPanel = document.getElementById("filterPanel");
+
+    if (!filterToggle || !filterPanel) {
+        return;
+    }
+
+    filterToggle.addEventListener("click", () => {
+        const isHidden = filterPanel.classList.toggle("d-none");
+
+        filterToggle.textContent = isHidden ? "Show filters" : "Hide filters";
+        filterToggle.setAttribute("aria-expanded", String(!isHidden));
+        filterToggle.classList.toggle("btn-outline-dark", isHidden);
+        filterToggle.classList.toggle("btn-dark", !isHidden);
+    });
+}
+
 function initSearchPage() {
     setInitialSearchValues();
     updateSearchSummary();
     initBookmarks();
+    initMapToggle();
+    initFilterToggle();
 }
 
 document.addEventListener("DOMContentLoaded", initSearchPage);

@@ -11,13 +11,67 @@
     background: #f7f9fb;
 }
 
-.search-filter-placeholder {
-    padding: 18px;
-    border: 1px dashed var(--brand-line);
-    border-radius: 16px;
+.search-filter-panel {
     background: #ffffff;
-    color: #6b7280;
-    text-align: center;
+    border: 1px solid var(--brand-line);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.search-filter-toggle-row {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.search-filter-toggle {
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-weight: 700;
+}
+
+.search-filter-wrapper {
+    transition: 0.2s ease;
+}
+
+.search-map-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#mapToggle {
+    width: 52px;
+    height: 28px;
+    cursor: pointer;
+}
+
+#mapToggle.form-check-input {
+    border-width: 2px;
+}
+
+#mapToggle:checked {
+    background-color: var(--brand-green);
+    border-color: var(--brand-green);
+}
+
+.search-map-panel {
+    min-height: 340px;
+    background:
+        linear-gradient(90deg, rgba(21, 128, 61, .12) 1px, transparent 1px),
+        linear-gradient(rgba(226, 85, 68, .12) 1px, transparent 1px),
+        #ffffff;
+    background-size: 42px 42px;
+    border: 1px solid var(--brand-line);
+    border-radius: 16px;
+}
+
+.map-pin {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--brand-coral);
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 0 2px rgba(226, 85, 68, .35);
 }
 
 .search-empty-message {
@@ -182,5 +236,21 @@
 
     .search-restaurant-description {
         max-height: none;
+    }
+
+    .search-filter-panel {
+        padding: 14px;
+    }
+
+    .search-filter-toggle-row {
+        justify-content: stretch;
+    }
+
+    .search-filter-toggle {
+        width: 100%;
+    }
+
+    .search-map-panel {
+        min-height: 260px;
     }
 }
