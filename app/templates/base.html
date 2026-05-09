@@ -12,7 +12,7 @@
     {% block styles %}{% endblock %}
 </head>
 
-<body>
+<body {% block body_attrs %}{% endblock %}>
     <header class="site-header">
         <nav class="navbar navbar-expand-md bg-white py-1">
             <div class="container-fluid px-5 py-1">
@@ -39,7 +39,11 @@
                         </li>
                     </ul>
 
-                    <a class="btn btn-dark site-header__login" href="#">Login</a>
+                    {% if session.get("user_id") %}
+                    <a class="btn btn-dark site-header__login" href="{{ url_for('logout') }}">Logout</a>
+                    {% else %}
+                    <a class="btn btn-dark site-header__login" href="{{ url_for('login') }}">Login</a>
+                    {% endif %}
                 </div>
             </div>
         </nav>
