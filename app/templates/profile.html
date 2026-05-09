@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Profile | TableTrail{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block body_attrs %}data-page="profile"{% endblock %}
+
+{% block content %}
+<main class="profile-page">
+    <section class="container py-4 py-md-5">
+        <div class="shared-page-header mb-4">
+            <div class="shared-page-header__content">
+                <h1 class="h3 fw-bold mb-2">My Profile</h1>
+                <p class="text-secondary">Manage your account details, reviews, and account settings.</p>
+            </div>
+            <a class="btn btn-success align-self-start align-self-md-center" href="{{ url_for('home') }}">Write a review</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="auth-alerts mb-4" aria-live="polite">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} py-2" role="alert">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <section class="profile-panel profile-info-panel" aria-labelledby="profileInfoTitle">
+                    <div class="profile-avatar" aria-hidden="true">
+                        {% if user.profile_image %}
+                        <img src="{{ user.profile_image }}" alt="">
+                        {% else %}
+                        {{ initials }}
+                        {% endif %}
+                    </div>
+                    <h2 class="h5 fw-bold mb-1" id="profileInfoTitle">{{ user.username }}</h2>
+                    <p class="text-secondary mb-4">{{ user.email }}</p>
+
+                    <form id="profileForm" method="post" action="{{ url_for('profile') }}" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label" for="usernameInput">Username</label>
+                            <input
+                                class="form-control"
+                                id="usernameInput"
+                                name="username"
+                                type="text"
+                                value="{{ user.username }}"
+                                autocomplete="name"
+                                required>
+                            <div class="invalid-feedback">Please enter your username.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="emailInput">Email</label>
+                            <input
+                                class="form-control"
+                                id="emailInput"
+                                name="email"
+                                type="email"
+                                value="{{ user.email }}"
+                                autocomplete="email"
+                                required>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="profileImageInput">Profile image URL</label>
+                            <input
+                                class="form-control"
+                                id="profileImageInput"
+                                name="profileImage"
+                                type="url"
+                                value="{{ user.profile_image or '' }}"
+                                placeholder="Optional image URL"
+                                autocomplete="url">
+                        </div>
+
+                        <button class="btn btn-success w-100" type="submit">Save profile</button>
+                        <p class="profile-message mb-0 mt-3" id="profileMessage" role="status" aria-live="polite"></p>
+                    </form>
+                </section>
+
+                <section class="profile-panel mt-4" aria-labelledby="accountActionsTitle">
+                    <h2 class="h5 fw-bold mb-3" id="accountActionsTitle">Account Actions</h2>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-outline-success" href="{{ url_for('logout') }}">Logout</a>
+                        <button class="btn btn-outline-danger" type="button" disabled>Delete account</button>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-lg-8">
+                <section class="profile-panel" aria-labelledby="myReviewsTitle">
+                    <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+                        <div>
+                            <h2 class="h5 fw-bold mb-1" id="myReviewsTitle">My Reviews</h2>
+                            <p class="text-secondary mb-0">View reviews you have written.</p>
+                        </div>
+                        <span class="review-count">{{ reviews|length }} reviews</span>
+                    </div>
+
+                    {% if reviews %}
+                    <div class="review-list">
+                        {% for review in reviews %}
+                        <article class="review-card">
+                            <div class="review-card__header">
+                                <div>
+                                    <h3 class="review-card__title">{{ review.restaurant.name }}</h3>
+                                    <p class="review-card__meta">{{ review.created_at.strftime("%d %b %Y") }}</p>
+                                </div>
+                                <div class="review-card__rating">{{ review.rating }} / 5</div>
+                            </div>
+                            <p class="review-card__body">{{ review.content }}</p>
+                            <div class="review-card__actions">
+                                <button class="btn btn-outline-success btn-sm" type="button" disabled>Edit</button>
+                                <button class="btn btn-outline-danger btn-sm" type="button" disabled>Delete</button>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="review-empty-state">
+                        <p class="mb-0">You have not written any reviews yet.</p>
+                    </div>
+                    {% endif %}
+                </section>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}
