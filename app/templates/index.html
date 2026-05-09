@@ -85,7 +85,10 @@
                                 <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>
                             </p>
                             <p class="featured-card__description">{{ restaurant.description }}</p>
-                            <a class="btn btn-dark featured-card__action" href="search.html">View details</a>
+                            <a class="btn btn-dark featured-card__action"
+                                href="{{ url_for('restaurant_detail', restaurant_id=restaurant.restaurant_id) }}">
+                                View details
+                            </a>
                         </div>
                     </article>
                 </div>
