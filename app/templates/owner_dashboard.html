@@ -50,42 +50,48 @@
             </section>
 
             <section class="owner-card">
-                <div class="owner-card__heading">
-                    <h2>Restaurant Information</h2>
-                    <p>
-                        This section shows the main information that will appear on the public restaurant detail page.
-                    </p>
+                <div class="owner-card__heading owner-card__heading--with-action">
+                    <div>
+                        <h2>Restaurant Information</h2>
+                        <p>
+                            This section shows the main information that will appear on the public restaurant detail page.
+                        </p>
+                    </div>
+
+                    <button type="button" class="owner-action-button owner-action-button--secondary" id="editRestaurantInfoBtn">
+                        Edit information
+                    </button>
                 </div>
 
                 <div class="owner-info-grid">
                     <div class="owner-info-item">
                         <span>Restaurant Name</span>
-                        <p>Laneway Pizza Co.</p>
+                        <p data-info-field="name">Laneway Pizza Co.</p>
                     </div>
 
                     <div class="owner-info-item">
                         <span>Category</span>
-                        <p>Italian</p>
+                        <p data-info-field="category">Italian</p>
                     </div>
 
                     <div class="owner-info-item">
                         <span>Address</span>
-                        <p>Barrack St, Perth, WA 6000</p>
+                        <p data-info-field="address">Barrack St, Perth, WA 6000</p>
                     </div>
 
                     <div class="owner-info-item">
                         <span>Phone</span>
-                        <p>+61 8 1234 5678</p>
+                        <p data-info-field="phone">+61 8 1234 5678</p>
                     </div>
 
                     <div class="owner-info-item">
                         <span>Website</span>
-                        <p>https://example.com</p>
+                        <p data-info-field="website">https://example.com</p>
                     </div>
 
                     <div class="owner-info-item">
                         <span>Opening Hours</span>
-                        <p>Mon-Sun, 7:00 AM - 11:00 PM</p>
+                        <p data-info-field="hours">Mon-Sun, 7:00 AM - 11:00 PM</p>
                     </div>
                 </div>
             </section>
@@ -99,11 +105,53 @@
                 </div>
 
                 <div class="owner-toolbar">
-                    <button type="button" class="owner-action-button">Add menu item</button>
-                    <button type="button" class="owner-action-button owner-action-button--secondary">
+                    <button type="button" class="owner-action-button" id="addMenuItemBtn">
+                        Add menu item
+                    </button>
+
+                    <button type="button" class="owner-action-button owner-action-button--secondary" id="editCategoriesBtn">
                         Edit categories
                     </button>
                 </div>
+
+                <p class="owner-action-message" id="ownerActionMessage"></p>
+
+                <form class="owner-edit-form is-hidden" id="menuItemForm">
+                    <div class="owner-form-grid">
+                        <div class="owner-form-field">
+                            <label for="menuItemName">Item name</label>
+                            <input type="text" id="menuItemName" placeholder="e.g. Margherita Pizza">
+                        </div>
+
+                        <div class="owner-form-field">
+                            <label for="menuItemCategory">Category</label>
+                            <input type="text" id="menuItemCategory" placeholder="e.g. Pizza">
+                        </div>
+
+                        <div class="owner-form-field">
+                            <label for="menuItemPrice">Price</label>
+                            <input type="text" id="menuItemPrice" placeholder="e.g. $22">
+                        </div>
+
+                        <div class="owner-form-field">
+                            <label for="menuItemStatus">Status</label>
+                            <select id="menuItemStatus">
+                                <option value="Available">Available</option>
+                                <option value="Hidden">Hidden</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="owner-form-actions">
+                        <button type="submit" class="owner-action-button" id="saveMenuItemBtn">
+                            Save item
+                        </button>
+
+                        <button type="button" class="owner-action-button owner-action-button--secondary" id="cancelMenuEditBtn">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
 
                 <div class="owner-table-wrap">
                     <table class="owner-table">
@@ -117,7 +165,7 @@
                             </tr>
                         </thead>
 
-                        <tbody>
+                        <tbody id="menuTableBody">
                             <tr>
                                 <td>Margherita Pizza</td>
                                 <td>Pizza</td>
@@ -128,7 +176,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <button type="button" class="owner-table-button">Edit</button>
+                                    <button type="button" class="owner-table-button" data-action="edit-menu">
+                                        Edit
+                                    </button>
                                 </td>
                             </tr>
 
@@ -142,7 +192,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <button type="button" class="owner-table-button">Edit</button>
+                                    <button type="button" class="owner-table-button" data-action="edit-menu">
+                                        Edit
+                                    </button>
                                 </td>
                             </tr>
 
@@ -156,7 +208,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <button type="button" class="owner-table-button">Edit</button>
+                                    <button type="button" class="owner-table-button" data-action="edit-menu">
+                                        Edit
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -199,4 +253,6 @@
         </div>
     </section>
 </main>
+
+<script src="{{ url_for('static', filename='js/owner_dashboard.js') }}"></script>
 {% endblock %}

@@ -1,9 +1,20 @@
-from flask import render_template, redirect, url_for
+from flask import flash, redirect, render_template, request, session, url_for
 from app import app
 from app.utils import make_star_text
-from app.models import Restaurant, MenuItem, OpeningHour, Review
+from app.models import Restaurant, MenuItem, OpeningHour, Review, User
+from werkzeug.security import check_password_hash
 
 from datetime import datetime
+
+
+def is_valid_login(user, password):
+    if not user or not password:
+        return False
+
+    if user.password_hash == "dev-password-hash":
+        return password == "password"
+
+    return check_password_hash(user.password_hash, password)
 
 
 def build_review_summary(reviews):
@@ -45,9 +56,36 @@ def home():
     return redirect(url_for("restaurant_detail", restaurant_id=1))
 
 
+
 @app.route("/home-test")
 def home_test():
     return render_template("home.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        user = User.query.filter_by(email=email).first()
+
+        if is_valid_login(user, password):
+            session["user_id"] = user.id
+            session["username"] = user.username
+            flash(f"Welcome back, {user.username}.", "success")
+            return redirect(url_for("restaurant_detail", restaurant_id=1))
+
+        flash("Invalid email or password.", "danger")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("You have been logged out.", "info")
+    return redirect(url_for("login"))
+
 
 
 @app.route("/restaurants/<int:restaurant_id>")
@@ -85,7 +123,7 @@ def restaurant_detail(restaurant_id):
         reviews=reviews,
         star_text=star_text,
         today_day_of_week=today_day_of_week,
-        is_logged_in=True,
+        is_logged_in="user_id" in session,
     )
 
 
@@ -103,4 +141,3 @@ def admin_dashboard():
 @app.route("/owner")
 def owner_dashboard():
     return render_template("owner_dashboard.html")
-

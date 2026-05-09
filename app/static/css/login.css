@@ -1,0 +1,69 @@
+body[data-page="login"] {
+  background: #f4f6f8;
+}
+
+body[data-page="login"] .auth-shell {
+  align-items: flex-start !important;
+  min-height: calc(100vh - 138px);
+  padding-top: 1.5rem !important;
+}
+
+.form-card {
+  border-color: #d9e2ec;
+  max-width: 650px;
+  padding: 1.75rem 1.875rem 1.9rem !important;
+  box-shadow: 0 0.25rem 0.75rem rgba(31, 41, 51, 0.08);
+}
+
+.form-card h1 {
+  color: #0f172a;
+  font-size: 2.125rem;
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+}
+
+.form-card .text-secondary {
+  color: #5f6f82 !important;
+  font-size: 1.25rem;
+  line-height: 1.55;
+  margin-bottom: 1.35rem;
+  max-width: 560px;
+}
+
+.form-card .form-label {
+  color: #0f172a;
+  font-size: 1.25rem;
+  margin-bottom: 0.65rem;
+}
+
+.form-card .form-control {
+  border-color: #d9e2ec;
+  border-radius: 8px;
+  color: #334155;
+  font-size: 1.25rem;
+  min-height: 47px;
+  padding: 0.5rem 0.9rem;
+}
+
+.login-submit {
+  border-radius: 8px;
+  font-weight: 700;
+  margin-top: 0.25rem;
+  min-height: 46px;
+}
+
+.form-card .small {
+  font-size: 1.125rem;
+  margin-top: 1.35rem !important;
+}
+
+.login-message {
+  color: var(--brand-green);
+  font-weight: 600;
+  min-height: 1.5rem;
+  text-align: center;
+}
+
+.login-message.is-error {
+  color: #b42318;
+}
