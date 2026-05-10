@@ -169,9 +169,23 @@ def signup():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
+        role = request.form.get("role", "customer")
+        restaurant_name = request.form.get("restaurant_name", "").strip()
+        abn_number = request.form.get("abn_number", "").strip()
+        contact_number = request.form.get("contact_number", "").strip()
 
         if not username or not email or not password:
             flash("Please complete all required fields.", "danger")
+            return render_template("signup.html")
+
+        if role not in ["customer", "owner"]:
+            flash("Please choose a valid account role.", "danger")
+            return render_template("signup.html")
+
+        if role == "owner" and (
+            not restaurant_name or not abn_number or not contact_number
+        ):
+            flash("Please complete all restaurant owner details.", "danger")
             return render_template("signup.html")
 
         if password != confirm_password:
@@ -188,7 +202,10 @@ def signup():
             username=username,
             email=email,
             password_hash=generate_password_hash(password),
-            role="customer",
+            role=role,
+            restaurant_name=restaurant_name if role == "owner" else None,
+            abn_number=abn_number if role == "owner" else None,
+            contact_number=contact_number if role == "owner" else None,
         )
 
         db.session.add(user)
