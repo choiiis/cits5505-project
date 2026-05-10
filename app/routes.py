@@ -2,7 +2,7 @@ from flask import flash, redirect, render_template, request, session, url_for
 from app import app, db
 from app.utils import make_star_text
 from app.models import Restaurant, MenuItem, OpeningHour, Review, User
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import datetime
 
@@ -64,10 +64,66 @@ def home():
     return redirect(url_for("restaurant_detail", restaurant_id=1))
 
 
-
 @app.route("/home-test")
 def home_test():
-    return render_template("home.html")
+    home_categories = ["Italian", "Japanese", "Cafe", "Thai", "Dessert"]
+    featured_restaurants = [
+        {
+            "name": "Green Bowl Kitchen",
+            "restaurant_id": 5,
+            "category": "Healthy",
+            "location": "Subiaco",
+            "price": "$$",
+            "rating": 4.4,
+            "star_text": make_star_text(4.4),
+            "review_count": 3,
+            "description": "Fresh bowls, salads, smoothies, and vegan-friendly meals.",
+            "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Laneway Pizza Co.",
+            "restaurant_id": 1,
+            "category": "Italian",
+            "location": "Perth CBD",
+            "price": "$$",
+            "rating": 4.7,
+            "star_text": make_star_text(4.7),
+            "review_count": 3,
+            "description": "A casual pizza spot in Perth CBD.",
+            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Northbridge Coffee Lab",
+            "restaurant_id": 2,
+            "category": "Cafe",
+            "location": "Northbridge",
+            "price": "$$",
+            "rating": 4.5,
+            "star_text": make_star_text(4.5),
+            "review_count": 2,
+            "description": "Specialty coffee and brunch near Northbridge.",
+            "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Seoul Table",
+            "restaurant_id": 3,
+            "category": "Korean",
+            "location": "Victoria Park",
+            "price": "$$",
+            "rating": 4.8,
+            "star_text": make_star_text(4.8),
+            "review_count": 4,
+            "description": "Korean comfort food and BBQ in Victoria Park.",
+            "image": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1200&q=80",
+        },
+    ]
+
+    return render_template(
+        "index.html",
+        home_categories=home_categories,
+        featured_restaurants=featured_restaurants,
+    )
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -86,6 +142,60 @@ def login():
         flash("Invalid email or password.", "danger")
 
     return render_template("login.html")
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+
+        if not email:
+            flash("Please enter your email address.", "danger")
+            return render_template("forgot_password.html")
+
+        User.query.filter_by(email=email).first()
+        flash("If an account exists for that email, reset instructions will be sent.", "success")
+
+    return render_template("forgot_password.html")
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not username or not email or not password:
+            flash("Please complete all required fields.", "danger")
+            return render_template("signup.html")
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return render_template("signup.html")
+
+        existing_user = User.query.filter_by(email=email).first()
+
+        if existing_user:
+            flash("An account with that email already exists.", "danger")
+            return render_template("signup.html")
+
+        user = User(
+            username=username,
+            email=email,
+            password_hash=generate_password_hash(password),
+            role="customer",
+        )
+
+        db.session.add(user)
+        db.session.commit()
+
+        session["user_id"] = user.id
+        session["username"] = user.username
+        flash(f"Welcome to TableTrail, {user.username}.", "success")
+        return redirect(url_for("restaurant_detail", restaurant_id=1))
+
+    return render_template("signup.html")
 
 
 @app.route("/logout")
@@ -142,6 +252,54 @@ def profile():
         reviews=reviews,
     )
 
+
+@app.route("/search")
+def search():
+    restaurants = [
+        {
+            "id": 1,
+            "name": "Little Italy",
+            "category": "Italian",
+            "location": "Northbridge",
+            "rating": 4.6,
+            "review_count": 128,
+            "description": "Authentic Italian cuisine in the heart of Northbridge. Fresh pasta, wood-fired pizza, and a great wine list.",
+            "image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+            "tags": ["$$", "Vegetarian options", "Outdoor seating"],
+        },
+        {
+            "id": 2,
+            "name": "Sakura Sushi",
+            "category": "Japanese",
+            "location": "Subiaco",
+            "rating": 4.4,
+            "review_count": 96,
+            "description": "Fresh and authentic Japanese cuisine. Sushi, sashimi and more.",
+            "image_url": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80",
+            "tags": ["$$", "Gluten-free options", "Takeaway"],
+        },
+        {
+            "id": 3,
+            "name": "Greenhouse Cafe",
+            "category": "Cafe",
+            "location": "Fremantle",
+            "rating": 4.3,
+            "review_count": 72,
+            "description": "Relaxed cafe with excellent coffee, brunch, and house-made pastries.",
+            "image_url": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+            "tags": ["$", "Vegan options", "Outdoor seating"],
+        },
+    ]
+
+    categories = ["Italian", "Japanese", "Mexican", "Cafe"]
+    locations = ["Northbridge", "Fremantle", "Subiaco", "Perth CBD"]
+
+    return render_template(
+        "search.html",
+        restaurants=restaurants,
+        categories=categories,
+        locations=locations,
+    )
 
 
 @app.route("/restaurants/<int:restaurant_id>")
