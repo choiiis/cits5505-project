@@ -51,14 +51,7 @@ def build_review_summary(reviews):
     }
 
 
-@app.route("/")
-def home():
-    return redirect(url_for("restaurant_detail", restaurant_id=1))
-
-
-
-@app.route("/home-test")
-def home_test():
+def build_home_context():
     home_categories = ["Italian", "Japanese", "Cafe", "Thai", "Dessert"]
     featured_restaurants = [
         {
@@ -111,11 +104,21 @@ def home_test():
         },
     ]
 
-    return render_template(
-        "index.html",
-        home_categories=home_categories,
-        featured_restaurants=featured_restaurants,
-    )
+    return {
+        "home_categories": home_categories,
+        "featured_restaurants": featured_restaurants,
+    }
+
+
+@app.route("/")
+def home():
+    return render_template("index.html", **build_home_context())
+
+
+@app.route("/index")
+def index():
+    return render_template("index.html", **build_home_context())
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
