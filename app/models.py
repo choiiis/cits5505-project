@@ -11,6 +11,9 @@ class User(db.Model):
     profile_image = db.Column(db.String(255))
 
     role = db.Column(db.String(20), nullable=False, default="customer")
+    restaurant_name = db.Column(db.String(120))
+    abn_number = db.Column(db.String(20))
+    contact_number = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     reviews = db.relationship(
