@@ -239,7 +239,6 @@ def profile():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip().lower()
-        profile_image = request.form.get("profileImage", "").strip()
 
         if not username or not email:
             flash("Please enter your username and email.", "danger")
@@ -253,7 +252,6 @@ def profile():
 
         user.username = username
         user.email = email
-        user.profile_image = profile_image or None
         db.session.commit()
 
         session["username"] = user.username

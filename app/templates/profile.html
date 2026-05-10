@@ -33,11 +33,7 @@
             <div class="col-lg-4">
                 <section class="profile-panel profile-info-panel" aria-labelledby="profileInfoTitle">
                     <div class="profile-avatar" aria-hidden="true">
-                        {% if user.profile_image %}
-                        <img src="{{ user.profile_image }}" alt="">
-                        {% else %}
                         {{ initials }}
-                        {% endif %}
                     </div>
                     <h2 class="h5 fw-bold mb-1" id="profileInfoTitle">{{ user.username }}</h2>
                     <p class="text-secondary mb-4">{{ user.email }}</p>
@@ -67,18 +63,6 @@
                                 autocomplete="email"
                                 required>
                             <div class="invalid-feedback">Please enter a valid email address.</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label" for="profileImageInput">Profile image URL</label>
-                            <input
-                                class="form-control"
-                                id="profileImageInput"
-                                name="profileImage"
-                                type="url"
-                                value="{{ user.profile_image or '' }}"
-                                placeholder="Optional image URL"
-                                autocomplete="url">
                         </div>
 
                         <button class="btn btn-success w-100" type="submit">Save profile</button>

@@ -65,7 +65,6 @@ def seed_data():
         username="Alex",
         password_hash="dev-password-hash",
         role="customer",
-        profile_image="https://randomuser.me/api/portraits/men/32.jpg",
     )
 
     mia = User(
@@ -73,7 +72,6 @@ def seed_data():
         username="Mia",
         password_hash="dev-password-hash",
         role="customer",
-        profile_image="https://randomuser.me/api/portraits/women/44.jpg",
     )
 
     daniel = User(
@@ -81,7 +79,6 @@ def seed_data():
         username="Daniel",
         password_hash="dev-password-hash",
         role="customer",
-        profile_image="https://randomuser.me/api/portraits/men/75.jpg",
     )
 
     owner = User(
@@ -89,7 +86,6 @@ def seed_data():
         username="Restaurant Owner",
         password_hash="dev-password-hash",
         role="owner",
-        profile_image="https://randomuser.me/api/portraits/women/68.jpg",
     )
 
     db.session.add_all([alex, mia, daniel, owner])
