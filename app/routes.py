@@ -58,7 +58,63 @@ def home():
 
 @app.route("/home-test")
 def home_test():
-    return render_template("index.html")
+    home_categories = ["Italian", "Japanese", "Cafe", "Thai", "Dessert"]
+    featured_restaurants = [
+        {
+            "name": "Green Bowl Kitchen",
+            "restaurant_id": 5,
+            "category": "Healthy",
+            "location": "Subiaco",
+            "price": "$$",
+            "rating": 4.4,
+            "star_text": make_star_text(4.4),
+            "review_count": 3,
+            "description": "Fresh bowls, salads, smoothies, and vegan-friendly meals.",
+            "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Laneway Pizza Co.",
+            "restaurant_id": 1,
+            "category": "Italian",
+            "location": "Perth CBD",
+            "price": "$$",
+            "rating": 4.7,
+            "star_text": make_star_text(4.7),
+            "review_count": 3,
+            "description": "A casual pizza spot in Perth CBD.",
+            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Northbridge Coffee Lab",
+            "restaurant_id": 2,
+            "category": "Cafe",
+            "location": "Northbridge",
+            "price": "$$",
+            "rating": 4.5,
+            "star_text": make_star_text(4.5),
+            "review_count": 2,
+            "description": "Specialty coffee and brunch near Northbridge.",
+            "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Seoul Table",
+            "restaurant_id": 3,
+            "category": "Korean",
+            "location": "Victoria Park",
+            "price": "$$",
+            "rating": 4.8,
+            "star_text": make_star_text(4.8),
+            "review_count": 4,
+            "description": "Korean comfort food and BBQ in Victoria Park.",
+            "image": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1200&q=80",
+        },
+    ]
+
+    return render_template(
+        "index.html",
+        home_categories=home_categories,
+        featured_restaurants=featured_restaurants,
+    )
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -412,4 +468,3 @@ def owner_dashboard():
         menu_items=menu_items,
         owner_tasks=owner_tasks,
     )
-

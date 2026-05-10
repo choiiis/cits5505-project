@@ -7,16 +7,94 @@
 {% endblock %}
 
 {% block content %}
-<main class="container py-5">
-    <section>
-        <h1 class="display-5 fw-bold">TableTrail Home</h1>
-        <p class="lead text-secondary mb-4">
-            This page is being migrated from the static home page into Flask and Jinja.
-        </p>
+<main>
+    <section class="hero-section py-5">
+        <div class="container">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-7">
+                    <span class="badge text-bg-success mb-3">Discover trusted local restaurants</span>
+                    <h1 class="display-5 fw-bold">Find the right table for tonight, lunch break, or a new favourite.</h1>
+                    <p class="lead text-secondary hero-copy">Search by name, cuisine, or location, then compare ratings
+                        and explore places worth saving.</p>
+                </div>
+                <div class="col-lg-5">
+                    <img
+                        src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80"
+                        class="img-fluid rounded shadow-sm hero-image" alt="Restaurant table with food">
+                </div>
+            </div>
 
-        <a class="btn btn-success" href="{{ url_for('restaurant_detail', restaurant_id=1) }}">
-            View sample restaurant
-        </a>
+            <div class="search-bar hero-search mt-4">
+                <form class="row g-2 align-items-center" action="search.html" method="get">
+                    <div class="col-lg-5">
+                        <label class="visually-hidden" for="keywordSearch">Search restaurants</label>
+                        <input class="form-control form-control-lg" id="keywordSearch" name="q"
+                            placeholder="Restaurant, cuisine, or dish" aria-label="Search restaurants">
+                    </div>
+                    <div class="col-lg-4">
+                        <label class="visually-hidden" for="locationSearch">Search location</label>
+                        <input class="form-control form-control-lg" id="locationSearch" name="location"
+                            placeholder="Suburb or city" aria-label="Search location">
+                    </div>
+                    <div class="col-lg-3 d-flex gap-2">
+                        <button class="btn btn-success btn-lg flex-fill" type="submit">Search</button>
+                        <a class="btn btn-outline-success btn-lg map-btn" id="mapLink" href="search.html?map=true">
+                            Map
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="home-categories-section">
+        <div class="container">
+            <div class="category-pills-wrap" id="categoryMount" aria-label="Restaurant categories">
+                {% for category in home_categories %}
+                <div class="category-pill-placeholder">{{ category }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="section-band featured-section py-5">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+                <div>
+                    <h2 class="h3 fw-bold mb-2">Featured Restaurants</h2>
+                    <p class="text-secondary mb-0">Explore highlighted dining spots from different cuisines and
+                        locations.</p>
+                </div>
+                <a class="btn btn-success align-self-md-center" href="search.html">Explore More</a>
+            </div>
+
+            <div class="row g-3" id="featuredMount">
+                {% for restaurant in featured_restaurants %}
+                <div class="col-md-6 col-xl-3">
+                    <article class="featured-card">
+                        <img src="{{ restaurant.image }}" class="featured-card__image" alt="{{ restaurant.name }}">
+                        <div class="featured-card__body">
+                            <div class="featured-card__top">
+                                <span class="featured-card__category">{{ restaurant.category }}</span>
+                                <button class="featured-card__save" type="button">Save</button>
+                            </div>
+                            <h3 class="featured-card__title">{{ restaurant.name }}</h3>
+                            <p class="featured-card__meta">{{ restaurant.location }} · {{ restaurant.price }}</p>
+                            <p class="featured-card__rating">
+                                {{ restaurant.star_text }}
+                                <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>
+                            </p>
+                            <p class="featured-card__description">{{ restaurant.description }}</p>
+                            <a class="btn btn-dark featured-card__action"
+                                href="{{ url_for('restaurant_detail', restaurant_id=restaurant.restaurant_id) }}">
+                                View details
+                            </a>
+                        </div>
+                    </article>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </section>
 </main>
 {% endblock %}
