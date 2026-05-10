@@ -36,13 +36,29 @@ body[data-page="signup"] .auth-shell {
   margin-bottom: 0.65rem;
 }
 
-.form-card .form-control {
+.form-card .form-control,
+.form-card .form-select {
   border-color: #d9e2ec;
   border-radius: 8px;
   color: #334155;
   font-size: 1.25rem;
   min-height: 47px;
   padding: 0.5rem 0.9rem;
+}
+
+.signup-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.signup-grid--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.owner-fields {
+  border-top: 1px solid var(--brand-line);
+  margin-top: 0.75rem;
+  padding-top: 1rem;
 }
 
 .signup-submit {
@@ -66,4 +82,10 @@ body[data-page="signup"] .auth-shell {
 
 .signup-message.is-error {
   color: #b42318;
+}
+
+@media (max-width: 767.98px) {
+  .signup-grid--two {
+    grid-template-columns: 1fr;
+  }
 }
