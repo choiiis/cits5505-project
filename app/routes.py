@@ -50,6 +50,15 @@ def build_review_summary(reviews):
         "distribution": distribution,
     }
 
+
+def make_initials(username):
+    parts = username.split()
+    if not parts:
+        return "TT"
+
+    return "".join(part[0] for part in parts[:2]).upper()
+
+
 def build_home_context():
     home_categories = ["Italian", "Japanese", "Cafe", "Thai", "Dessert"]
     featured_restaurants = [
@@ -198,6 +207,54 @@ def logout():
     session.clear()
     flash("You have been logged out.", "info")
     return redirect(url_for("login"))
+
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        flash("Please log in to view your profile.", "info")
+        return redirect(url_for("login"))
+
+    user = User.query.get_or_404(user_id)
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        profile_image = request.form.get("profileImage", "").strip()
+
+        if not username or not email:
+            flash("Please enter your username and email.", "danger")
+            return redirect(url_for("profile"))
+
+        existing_user = User.query.filter(User.email == email, User.id != user.id).first()
+
+        if existing_user:
+            flash("That email is already used by another account.", "danger")
+            return redirect(url_for("profile"))
+
+        user.username = username
+        user.email = email
+        user.profile_image = profile_image or None
+        db.session.commit()
+
+        session["username"] = user.username
+        flash("Profile updated successfully.", "success")
+        return redirect(url_for("profile"))
+
+    reviews = (
+        Review.query.filter_by(user_id=user.id)
+        .order_by(Review.created_at.desc())
+        .all()
+    )
+
+    return render_template(
+        "profile.html",
+        user=user,
+        initials=make_initials(user.username),
+        reviews=reviews,
+    )
 
 
 @app.route("/search")
