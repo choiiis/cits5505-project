@@ -50,7 +50,6 @@ def build_review_summary(reviews):
         "distribution": distribution,
     }
 
-
 def build_home_context():
     home_categories = ["Italian", "Japanese", "Cafe", "Thai", "Dessert"]
     featured_restaurants = [
@@ -120,6 +119,7 @@ def index():
     return render_template("index.html", **build_home_context())
 
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -137,6 +137,20 @@ def login():
         flash("Invalid email or password.", "danger")
 
     return render_template("login.html")
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+
+        if not email:
+            flash("Please enter your email address.", "danger")
+            return render_template("forgot_password.html")
+
+        User.query.filter_by(email=email).first()
+        flash("If an account exists for that email, reset instructions will be sent.", "success")
+
+    return render_template("forgot_password.html")
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -185,6 +199,54 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for("login"))
 
+
+@app.route("/search")
+def search():
+    restaurants = [
+        {
+            "id": 1,
+            "name": "Little Italy",
+            "category": "Italian",
+            "location": "Northbridge",
+            "rating": 4.6,
+            "review_count": 128,
+            "description": "Authentic Italian cuisine in the heart of Northbridge. Fresh pasta, wood-fired pizza, and a great wine list.",
+            "image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+            "tags": ["$$", "Vegetarian options", "Outdoor seating"],
+        },
+        {
+            "id": 2,
+            "name": "Sakura Sushi",
+            "category": "Japanese",
+            "location": "Subiaco",
+            "rating": 4.4,
+            "review_count": 96,
+            "description": "Fresh and authentic Japanese cuisine. Sushi, sashimi and more.",
+            "image_url": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80",
+            "tags": ["$$", "Gluten-free options", "Takeaway"],
+        },
+        {
+            "id": 3,
+            "name": "Greenhouse Cafe",
+            "category": "Cafe",
+            "location": "Fremantle",
+            "rating": 4.3,
+            "review_count": 72,
+            "description": "Relaxed cafe with excellent coffee, brunch, and house-made pastries.",
+            "image_url": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+            "tags": ["$", "Vegan options", "Outdoor seating"],
+        },
+    ]
+
+    categories = ["Italian", "Japanese", "Mexican", "Cafe"]
+    locations = ["Northbridge", "Fremantle", "Subiaco", "Perth CBD"]
+
+    return render_template(
+        "search.html",
+        restaurants=restaurants,
+        categories=categories,
+        locations=locations,
+    )
 
 
 @app.route("/restaurants/<int:restaurant_id>")
