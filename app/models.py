@@ -9,8 +9,8 @@ class User(db.Model):
     username = db.Column(db.String(80), nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
 
+    profile_image = db.Column(db.String(255))
     role = db.Column(db.String(20), nullable=False, default="customer")
-    restaurant_name = db.Column(db.String(120))
     abn_number = db.Column(db.String(20))
     contact_number = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

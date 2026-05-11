@@ -203,12 +203,22 @@ def signup():
             email=email,
             password_hash=generate_password_hash(password),
             role=role,
-            restaurant_name=restaurant_name if role == "owner" else None,
             abn_number=abn_number if role == "owner" else None,
             contact_number=contact_number if role == "owner" else None,
         )
 
         db.session.add(user)
+
+        if role == "owner":
+            restaurant = Restaurant(
+                name=restaurant_name,
+                category="Pending",
+                address="Pending owner update",
+                phone=contact_number,
+                owner=user,
+            )
+            db.session.add(restaurant)
+
         db.session.commit()
 
         session["user_id"] = user.id
