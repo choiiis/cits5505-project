@@ -6,6 +6,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import datetime
 
+DEFAULT_PROFILE_IMAGE = (
+    "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
+)
+
 
 def is_valid_login(user, password):
     if not user or not password:
@@ -169,9 +173,20 @@ def signup():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
+        role = request.form.get("role", "customer")
+        abn_number = request.form.get("abn_number", "").strip()
+        contact_number = request.form.get("contact_number", "").strip()
 
         if not username or not email or not password:
             flash("Please complete all required fields.", "danger")
+            return render_template("signup.html")
+
+        if role not in ["customer", "owner"]:
+            flash("Please choose a valid account role.", "danger")
+            return render_template("signup.html")
+
+        if role == "owner" and (not abn_number or not contact_number):
+            flash("Please complete all restaurant owner details.", "danger")
             return render_template("signup.html")
 
         if password != confirm_password:
@@ -188,7 +203,9 @@ def signup():
             username=username,
             email=email,
             password_hash=generate_password_hash(password),
-            role="customer",
+            role=role,
+            abn_number=abn_number if role == "owner" else None,
+            contact_number=contact_number if role == "owner" else None,
         )
 
         db.session.add(user)
@@ -222,7 +239,7 @@ def profile():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip().lower()
-        profile_image = request.form.get("profileImage", "").strip()
+        profile_image = request.form.get("profile_image", "").strip()
 
         if not username or not email:
             flash("Please enter your username and email.", "danger")
@@ -253,6 +270,7 @@ def profile():
         "profile.html",
         user=user,
         initials=make_initials(user.username),
+        profile_image=user.profile_image,
         reviews=reviews,
     )
 
@@ -328,6 +346,10 @@ def restaurant_detail(restaurant_id):
         .order_by(Review.created_at.desc())
         .all()
     )
+    current_user = None
+
+    if session.get("user_id"):
+        current_user = User.query.get(session["user_id"])
 
     review_summary = build_review_summary(reviews)
     star_text = make_star_text(review_summary["average_rating"])
@@ -342,6 +364,8 @@ def restaurant_detail(restaurant_id):
         star_text=star_text,
         today_day_of_week=today_day_of_week,
         is_logged_in="user_id" in session,
+        current_user=current_user,
+        default_profile_image=DEFAULT_PROFILE_IMAGE,
     )
 
 

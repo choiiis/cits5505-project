@@ -33,8 +33,8 @@
             <div class="col-lg-4">
                 <section class="profile-panel profile-info-panel" aria-labelledby="profileInfoTitle">
                     <div class="profile-avatar" aria-hidden="true">
-                        {% if user.profile_image %}
-                        <img src="{{ user.profile_image }}" alt="">
+                        {% if profile_image %}
+                        <img src="{{ profile_image }}" alt="">
                         {% else %}
                         {{ initials }}
                         {% endif %}
@@ -74,11 +74,11 @@
                             <input
                                 class="form-control"
                                 id="profileImageInput"
-                                name="profileImage"
+                                name="profile_image"
                                 type="url"
                                 value="{{ user.profile_image or '' }}"
-                                placeholder="Optional image URL"
                                 autocomplete="url">
+                            <div class="invalid-feedback">Please enter a valid image URL.</div>
                         </div>
 
                         <button class="btn btn-success w-100" type="submit">Save profile</button>

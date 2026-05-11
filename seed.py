@@ -64,32 +64,34 @@ def seed_data():
         email="alex@example.com",
         username="Alex",
         password_hash="dev-password-hash",
-        role="customer",
         profile_image="https://randomuser.me/api/portraits/men/32.jpg",
+        role="customer",
     )
 
     mia = User(
         email="mia@example.com",
         username="Mia",
         password_hash="dev-password-hash",
-        role="customer",
         profile_image="https://randomuser.me/api/portraits/women/44.jpg",
+        role="customer",
     )
 
     daniel = User(
         email="daniel@example.com",
         username="Daniel",
         password_hash="dev-password-hash",
+        profile_image="https://randomuser.me/api/portraits/men/45.jpg",
         role="customer",
-        profile_image="https://randomuser.me/api/portraits/men/75.jpg",
     )
 
     owner = User(
         email="owner@example.com",
         username="Restaurant Owner",
         password_hash="dev-password-hash",
-        role="owner",
         profile_image="https://randomuser.me/api/portraits/women/68.jpg",
+        role="owner",
+        abn_number="51824753556",
+        contact_number="+61 8 1234 5678",
     )
 
     db.session.add_all([alex, mia, daniel, owner])

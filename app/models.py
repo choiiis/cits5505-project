@@ -8,9 +8,11 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True, index=True)
     username = db.Column(db.String(80), nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    profile_image = db.Column(db.String(255))
 
+    profile_image = db.Column(db.String(255))
     role = db.Column(db.String(20), nullable=False, default="customer")
+    abn_number = db.Column(db.String(20))
+    contact_number = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     reviews = db.relationship(

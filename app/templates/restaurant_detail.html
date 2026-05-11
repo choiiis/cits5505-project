@@ -28,9 +28,9 @@
     <!-- Logged in -->
     <form class="review-form" id="reviewForm" method="post" action="#">
         <div class="review-user-preview">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User profile">
+            <img src="{{ current_user.profile_image if current_user and current_user.profile_image else default_profile_image }}" alt="User profile">
             <div>
-                <strong>Alex</strong>
+                <strong>{{ current_user.username if current_user else "Guest" }}</strong>
             </div>
         </div>
 
@@ -264,7 +264,7 @@
                                 <article class="review-item">
                                     <div class="review-top-row">
                                         <div class="review-user">
-                                            <img src="{{ review.user.profile_image or 'https://randomuser.me/api/portraits/lego/1.jpg' }}"
+                                            <img src="{{ review.user.profile_image or default_profile_image }}"
                                                 alt="{{ review.user.username }} profile">
                                             <div class="review-user-info">
                                                 <div class="review-name-row">
