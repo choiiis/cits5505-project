@@ -62,6 +62,18 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label" for="profileImageInput">Profile image URL</label>
+                <input
+                    class="form-control"
+                    id="profileImageInput"
+                    name="profile_image"
+                    type="url"
+                    placeholder="https://example.com/profile.jpg"
+                    autocomplete="url">
+                <div class="invalid-feedback">Please enter a valid image URL.</div>
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label" for="passwordInput">Password</label>
                 <input
                     class="form-control"

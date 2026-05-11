@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const usernameInput = document.getElementById("usernameInput");
     const roleInput = document.getElementById("roleInput");
     const emailInput = document.getElementById("emailInput");
+    const profileImageInput = document.getElementById("profileImageInput");
     const passwordInput = document.getElementById("passwordInput");
     const confirmPasswordInput = document.getElementById("confirmPasswordInput");
     const ownerFields = document.getElementById("ownerFields");
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const contactNumberInput = document.getElementById("contactNumberInput");
     const message = document.getElementById("signupMessage");
 
-    if (!form || !usernameInput || !roleInput || !emailInput || !passwordInput || !confirmPasswordInput || !ownerFields || !restaurantNameInput || !abnNumberInput || !contactNumberInput || !message) {
+    if (!form || !usernameInput || !roleInput || !emailInput || !profileImageInput || !passwordInput || !confirmPasswordInput || !ownerFields || !restaurantNameInput || !abnNumberInput || !contactNumberInput || !message) {
         return;
     }
 
@@ -22,6 +23,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function isValidEmail(value) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    function isOptionalUrl(value) {
+        if (!value.trim()) {
+            return true;
+        }
+
+        try {
+            new URL(value);
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     function isOwnerSignup() {
@@ -44,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function validateForm() {
         const usernameIsValid = usernameInput.value.trim().length > 0;
         const emailIsValid = isValidEmail(emailInput.value.trim());
+        const profileImageIsValid = isOptionalUrl(profileImageInput.value);
         const passwordIsValid = passwordInput.value.trim().length >= 6;
         const passwordsMatch = confirmPasswordInput.value === passwordInput.value && confirmPasswordInput.value.length >= 6;
         const ownerSelected = isOwnerSignup();
@@ -53,13 +68,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setFieldState(usernameInput, usernameIsValid);
         setFieldState(emailInput, emailIsValid);
+        setFieldState(profileImageInput, profileImageIsValid);
         setFieldState(passwordInput, passwordIsValid);
         setFieldState(confirmPasswordInput, passwordsMatch);
         setFieldState(restaurantNameInput, restaurantNameIsValid);
         setFieldState(abnNumberInput, abnNumberIsValid);
         setFieldState(contactNumberInput, contactNumberIsValid);
 
-        return usernameIsValid && emailIsValid && passwordIsValid && passwordsMatch && restaurantNameIsValid && abnNumberIsValid && contactNumberIsValid;
+        return usernameIsValid && emailIsValid && profileImageIsValid && passwordIsValid && passwordsMatch && restaurantNameIsValid && abnNumberIsValid && contactNumberIsValid;
     }
 
     roleInput.addEventListener("change", () => {
@@ -67,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         validateForm();
     });
 
-    [usernameInput, emailInput, passwordInput, confirmPasswordInput, restaurantNameInput, abnNumberInput, contactNumberInput].forEach((input) => {
+    [usernameInput, emailInput, profileImageInput, passwordInput, confirmPasswordInput, restaurantNameInput, abnNumberInput, contactNumberInput].forEach((input) => {
         input.addEventListener("input", () => {
             message.textContent = "";
             message.classList.remove("is-error");

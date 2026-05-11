@@ -33,8 +33,4 @@ def upgrade():
 
 
 def downgrade():
-    columns = _column_names("user")
-
-    with op.batch_alter_table("user", schema=None) as batch_op:
-        if "restaurant_name" not in columns:
-            batch_op.add_column(sa.Column("restaurant_name", sa.String(length=120), nullable=True))
+    pass
