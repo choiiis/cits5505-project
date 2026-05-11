@@ -262,7 +262,7 @@
 .search-restaurant-card {
     display: grid;
     grid-template-columns: 270px minmax(0, 1fr);
-    min-height: 150px;
+    height: 230px;
     overflow: hidden;
     border: 1px solid rgba(217, 226, 236, 0.95);
     border-radius: 12px;
@@ -345,6 +345,12 @@
     color: #4d5b68;
     font-size: 0.95rem;
     line-height: 1.45;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .search-tag-list {
@@ -489,6 +495,7 @@
 
     .search-restaurant-card {
         grid-template-columns: 1fr;
+        height: auto;
     }
 
     .search-image-wrap {
