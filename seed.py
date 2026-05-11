@@ -86,7 +86,6 @@ def seed_data():
         username="Restaurant Owner",
         password_hash="dev-password-hash",
         role="owner",
-        restaurant_name="Laneway Pizza Co.",
         abn_number="51824753556",
         contact_number="+61 8 1234 5678",
     )
