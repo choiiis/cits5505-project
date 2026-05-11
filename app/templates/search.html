@@ -164,9 +164,12 @@
                         <div class="col-12">
                             <article class="search-restaurant-card">
                                 <div class="search-image-wrap">
-                                    <img class="search-restaurant-image" src="{{ restaurant.image_url }}"
+                                    <img class="search-restaurant-image"
+                                        src="{{ restaurant.hero_image or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80' }}"
                                         alt="{{ restaurant.name }}" loading="lazy">
-                                    <span class="search-image-rating">{{ restaurant.rating }}</span>
+                                    <span class="search-image-rating">
+                                        {{ "%.1f"|format(restaurant.average_rating) }}
+                                    </span>
                                 </div>
 
                                 <div class="search-restaurant-card__body">
@@ -174,23 +177,26 @@
                                         <h2>{{ restaurant.name }}</h2>
 
                                         <p class="search-restaurant-meta">
-                                            {{ restaurant.category }} · {{ restaurant.location }}
+                                            {{ restaurant.category }} · {{ restaurant.suburb or restaurant.address }}
                                         </p>
 
-                                        <p class="search-rating" aria-label="{{ restaurant.rating }} out of 5">
+                                        <p class="search-rating" aria-label="{{ restaurant.average_rating }} out of 5">
                                             <span class="search-star">★</span>
-                                            <span>{{ restaurant.rating }} ({{ restaurant.review_count }} reviews)</span>
+                                            <span>
+                                                {{ "%.1f"|format(restaurant.average_rating) }}
+                                                ({{ restaurant.review_count }} reviews)
+                                            </span>
                                         </p>
 
                                         <p class="search-restaurant-description">
                                             {{ restaurant.description }}
                                         </p>
 
-                                        <div class="search-tag-list">
+                                        <!-- <div class="search-tag-list">
                                             {% for tag in restaurant.tags %}
                                             <span>{{ tag }}</span>
                                             {% endfor %}
-                                        </div>
+                                        </div> -->
                                     </div>
 
                                     <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}"

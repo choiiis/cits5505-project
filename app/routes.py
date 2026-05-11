@@ -6,9 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import datetime
 
-DEFAULT_PROFILE_IMAGE = (
-    "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
-)
+DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
 
 
 def is_valid_login(user, password):
@@ -132,7 +130,6 @@ def index():
     return render_template("index.html", **build_home_context())
 
 
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -151,6 +148,7 @@ def login():
 
     return render_template("login.html")
 
+
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
@@ -161,7 +159,10 @@ def forgot_password():
             return render_template("forgot_password.html")
 
         User.query.filter_by(email=email).first()
-        flash("If an account exists for that email, reset instructions will be sent.", "success")
+        flash(
+            "If an account exists for that email, reset instructions will be sent.",
+            "success",
+        )
 
     return render_template("forgot_password.html")
 
@@ -245,7 +246,9 @@ def profile():
             flash("Please enter your username and email.", "danger")
             return redirect(url_for("profile"))
 
-        existing_user = User.query.filter(User.email == email, User.id != user.id).first()
+        existing_user = User.query.filter(
+            User.email == email, User.id != user.id
+        ).first()
 
         if existing_user:
             flash("That email is already used by another account.", "danger")
@@ -261,9 +264,7 @@ def profile():
         return redirect(url_for("profile"))
 
     reviews = (
-        Review.query.filter_by(user_id=user.id)
-        .order_by(Review.created_at.desc())
-        .all()
+        Review.query.filter_by(user_id=user.id).order_by(Review.created_at.desc()).all()
     )
 
     return render_template(
@@ -277,44 +278,25 @@ def profile():
 
 @app.route("/search")
 def search():
-    restaurants = [
-        {
-            "id": 1,
-            "name": "Little Italy",
-            "category": "Italian",
-            "location": "Northbridge",
-            "rating": 4.6,
-            "review_count": 128,
-            "description": "Authentic Italian cuisine in the heart of Northbridge. Fresh pasta, wood-fired pizza, and a great wine list.",
-            "image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
-            "tags": ["$$", "Vegetarian options", "Outdoor seating"],
-        },
-        {
-            "id": 2,
-            "name": "Sakura Sushi",
-            "category": "Japanese",
-            "location": "Subiaco",
-            "rating": 4.4,
-            "review_count": 96,
-            "description": "Fresh and authentic Japanese cuisine. Sushi, sashimi and more.",
-            "image_url": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80",
-            "tags": ["$$", "Gluten-free options", "Takeaway"],
-        },
-        {
-            "id": 3,
-            "name": "Greenhouse Cafe",
-            "category": "Cafe",
-            "location": "Fremantle",
-            "rating": 4.3,
-            "review_count": 72,
-            "description": "Relaxed cafe with excellent coffee, brunch, and house-made pastries.",
-            "image_url": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
-            "tags": ["$", "Vegan options", "Outdoor seating"],
-        },
+    restaurants = Restaurant.query.order_by(Restaurant.average_rating.desc()).all()
+
+    categories = [
+        row[0]
+        for row in db.session.query(Restaurant.category)
+        .distinct()
+        .order_by(Restaurant.category)
+        .all()
+        if row[0]
     ]
 
-    categories = ["Italian", "Japanese", "Mexican", "Cafe"]
-    locations = ["Northbridge", "Fremantle", "Subiaco", "Perth CBD"]
+    locations = [
+        row[0]
+        for row in db.session.query(Restaurant.suburb)
+        .distinct()
+        .order_by(Restaurant.suburb)
+        .all()
+        if row[0]
+    ]
 
     return render_template(
         "search.html",
@@ -464,7 +446,8 @@ def admin_dashboard():
         users=users,
         admin_tasks=admin_tasks,
     )
-    
+
+
 @app.route("/owner")
 def owner_dashboard():
     restaurant = {
@@ -495,12 +478,42 @@ def owner_dashboard():
     ]
 
     opening_hours = [
-        {"day": "Monday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
-        {"day": "Tuesday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
-        {"day": "Wednesday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
-        {"day": "Thursday", "open_time": "07:00", "close_time": "23:00", "is_closed": False},
-        {"day": "Friday", "open_time": "07:00", "close_time": "00:00", "is_closed": False},
-        {"day": "Saturday", "open_time": "08:00", "close_time": "00:00", "is_closed": False},
+        {
+            "day": "Monday",
+            "open_time": "07:00",
+            "close_time": "23:00",
+            "is_closed": False,
+        },
+        {
+            "day": "Tuesday",
+            "open_time": "07:00",
+            "close_time": "23:00",
+            "is_closed": False,
+        },
+        {
+            "day": "Wednesday",
+            "open_time": "07:00",
+            "close_time": "23:00",
+            "is_closed": False,
+        },
+        {
+            "day": "Thursday",
+            "open_time": "07:00",
+            "close_time": "23:00",
+            "is_closed": False,
+        },
+        {
+            "day": "Friday",
+            "open_time": "07:00",
+            "close_time": "00:00",
+            "is_closed": False,
+        },
+        {
+            "day": "Saturday",
+            "open_time": "08:00",
+            "close_time": "00:00",
+            "is_closed": False,
+        },
         {"day": "Sunday", "open_time": "", "close_time": "", "is_closed": True},
     ]
 
