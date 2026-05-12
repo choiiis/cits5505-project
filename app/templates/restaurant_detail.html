@@ -92,8 +92,18 @@
 
                         <!-- Map and Address -->
                         <div class="location-column">
-                            <div class="map-placeholder">
-                                Map
+                            <div class="restaurant-map">
+                                <iframe
+                                    title="Google map showing {{ restaurant.name }}"
+                                    src="{{ google_maps_embed_url }}"
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    allowfullscreen>
+                                </iframe>
+                                <a class="restaurant-map-fallback" href="{{ google_maps_search_url }}" target="_blank"
+                                    rel="noopener">
+                                    View map
+                                </a>
                             </div>
 
                             <div class="address-card">
@@ -106,6 +116,10 @@
                                     <p class="restaurant-address">
                                         {{ restaurant.address }}
                                     </p>
+                                    <a class="address-map-link" href="{{ google_maps_search_url }}" target="_blank"
+                                        rel="noopener">
+                                        Open in Google Maps
+                                    </a>
                                 </div>
                             </div>
                         </div>

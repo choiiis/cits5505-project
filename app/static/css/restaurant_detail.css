@@ -178,14 +178,52 @@
     color: var(--brand-ink);
 }
 
-.map-placeholder {
+.restaurant-map {
+    position: relative;
     height: 230px;
-    background: var(--brand-mint);
     border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
+    background: var(--brand-mint);
+    border: 1px solid var(--brand-line);
+}
+
+.restaurant-map iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.restaurant-map-fallback {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    z-index: 1;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--brand-ink);
+    font-size: 0.85rem;
     font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+}
+
+.restaurant-map-fallback:hover {
+    color: var(--brand-green);
+}
+
+.address-map-link {
+    display: inline-block;
+    margin-top: 6px;
+    color: var(--brand-green);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.address-map-link:hover {
+    text-decoration: underline;
 }
 
 .hours-card {
