@@ -5,6 +5,7 @@ from app.models import Restaurant, MenuItem, OpeningHour, Review, User
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import datetime
+from urllib.parse import quote_plus
 
 DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
 DEFAULT_RESTAURANT_IMAGE = "images/restaurant-default.png"
@@ -286,6 +287,7 @@ def search():
     filter_location = request.args.get("filter_location", "").strip()
     rating = request.args.get("rating", "").strip()
     sort = request.args.get("sort", "rating").strip()
+    active_location = filter_location or location
 
     query = Restaurant.query
 
@@ -306,7 +308,9 @@ def search():
             .distinct()
         )
 
-    if location:
+    if filter_location:
+        query = query.filter(Restaurant.suburb == filter_location)
+    elif location:
         location_text = f"%{location}%"
         query = query.filter(
             db.or_(
@@ -317,9 +321,6 @@ def search():
 
     if category:
         query = query.filter(Restaurant.category == category)
-
-    if filter_location:
-        query = query.filter(Restaurant.suburb == filter_location)
 
     if rating:
         try:
@@ -336,6 +337,43 @@ def search():
         query = query.order_by(Restaurant.average_rating.desc())
 
     restaurants = query.all()
+
+    if active_location:
+        map_query_text = f"restaurants near {active_location}, Western Australia"
+        search_map_label = active_location
+    elif restaurants:
+        map_query_text = f"restaurants near {restaurants[0].address}, Australia"
+        search_map_label = restaurants[0].suburb or restaurants[0].address
+    else:
+        map_query_text = "restaurants near Perth, Western Australia"
+        search_map_label = "Perth"
+
+    search_map_query = quote_plus(map_query_text)
+    google_maps_api_key = app.config.get("GOOGLE_MAPS_API_KEY", "")
+
+    if google_maps_api_key:
+        search_map_embed_url = (
+            "https://www.google.com/maps/embed/v1/search"
+            f"?key={google_maps_api_key}&q={search_map_query}"
+        )
+    else:
+        search_map_embed_url = (
+            "https://maps.google.com/maps"
+            f"?q={search_map_query}&z=13&output=embed"
+        )
+
+    summary_parts = [keyword if keyword else "restaurants"]
+
+    if active_location:
+        summary_parts.append(f"in {active_location}")
+
+    if category:
+        summary_parts.append(category)
+
+    if rating:
+        summary_parts.append(f"{rating}+ rating")
+
+    search_summary_label = " ".join(summary_parts)
 
     categories = [
         row[0]
@@ -361,6 +399,10 @@ def search():
         categories=categories,
         locations=locations,
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
+        search_map_embed_url=search_map_embed_url,
+        search_map_search_url=f"https://www.google.com/maps/search/?api=1&query={search_map_query}",
+        search_map_label=search_map_label,
+        search_summary_label=search_summary_label,
     )
 
 
