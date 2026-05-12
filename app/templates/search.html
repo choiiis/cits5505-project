@@ -140,7 +140,7 @@
                             <h1 class="search-results-title">Search Results</h1>
                             <p class="search-summary" id="summaryText">
                                 {{ restaurants|length }} results for
-                                "<strong>{{ request.args.get('q', 'restaurants') }}</strong>"
+                                "<strong>{{ search_summary_label }}</strong>"
                             </p>
                         </div>
 
@@ -152,11 +152,24 @@
                         </div>
                     </div>
 
-                    <section id="mapPreview" class="search-map-panel p-4 mb-3 position-relative">
+                    <section id="mapPreview" class="search-map-panel mb-3 position-relative">
+                        <iframe
+                            title="Map preview for restaurants near {{ search_map_label }}"
+                            src="{{ search_map_embed_url }}"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            allowfullscreen>
+                        </iframe>
+
                         <div class="search-map-content">
-                            <h2>Map preview</h2>
-                            <p>Explore restaurants nearby on the map.</p>
+                            <span class="search-map-eyebrow">Live area preview</span>
+                            <h2>{{ search_map_label }}</h2>
+                            <p>{{ restaurants|length }} matching restaurants nearby</p>
                         </div>
+
+                        <a class="search-map-link" href="{{ search_map_search_url }}" target="_blank" rel="noopener">
+                            Open map
+                        </a>
                     </section>
 
                     <div class="search-results-list row g-3" id="resultsList">
