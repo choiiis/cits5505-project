@@ -287,6 +287,7 @@ def search():
     filter_location = request.args.get("filter_location", "").strip()
     rating = request.args.get("rating", "").strip()
     sort = request.args.get("sort", "rating").strip()
+    active_location = filter_location or location
 
     query = Restaurant.query
 
@@ -307,7 +308,9 @@ def search():
             .distinct()
         )
 
-    if location:
+    if filter_location:
+        query = query.filter(Restaurant.suburb == filter_location)
+    elif location:
         location_text = f"%{location}%"
         query = query.filter(
             db.or_(
@@ -318,9 +321,6 @@ def search():
 
     if category:
         query = query.filter(Restaurant.category == category)
-
-    if filter_location:
-        query = query.filter(Restaurant.suburb == filter_location)
 
     if rating:
         try:
@@ -338,12 +338,9 @@ def search():
 
     restaurants = query.all()
 
-    if location:
-        map_query_text = f"restaurants near {location}, Western Australia"
-        search_map_label = location
-    elif filter_location:
-        map_query_text = f"restaurants near {filter_location}, Western Australia"
-        search_map_label = filter_location
+    if active_location:
+        map_query_text = f"restaurants near {active_location}, Western Australia"
+        search_map_label = active_location
     elif restaurants:
         map_query_text = f"restaurants near {restaurants[0].address}, Australia"
         search_map_label = restaurants[0].suburb or restaurants[0].address
@@ -364,6 +361,24 @@ def search():
             "https://maps.google.com/maps"
             f"?q={search_map_query}&z=13&output=embed"
         )
+
+    summary_parts = []
+
+    if keyword:
+        summary_parts.append(keyword)
+    else:
+        summary_parts.append("restaurants")
+
+    if active_location:
+        summary_parts.append(f"in {active_location}")
+
+    if category:
+        summary_parts.append(category)
+
+    if rating:
+        summary_parts.append(f"{rating}+ rating")
+
+    search_summary_label = " ".join(summary_parts)
 
     categories = [
         row[0]
@@ -392,6 +407,7 @@ def search():
         search_map_embed_url=search_map_embed_url,
         search_map_search_url=f"https://www.google.com/maps/search/?api=1&query={search_map_query}",
         search_map_label=search_map_label,
+        search_summary_label=search_summary_label,
     )
 
 
