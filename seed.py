@@ -10,6 +10,554 @@ from app.models import (
     Bookmark,
 )
 
+import random
+from datetime import datetime, timedelta
+
+random.seed(42)
+
+DEFAULT_PASSWORD_HASH = "dev-password-hash"
+
+PROFILE_IMAGES = [
+    "https://randomuser.me/api/portraits/women/44.jpg",
+    "https://randomuser.me/api/portraits/men/32.jpg",
+    "https://randomuser.me/api/portraits/women/68.jpg",
+    "https://randomuser.me/api/portraits/men/45.jpg",
+    "https://randomuser.me/api/portraits/women/12.jpg",
+    "https://randomuser.me/api/portraits/men/11.jpg",
+    "https://randomuser.me/api/portraits/women/22.jpg",
+    "https://randomuser.me/api/portraits/men/23.jpg",
+]
+
+CATEGORY_IMAGES = {
+    "Italian": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+    "Cafe": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+    "Korean": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1200&q=80",
+    "Japanese": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80",
+    "Thai": "https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1200&q=80",
+    "Mexican": "https://images.unsplash.com/photo-1565299585323-38174c4a67df?auto=format&fit=crop&w=1200&q=80",
+    "Healthy": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+    "Fast Food": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80",
+    "Dessert": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=1200&q=80",
+    "Indian": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1200&q=80",
+    "Seafood": "https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&w=1200&q=80",
+    "Modern Australian": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80",
+}
+
+# Only these 20 restaurants have uploaded restaurant images.
+# The other 20 restaurants intentionally keep thumbnail_image/hero_image as None
+# so the UI fallback/default image can be tested.
+RESTAURANT_IMAGE_OVERRIDES = {
+    "Laneway Pizza Co.": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+    "Northbridge Coffee Lab": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+    "Seoul Table": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1200&q=80",
+    "Burger Corner": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80",
+    "Green Bowl Kitchen": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+    "Sakura Sushi House": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80",
+    "Bangkok Street Eats": "https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1200&q=80",
+    "Taco Verde": "https://images.unsplash.com/photo-1565299585323-38174c4a67df?auto=format&fit=crop&w=1200&q=80",
+    "Sweet Crumb Dessert Bar": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=1200&q=80",
+    "Curry Leaf Kitchen": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1200&q=80",
+    "Harbour Fish Grill": "https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&w=1200&q=80",
+    "Banksia Bistro": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80",
+    "Pasta Piazza": "https://images.unsplash.com/photo-1528137871618-79d2761e3fd5?auto=format&fit=crop&w=1200&q=80",
+    "Campus Brew": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80",
+    "Kimchi Garden": "https://images.unsplash.com/photo-1580651315530-69c8e0026377?auto=format&fit=crop&w=1200&q=80",
+    "Tokyo Bento Bar": "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?auto=format&fit=crop&w=1200&q=80",
+    "Siam Corner": "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?auto=format&fit=crop&w=1200&q=80",
+    "El Camino Cantina": "https://images.unsplash.com/photo-1615870216519-2f9fa575fa5c?auto=format&fit=crop&w=1200&q=80",
+    "Fit Plate Co.": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80",
+    "Crispy Burger Works": "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=80",
+}
+
+MENU_LIBRARY = {
+    "Italian": [
+        ("Margherita Pizza", "Tomato, mozzarella, basil", 22.0),
+        ("Pepperoni Pizza", "Pepperoni, tomato, mozzarella", 24.0),
+        ("Truffle Mushroom Pizza", "Mushroom, truffle oil, mozzarella", 27.0),
+        ("Carbonara", "Pasta, egg, pancetta, parmesan", 25.0),
+        ("Seafood Linguine", "Linguine, prawns, mussels, tomato", 31.0),
+        ("Lasagne", "Beef ragu, pasta sheets, bechamel", 26.0),
+        ("Caprese Salad", "Tomato, mozzarella, basil", 16.0),
+        ("Garlic Bread", "Toasted bread with garlic butter", 9.0),
+        ("Tiramisu", "Coffee, mascarpone, cocoa", 14.0),
+        ("Panna Cotta", "Vanilla cream dessert with berry compote", 13.0),
+    ],
+    "Cafe": [
+        ("Flat White", "Espresso with steamed milk", 5.5),
+        ("Iced Latte", "Espresso, milk, ice", 6.5),
+        ("Cold Brew", "Slow brewed coffee over ice", 6.0),
+        ("Avocado Toast", "Sourdough, avocado, feta, chilli", 18.0),
+        ("Eggs Benedict", "Poached eggs, hollandaise, sourdough", 22.0),
+        ("Granola Bowl", "Yoghurt, fruit, granola, honey", 17.0),
+        ("Chicken Panini", "Chicken, pesto, cheese, toasted bread", 19.0),
+        ("Mushroom Toast", "Mushrooms, ricotta, herbs", 20.0),
+        ("Banana Bread", "Toasted banana bread with butter", 8.0),
+        ("Almond Croissant", "Flaky pastry with almond filling", 7.5),
+    ],
+    "Korean": [
+        ("Bibimbap", "Rice bowl with vegetables, beef, egg, gochujang", 21.0),
+        ("Kimchi Stew", "Kimchi stew with pork and tofu", 19.0),
+        ("Bulgogi", "Marinated beef with rice and sides", 24.0),
+        ("Korean Fried Chicken", "Crispy chicken with sweet spicy sauce", 25.0),
+        ("Tteokbokki", "Rice cakes in spicy sauce", 17.0),
+        ("Japchae", "Glass noodles with vegetables", 18.0),
+        ("Soft Tofu Stew", "Spicy tofu soup with egg", 19.0),
+        ("Seafood Pancake", "Crispy pancake with seafood and spring onion", 22.0),
+        ("Kimchi Fried Rice", "Fried rice with kimchi and egg", 18.0),
+        ("Banchan Set", "Assorted Korean side dishes", 10.0),
+    ],
+    "Japanese": [
+        ("Salmon Sushi Set", "Assorted salmon nigiri and rolls", 24.0),
+        ("Chicken Katsu Curry", "Crispy chicken with Japanese curry", 21.0),
+        ("Tonkotsu Ramen", "Pork broth ramen with chashu", 23.0),
+        ("Teriyaki Chicken Don", "Chicken teriyaki rice bowl", 19.0),
+        ("Tempura Udon", "Udon noodles with prawn tempura", 22.0),
+        ("Gyoza", "Pan-fried pork dumplings", 12.0),
+        ("Sashimi Plate", "Fresh assorted sashimi", 32.0),
+        ("Miso Soup", "Soybean soup with tofu and seaweed", 5.0),
+        ("Edamame", "Steamed soybeans with salt", 7.0),
+        ("Matcha Cheesecake", "Creamy matcha dessert", 13.0),
+    ],
+    "Thai": [
+        ("Pad Thai", "Rice noodles, egg, tofu, prawns, peanuts", 21.0),
+        ("Green Curry", "Green curry with chicken and vegetables", 22.0),
+        ("Massaman Beef Curry", "Slow cooked beef curry with potato", 24.0),
+        ("Tom Yum Soup", "Hot and sour soup with prawns", 19.0),
+        ("Papaya Salad", "Green papaya, lime, chilli, peanuts", 16.0),
+        ("Basil Chicken", "Stir-fried chicken with basil and chilli", 20.0),
+        ("Satay Skewers", "Chicken skewers with peanut sauce", 14.0),
+        ("Coconut Rice", "Jasmine rice cooked with coconut milk", 6.0),
+        ("Thai Fish Cakes", "Spiced fish cakes with dipping sauce", 13.0),
+        ("Mango Sticky Rice", "Sweet coconut rice with mango", 12.0),
+    ],
+    "Mexican": [
+        ("Beef Tacos", "Soft tacos with beef, salsa, coriander", 18.0),
+        ("Fish Tacos", "Battered fish, slaw, chipotle mayo", 19.0),
+        ("Chicken Quesadilla", "Tortilla, cheese, chicken, salsa", 17.0),
+        ("Nachos", "Corn chips, cheese, beans, guacamole", 20.0),
+        ("Burrito Bowl", "Rice, beans, meat, salsa, avocado", 21.0),
+        ("Pork Carnitas", "Slow-cooked pork with tortillas", 24.0),
+        ("Street Corn", "Corn with chilli, cheese, lime", 9.0),
+        ("Guacamole", "Avocado dip with corn chips", 12.0),
+        ("Churros", "Cinnamon sugar churros with chocolate", 11.0),
+        ("Horchata", "Sweet cinnamon rice drink", 6.5),
+    ],
+    "Healthy": [
+        ("Salmon Poke Bowl", "Rice, salmon, edamame, cucumber, avocado", 23.0),
+        ("Vegan Buddha Bowl", "Quinoa, chickpeas, greens, tahini", 20.0),
+        ("Chicken Protein Bowl", "Chicken, brown rice, greens, yoghurt sauce", 22.0),
+        ("Green Smoothie", "Spinach, banana, apple, almond milk", 10.0),
+        ("Acai Bowl", "Acai, berries, banana, granola", 17.0),
+        ("Falafel Wrap", "Falafel, salad, hummus, pita", 16.0),
+        ("Lentil Soup", "Lentils, vegetables, herbs", 14.0),
+        ("Tofu Salad", "Tofu, greens, sesame dressing", 18.0),
+        ("Overnight Oats", "Oats, yoghurt, berries", 12.0),
+        ("Fresh Juice", "Seasonal cold-pressed juice", 8.0),
+    ],
+    "Fast Food": [
+        ("Classic Cheeseburger", "Beef patty, cheddar, pickles, house sauce", 16.0),
+        ("Double Smash Burger", "Two beef patties, cheese, onions", 21.0),
+        ("Chicken Burger", "Crispy chicken, slaw, mayo", 18.0),
+        ("Loaded Fries", "Fries, cheese, bacon, sauce", 14.0),
+        ("Onion Rings", "Crispy onion rings", 9.0),
+        ("Nuggets", "Chicken nuggets with dipping sauce", 11.0),
+        ("Milkshake", "Vanilla, chocolate, or strawberry", 8.0),
+        ("Veggie Burger", "Plant-based patty, lettuce, tomato", 17.0),
+        ("Hot Wings", "Spicy chicken wings", 15.0),
+        ("Soft Drink", "Chilled canned drink", 4.0),
+    ],
+    "Dessert": [
+        ("Chocolate Waffle", "Waffle, chocolate sauce, ice cream", 16.0),
+        ("Strawberry Crepe", "Crepe with strawberries and cream", 15.0),
+        ("Basque Cheesecake", "Burnt cheesecake slice", 13.0),
+        ("Gelato Cup", "Two scoops of gelato", 8.5),
+        ("Brownie Sundae", "Warm brownie, ice cream, fudge", 14.0),
+        ("Matcha Roll Cake", "Soft roll cake with matcha cream", 12.0),
+        ("Mango Pancake", "Pancake filled with mango and cream", 11.0),
+        ("Taro Milk Tea", "Milk tea with taro flavour", 7.5),
+        ("Macaron Box", "Assorted macarons", 18.0),
+        ("Fruit Tart", "Custard tart with fresh fruit", 12.0),
+    ],
+    "Indian": [
+        ("Butter Chicken", "Creamy tomato curry with chicken", 23.0),
+        ("Lamb Rogan Josh", "Slow-cooked lamb curry", 25.0),
+        ("Palak Paneer", "Spinach curry with paneer", 21.0),
+        ("Chana Masala", "Chickpea curry with spices", 18.0),
+        ("Garlic Naan", "Naan bread with garlic butter", 5.5),
+        ("Biryani", "Spiced rice with meat or vegetables", 22.0),
+        ("Tandoori Chicken", "Chargrilled spiced chicken", 24.0),
+        ("Samosa", "Crispy pastry with potato filling", 9.0),
+        ("Raita", "Yoghurt with cucumber and herbs", 5.0),
+        ("Gulab Jamun", "Sweet milk dumplings in syrup", 8.0),
+    ],
+    "Seafood": [
+        ("Fish and Chips", "Battered fish with chips and tartare", 24.0),
+        ("Grilled Barramundi", "Barramundi with lemon butter", 31.0),
+        ("Garlic Prawns", "Prawns cooked with garlic and herbs", 28.0),
+        ("Seafood Platter", "Mixed seafood with chips and salad", 42.0),
+        ("Calamari", "Crispy calamari with aioli", 18.0),
+        ("Oysters", "Fresh oysters with mignonette", 30.0),
+        ("Crab Linguine", "Pasta with crab, chilli, garlic", 33.0),
+        ("Mussel Pot", "Mussels in white wine sauce", 27.0),
+        ("Prawn Tacos", "Prawns, slaw, lime crema", 20.0),
+        ("Lemon Sorbet", "Refreshing citrus sorbet", 9.0),
+    ],
+    "Modern Australian": [
+        ("Grilled Chicken", "Chicken breast, seasonal vegetables", 27.0),
+        ("Steak Sandwich", "Beef steak, onion jam, chips", 25.0),
+        ("Barramundi Plate", "Barramundi, greens, lemon butter", 31.0),
+        ("Pumpkin Risotto", "Creamy risotto with pumpkin and sage", 23.0),
+        ("Lamb Shoulder", "Slow-cooked lamb with mash", 34.0),
+        ("Caesar Salad", "Cos lettuce, parmesan, croutons", 18.0),
+        ("Pork Belly", "Crispy pork belly with apple slaw", 32.0),
+        ("Roast Vegetable Plate", "Seasonal roasted vegetables", 20.0),
+        ("Sticky Date Pudding", "Warm pudding with caramel sauce", 14.0),
+        ("Lemon Lime Bitters", "Classic Australian soft drink", 6.0),
+    ],
+}
+
+REVIEW_TEXTS = [
+    "Really enjoyable meal and the staff were friendly.",
+    "Good value for the price and the food came out quickly.",
+    "The atmosphere was relaxed and the dishes tasted fresh.",
+    "Would come back again with friends.",
+    "The main dish was excellent, although the service was a little slow.",
+    "Nice spot for a casual meal after class.",
+    "The flavours were balanced and the portion size was generous.",
+    "A reliable place when I want something simple and tasty.",
+    "The menu had enough variety and everything felt well prepared.",
+    "Loved the vibe and the location was convenient.",
+    "The food was good, but the place was a bit noisy.",
+    "Great option for dinner around Perth.",
+    "The dessert was the highlight of the visit.",
+    "Friendly team and a comfortable dining space.",
+    "Solid restaurant overall, especially for a quick catch-up.",
+]
+
+
+RESTAURANT_DATA = [
+    (
+        "Laneway Pizza Co.",
+        "Italian",
+        "A casual pizza spot with wood-fired favourites and a relaxed laneway feel.",
+        "Barrack St, Perth, WA 6000",
+        "Perth CBD",
+        "+61 8 1000 0001",
+    ),
+    (
+        "Northbridge Coffee Lab",
+        "Cafe",
+        "Specialty coffee, brunch plates, and a calm morning atmosphere.",
+        "William St, Northbridge, WA 6003",
+        "Northbridge",
+        "+61 8 1000 0002",
+    ),
+    (
+        "Seoul Table",
+        "Korean",
+        "Korean comfort food, BBQ dishes, stews, and generous shared plates.",
+        "Albany Hwy, Victoria Park, WA 6100",
+        "Victoria Park",
+        "+61 8 1000 0003",
+    ),
+    (
+        "Burger Corner",
+        "Fast Food",
+        "Quick burgers, loaded fries, and late-night comfort food.",
+        "Murray St, Perth, WA 6000",
+        "Perth CBD",
+        "+61 8 1000 0004",
+    ),
+    (
+        "Green Bowl Kitchen",
+        "Healthy",
+        "Fresh bowls, salads, smoothies, and vegan-friendly meals.",
+        "Hay St, Subiaco, WA 6008",
+        "Subiaco",
+        "+61 8 1000 0005",
+    ),
+    (
+        "Sakura Sushi House",
+        "Japanese",
+        "Fresh sushi, ramen, rice bowls, and simple Japanese lunch sets.",
+        "Rokeby Rd, Subiaco, WA 6008",
+        "Subiaco",
+        "+61 8 1000 0006",
+    ),
+    (
+        "Bangkok Street Eats",
+        "Thai",
+        "Thai curries, noodles, and street-food favourites with bold flavours.",
+        "Beaufort St, Mount Lawley, WA 6050",
+        "Mount Lawley",
+        "+61 8 1000 0007",
+    ),
+    (
+        "Taco Verde",
+        "Mexican",
+        "Colourful tacos, burrito bowls, nachos, and fresh salsa.",
+        "South Tce, Fremantle, WA 6160",
+        "Fremantle",
+        "+61 8 1000 0008",
+    ),
+    (
+        "Sweet Crumb Dessert Bar",
+        "Dessert",
+        "Waffles, cakes, gelato, and colourful desserts for late afternoons.",
+        "James St, Northbridge, WA 6003",
+        "Northbridge",
+        "+61 8 1000 0009",
+    ),
+    (
+        "Curry Leaf Kitchen",
+        "Indian",
+        "Classic curries, naan, biryani, and rich spiced dishes.",
+        "Albany Hwy, Cannington, WA 6107",
+        "Cannington",
+        "+61 8 1000 0010",
+    ),
+    (
+        "Harbour Fish Grill",
+        "Seafood",
+        "Grilled seafood, fish and chips, and casual harbour-side plates.",
+        "Mews Rd, Fremantle, WA 6160",
+        "Fremantle",
+        "+61 8 1000 0011",
+    ),
+    (
+        "Banksia Bistro",
+        "Modern Australian",
+        "Modern Australian meals using local produce and seasonal sides.",
+        "St Georges Tce, Perth, WA 6000",
+        "Perth CBD",
+        "+61 8 1000 0012",
+    ),
+    (
+        "Pasta Piazza",
+        "Italian",
+        "Handmade pasta, sauces, salads, and classic Italian desserts.",
+        "Oxford St, Leederville, WA 6007",
+        "Leederville",
+        "+61 8 1000 0013",
+    ),
+    (
+        "Campus Brew",
+        "Cafe",
+        "Student-friendly cafe with coffee, toasties, and study tables.",
+        "Hackett Dr, Crawley, WA 6009",
+        "Crawley",
+        "+61 8 1000 0014",
+    ),
+    (
+        "Kimchi Garden",
+        "Korean",
+        "A cosy Korean diner with stews, fried chicken, and rice dishes.",
+        "Francis St, Northbridge, WA 6003",
+        "Northbridge",
+        "+61 8 1000 0015",
+    ),
+    (
+        "Tokyo Bento Bar",
+        "Japanese",
+        "Fast Japanese bento boxes, curry, sushi, and udon.",
+        "Hay St, Perth, WA 6000",
+        "Perth CBD",
+        "+61 8 1000 0016",
+    ),
+    (
+        "Siam Corner",
+        "Thai",
+        "Thai restaurant serving curries, stir-fries, and noodle dishes.",
+        "Cambridge St, Wembley, WA 6014",
+        "Wembley",
+        "+61 8 1000 0017",
+    ),
+    (
+        "El Camino Cantina",
+        "Mexican",
+        "Casual Mexican food with tacos, nachos, and shared plates.",
+        "Scarborough Beach Rd, Scarborough, WA 6019",
+        "Scarborough",
+        "+61 8 1000 0018",
+    ),
+    (
+        "Fit Plate Co.",
+        "Healthy",
+        "Protein bowls, salads, smoothies, and healthy takeaway meals.",
+        "Angelo St, South Perth, WA 6151",
+        "South Perth",
+        "+61 8 1000 0019",
+    ),
+    (
+        "Crispy Burger Works",
+        "Fast Food",
+        "Burgers, wings, fries, and easy takeaway meals.",
+        "Great Eastern Hwy, Belmont, WA 6104",
+        "Belmont",
+        "+61 8 1000 0020",
+    ),
+    (
+        "Milky Moon Desserts",
+        "Dessert",
+        "Milk tea, crepes, cakes, and soft desserts.",
+        "Murray St, Perth, WA 6000",
+        "Perth CBD",
+        "+61 8 1000 0021",
+    ),
+    (
+        "Tandoori Nights",
+        "Indian",
+        "Tandoori dishes, curries, naan, and rice plates.",
+        "High Rd, Willetton, WA 6155",
+        "Willetton",
+        "+61 8 1000 0022",
+    ),
+    (
+        "Ocean Basket Perth",
+        "Seafood",
+        "Seafood platters, grilled fish, prawns, and fresh sides.",
+        "Riverside Dr, Perth, WA 6000",
+        "Perth CBD",
+        "+61 8 1000 0023",
+    ),
+    (
+        "Jarrah House",
+        "Modern Australian",
+        "Local plates, steaks, seafood, and seasonal vegetables.",
+        "Rokeby Rd, Subiaco, WA 6008",
+        "Subiaco",
+        "+61 8 1000 0024",
+    ),
+    (
+        "Little Napoli",
+        "Italian",
+        "Neighbourhood Italian spot with pizza, pasta, and desserts.",
+        "Albany Hwy, East Victoria Park, WA 6101",
+        "East Victoria Park",
+        "+61 8 1000 0025",
+    ),
+    (
+        "Morning Fox Cafe",
+        "Cafe",
+        "Bright cafe serving brunch, pastries, and smooth coffee.",
+        "Napoleon St, Cottesloe, WA 6011",
+        "Cottesloe",
+        "+61 8 1000 0026",
+    ),
+    (
+        "Busan BBQ House",
+        "Korean",
+        "Korean BBQ, stews, rice dishes, and group-friendly tables.",
+        "Beaufort St, Inglewood, WA 6052",
+        "Inglewood",
+        "+61 8 1000 0027",
+    ),
+    (
+        "Kyoto Ramen Lane",
+        "Japanese",
+        "Ramen, gyoza, rice bowls, and Japanese desserts.",
+        "Albany Hwy, Victoria Park, WA 6100",
+        "Victoria Park",
+        "+61 8 1000 0028",
+    ),
+    (
+        "Thai Orchid Room",
+        "Thai",
+        "Traditional Thai flavours with curries, salads, and soups.",
+        "Canning Hwy, Applecross, WA 6153",
+        "Applecross",
+        "+61 8 1000 0029",
+    ),
+    (
+        "Casa Burrito",
+        "Mexican",
+        "Burritos, tacos, quesadillas, and quick Mexican takeaway.",
+        "Leach Hwy, Booragoon, WA 6154",
+        "Booragoon",
+        "+61 8 1000 0030",
+    ),
+    (
+        "Nourish Lane",
+        "Healthy",
+        "Light meals, plant-based options, juices, and grain bowls.",
+        "Hampden Rd, Nedlands, WA 6009",
+        "Nedlands",
+        "+61 8 1000 0031",
+    ),
+    (
+        "Fry Yard",
+        "Fast Food",
+        "Crispy fried chicken, burgers, fries, and shakes.",
+        "Oats St, Carlisle, WA 6101",
+        "Carlisle",
+        "+61 8 1000 0032",
+    ),
+    (
+        "Sugar Finch",
+        "Dessert",
+        "Small dessert cafe with cakes, waffles, and drinks.",
+        "Queen Victoria St, Fremantle, WA 6160",
+        "Fremantle",
+        "+61 8 1000 0033",
+    ),
+    (
+        "Masala Street",
+        "Indian",
+        "Indian street snacks, curries, and warm breads.",
+        "Walter Rd, Morley, WA 6062",
+        "Morley",
+        "+61 8 1000 0034",
+    ),
+    (
+        "Coral Coast Seafood",
+        "Seafood",
+        "Fresh seafood dishes with simple sides and casual service.",
+        "West Coast Dr, Hillarys, WA 6025",
+        "Hillarys",
+        "+61 8 1000 0035",
+    ),
+    (
+        "Rivergum Kitchen",
+        "Modern Australian",
+        "Relaxed Australian dining with local ingredients.",
+        "Canning Hwy, South Perth, WA 6151",
+        "South Perth",
+        "+61 8 1000 0036",
+    ),
+    (
+        "Roman Hearth",
+        "Italian",
+        "Italian dishes, roasted vegetables, and handmade pasta.",
+        "Cambridge St, West Leederville, WA 6007",
+        "West Leederville",
+        "+61 8 1000 0037",
+    ),
+    (
+        "Foam & Flour",
+        "Cafe",
+        "Bakery cafe with coffee, sourdough, and pastries.",
+        "Stirling Hwy, Claremont, WA 6010",
+        "Claremont",
+        "+61 8 1000 0038",
+    ),
+    (
+        "Han River Kitchen",
+        "Korean",
+        "Korean rice bowls, noodles, stew, and fried snacks.",
+        "Korean St, Perth, WA 6000",
+        "Perth CBD",
+        "+61 8 1000 0039",
+    ),
+    (
+        "Nori Market",
+        "Japanese",
+        "Sushi rolls, donburi, ramen, and light Japanese meals.",
+        "Fremantle Markets, Fremantle, WA 6160",
+        "Fremantle",
+        "+61 8 1000 0040",
+    ),
+]
+
 
 def clear_data():
     ReviewPhoto.query.delete()
@@ -30,7 +578,6 @@ def create_opening_hours(
     weekend_hours=None,
     closed_days=None,
 ):
-    """Create a simple 7-day opening hour schedule for a restaurant."""
     friday_hours = friday_hours or weekday_hours
     weekend_hours = weekend_hours or weekday_hours
     closed_days = closed_days or []
@@ -58,354 +605,429 @@ def create_opening_hours(
     ]
 
 
-def seed_data():
-    # Users
-    alex = User(
-        email="alex@example.com",
-        username="Alex",
-        password_hash="dev-password-hash",
-        profile_image="https://randomuser.me/api/portraits/men/32.jpg",
-        role="customer",
-    )
-
-    mia = User(
-        email="mia@example.com",
-        username="Mia",
-        password_hash="dev-password-hash",
-        profile_image="https://randomuser.me/api/portraits/women/44.jpg",
-        role="customer",
-    )
-
-    daniel = User(
-        email="daniel@example.com",
-        username="Daniel",
-        password_hash="dev-password-hash",
-        profile_image="https://randomuser.me/api/portraits/men/45.jpg",
-        role="customer",
-    )
-
-    owner = User(
-        email="owner@example.com",
-        username="Restaurant Owner",
-        password_hash="dev-password-hash",
-        profile_image="https://randomuser.me/api/portraits/women/68.jpg",
-        role="owner",
-        abn_number="51824753556",
-        contact_number="+61 8 1234 5678",
-    )
-
-    db.session.add_all([alex, mia, daniel, owner])
-    db.session.commit()
-
-    # Restaurants
-    laneway_pizza = Restaurant(
-        name="Laneway Pizza Co.",
-        category="Italian",
-        description="A casual pizza spot in Perth CBD.",
-        address="Barrack St, Perth, WA 6000",
-        suburb="Perth CBD",
-        phone="+61 8 1234 5678",
-        website="https://example.com",
-        thumbnail_image="images/margherita.jpg",
-        hero_image="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
-        average_rating=4.7,
-        review_count=3,
-        owner_id=owner.id,
-    )
-
-    northbridge_cafe = Restaurant(
-        name="Northbridge Coffee Lab",
-        category="Cafe",
-        description="Specialty coffee and brunch near Northbridge.",
-        address="William St, Northbridge, WA 6003",
-        suburb="Northbridge",
-        phone="+61 8 2222 3333",
-        website="https://example.com",
-        thumbnail_image="images/margherita.jpg",
-        hero_image="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
-        average_rating=4.5,
-        review_count=2,
-    )
-
-    seoul_table = Restaurant(
-        name="Seoul Table",
-        category="Korean",
-        description="Korean comfort food and BBQ in Victoria Park.",
-        address="Albany Hwy, Victoria Park, WA 6100",
-        suburb="Victoria Park",
-        phone="+61 8 4444 5555",
-        website="https://example.com",
-        thumbnail_image="images/margherita.jpg",
-        hero_image="https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1200&q=80",
-        average_rating=4.8,
-        review_count=4,
-    )
-
-    burger_corner = Restaurant(
-        name="Burger Corner",
-        category="Fast Food",
-        description="Quick burgers, fries, and late-night comfort food.",
-        address="Murray St, Perth, WA 6000",
-        suburb="Perth CBD",
-        phone="+61 8 7777 8888",
-        website="https://example.com",
-        thumbnail_image="images/margherita.jpg",
-        hero_image="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80",
-        average_rating=4.2,
-        review_count=6,
-    )
-
-    green_bowl = Restaurant(
-        name="Green Bowl Kitchen",
-        category="Healthy",
-        description="Fresh bowls, salads, smoothies, and vegan-friendly meals.",
-        address="Hay St, Subiaco, WA 6008",
-        suburb="Subiaco",
-        phone="+61 8 9999 1111",
-        website="https://example.com",
-        thumbnail_image="images/margherita.jpg",
-        hero_image="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
-        average_rating=4.4,
-        review_count=3,
-    )
-
-    db.session.add_all(
-        [
-            laneway_pizza,
-            northbridge_cafe,
-            seoul_table,
-            burger_corner,
-            green_bowl,
-        ]
-    )
-    db.session.commit()
-
-    # Menu items
-    menu_items = [
-        MenuItem(
-            restaurant_id=laneway_pizza.id,
-            name="Margherita Pizza",
-            description="Tomato, mozzarella, basil",
-            price=22.0,
-            image_url="images/margherita.jpg",
-        ),
-        MenuItem(
-            restaurant_id=laneway_pizza.id,
-            name="Truffle Mushroom Pizza",
-            description="Mushroom, truffle oil, mozzarella",
-            price=27.0,
-            image_url="images/margherita.jpg",
-        ),
-        MenuItem(
-            restaurant_id=laneway_pizza.id,
-            name="Tiramisu",
-            description="Coffee, mascarpone, cocoa",
-            price=14.0,
-            image_url="images/margherita.jpg",
-        ),
-        MenuItem(
-            restaurant_id=northbridge_cafe.id,
-            name="Iced Latte",
-            description="Espresso, milk, ice",
-            price=6.5,
-            image_url="images/margherita.jpg",
-        ),
-        MenuItem(
-            restaurant_id=northbridge_cafe.id,
-            name="Avocado Toast",
-            description="Sourdough, avocado, feta, chilli flakes",
-            price=18.0,
-            image_url="images/margherita.jpg",
-        ),
-        MenuItem(
-            restaurant_id=seoul_table.id,
-            name="Bibimbap",
-            description="Rice bowl with vegetables, beef, egg, and gochujang",
-            price=21.0,
-            image_url="images/margherita.jpg",
-        ),
-        MenuItem(
-            restaurant_id=seoul_table.id,
-            name="Kimchi Stew",
-            description="Spicy kimchi stew with pork and tofu",
-            price=19.0,
-            image_url="images/margherita.jpg",
-        ),
-        MenuItem(
-            restaurant_id=burger_corner.id,
-            name="Classic Cheeseburger",
-            description="Beef patty, cheddar, pickles, lettuce, house sauce",
-            price=16.0,
-            image_url="images/margherita.jpg",
-        ),
-        MenuItem(
-            restaurant_id=green_bowl.id,
-            name="Salmon Poke Bowl",
-            description="Rice, salmon, edamame, cucumber, avocado",
-            price=23.0,
-            image_url="images/margherita.jpg",
-        ),
+def create_users():
+    owner_specs = [
+        ("owner1@example.com", "Mia Owner", "51824753556", "+61 8 2000 0001"),
+        ("owner2@example.com", "Daniel Owner", "23684597120", "+61 8 2000 0002"),
+        ("owner3@example.com", "Sophie Owner", "74920138645", "+61 8 2000 0003"),
+        ("owner4@example.com", "Noah Owner", "90361278451", "+61 8 2000 0004"),
+        ("owner5@example.com", "Grace Owner", "61273948015", "+61 8 2000 0005"),
     ]
+
+    users = []
+
+    for index, (email, username, abn_number, contact_number) in enumerate(owner_specs):
+        users.append(
+            User(
+                email=email,
+                username=username,
+                password_hash=DEFAULT_PASSWORD_HASH,
+                profile_image=(
+                    PROFILE_IMAGES[index] if index < len(PROFILE_IMAGES) else None
+                ),
+                role="owner",
+                abn_number=abn_number,
+                contact_number=contact_number,
+            )
+        )
+
+    customer_names = [
+        "Alex",
+        "Mia",
+        "Daniel",
+        "Sophie",
+        "Noah",
+        "Grace",
+        "Ethan",
+        "Olivia",
+        "Liam",
+        "Emma",
+        "Lucas",
+        "Ava",
+        "Henry",
+        "Chloe",
+        "Jack",
+        "Ruby",
+        "Leo",
+        "Isla",
+        "Mason",
+        "Zoe",
+        "Charlie",
+        "Lily",
+        "Oscar",
+        "Ella",
+        "Max",
+        "Amelia",
+        "Hugo",
+        "Maya",
+        "Arlo",
+        "Ivy",
+        "Finn",
+        "Sienna",
+        "Kai",
+        "Harper",
+        "Jasper",
+        "Evie",
+        "Theo",
+        "Poppy",
+        "Louis",
+        "Freya",
+        "Ben",
+        "Nora",
+        "Adam",
+        "Clara",
+        "Ryan",
+    ]
+
+    for index, name in enumerate(customer_names, start=1):
+        users.append(
+            User(
+                email=f"customer{index:02d}@example.com",
+                username=name,
+                password_hash=DEFAULT_PASSWORD_HASH,
+                profile_image=(
+                    PROFILE_IMAGES[len(owner_specs) + index - 1]
+                    if len(owner_specs) + index - 1 < len(PROFILE_IMAGES)
+                    else None
+                ),
+                role="customer",
+            )
+        )
+
+    db.session.add_all(users)
+    db.session.commit()
+
+    owners = [user for user in users if user.role == "owner"]
+    customers = [user for user in users if user.role == "customer"]
+
+    return owners, customers
+
+
+def create_restaurants(owners):
+    restaurants = []
+
+    for index, (name, category, description, address, suburb, phone) in enumerate(
+        RESTAURANT_DATA
+    ):
+        image_url = RESTAURANT_IMAGE_OVERRIDES.get(name)
+
+        restaurant = Restaurant(
+            name=name,
+            category=category,
+            description=description,
+            address=address,
+            suburb=suburb,
+            phone=phone,
+            website=f"https://example.com/restaurants/{index + 1}",
+            thumbnail_image=image_url,
+            hero_image=image_url,
+            average_rating=0.0,
+            review_count=0,
+            owner_id=owners[index % len(owners)].id,
+            created_at=datetime.utcnow() - timedelta(days=40 - index),
+        )
+
+        restaurants.append(restaurant)
+
+    db.session.add_all(restaurants)
+    db.session.commit()
+
+    return restaurants
+
+
+def create_menu_items(restaurants):
+    menu_items = []
+
+    for restaurant in restaurants:
+        items = MENU_LIBRARY[restaurant.category]
+
+        for item_index, (name, description, price) in enumerate(items):
+            menu_items.append(
+                MenuItem(
+                    restaurant_id=restaurant.id,
+                    name=name,
+                    description=description,
+                    price=price,
+                    image_url=restaurant.thumbnail_image,
+                )
+            )
 
     db.session.add_all(menu_items)
-
-    # Opening hours
-    # Keep one restaurant without opening hours to test the fallback UI.
-    db.session.add_all(
-        create_opening_hours(
-            laneway_pizza.id,
-            weekday_hours=("7:00 AM", "11:00 PM"),
-            friday_hours=("7:00 AM", "12:00 AM"),
-            weekend_hours=("8:00 AM", "12:00 AM"),
-            closed_days=[1],  # Tuesday closed
-        )
-    )
-
-    db.session.add_all(
-        create_opening_hours(
-            northbridge_cafe.id,
-            weekday_hours=("6:30 AM", "3:00 PM"),
-            weekend_hours=("7:00 AM", "2:00 PM"),
-            closed_days=[6],  # Sunday closed
-        )
-    )
-
-    db.session.add_all(
-        create_opening_hours(
-            seoul_table.id,
-            weekday_hours=("11:30 AM", "9:30 PM"),
-            friday_hours=("11:30 AM", "10:30 PM"),
-            weekend_hours=("11:30 AM", "10:30 PM"),
-            closed_days=[0],  # Monday closed
-        )
-    )
-
-    db.session.add_all(
-        create_opening_hours(
-            burger_corner.id,
-            weekday_hours=("10:00 AM", "10:00 PM"),
-            friday_hours=("10:00 AM", "1:00 AM"),
-            weekend_hours=("11:00 AM", "1:00 AM"),
-        )
-    )
-
-    # green_bowl intentionally has no opening hours.
-
     db.session.commit()
 
-    # Reviews
-    reviews = [
-        Review(
-            restaurant_id=laneway_pizza.id,
-            user_id=alex.id,
-            rating=5,
-            content="Great pizza and a nice late-night atmosphere. The crust was perfectly crispy and the staff were friendly.",
+
+def create_all_opening_hours(restaurants):
+    opening_patterns = [
+        (("7:00 AM", "3:00 PM"), ("7:00 AM", "4:00 PM"), ("8:00 AM", "2:00 PM"), [6]),
+        (
+            ("11:00 AM", "9:00 PM"),
+            ("11:00 AM", "10:30 PM"),
+            ("11:30 AM", "10:30 PM"),
+            [0],
         ),
-        Review(
-            restaurant_id=laneway_pizza.id,
-            user_id=mia.id,
-            rating=4,
-            content="Good food overall and the dessert was definitely the highlight.",
+        (
+            ("10:00 AM", "10:00 PM"),
+            ("10:00 AM", "12:00 AM"),
+            ("11:00 AM", "12:00 AM"),
+            [],
         ),
-        Review(
-            restaurant_id=laneway_pizza.id,
-            user_id=daniel.id,
-            rating=5,
-            content="Loved the truffle mushroom pizza and tiramisu. Cozy atmosphere and quick service.",
+        (("8:00 AM", "8:00 PM"), ("8:00 AM", "9:00 PM"), ("9:00 AM", "8:00 PM"), []),
+        (
+            ("12:00 PM", "9:30 PM"),
+            ("12:00 PM", "11:00 PM"),
+            ("12:00 PM", "11:00 PM"),
+            [2],
         ),
-        Review(
-            restaurant_id=northbridge_cafe.id,
-            user_id=alex.id,
-            rating=5,
-            content="Excellent coffee and a calm place to study in the morning.",
+        (("6:30 AM", "2:30 PM"), ("6:30 AM", "3:00 PM"), ("7:30 AM", "2:00 PM"), [6]),
+        (
+            ("5:00 PM", "10:00 PM"),
+            ("5:00 PM", "11:30 PM"),
+            ("4:30 PM", "11:30 PM"),
+            [1],
         ),
-        Review(
-            restaurant_id=northbridge_cafe.id,
-            user_id=mia.id,
-            rating=4,
-            content="Nice brunch menu and friendly service.",
-        ),
-        Review(
-            restaurant_id=seoul_table.id,
-            user_id=daniel.id,
-            rating=5,
-            content="The kimchi stew was rich and comforting. Great place for dinner.",
-        ),
-        Review(
-            restaurant_id=burger_corner.id,
-            user_id=alex.id,
-            rating=4,
-            content="Good late-night burger option in the city.",
-        ),
-        Review(
-            restaurant_id=green_bowl.id,
-            user_id=mia.id,
-            rating=4,
-            content="Fresh bowls and good vegan options.",
-        ),
+        (("9:00 AM", "5:00 PM"), ("9:00 AM", "6:00 PM"), ("10:00 AM", "4:00 PM"), []),
     ]
+
+    # Intentionally leave two restaurants without opening hours to test fallback UI.
+    restaurants_without_hours = {restaurants[4].id, restaurants[32].id}
+
+    all_hours = []
+
+    for index, restaurant in enumerate(restaurants):
+        if restaurant.id in restaurants_without_hours:
+            continue
+
+        weekday_hours, friday_hours, weekend_hours, closed_days = opening_patterns[
+            index % len(opening_patterns)
+        ]
+
+        all_hours.extend(
+            create_opening_hours(
+                restaurant.id,
+                weekday_hours=weekday_hours,
+                friday_hours=friday_hours,
+                weekend_hours=weekend_hours,
+                closed_days=closed_days,
+            )
+        )
+
+    db.session.add_all(all_hours)
+    db.session.commit()
+
+
+def create_reviews(restaurants, customers):
+    reviews = []
+
+    # Max review count is 15. Most restaurants have fewer.
+    review_counts = [
+        15,
+        14,
+        13,
+        12,
+        11,
+        10,
+        9,
+        8,
+        7,
+        6,
+        5,
+        5,
+        4,
+        4,
+        3,
+        3,
+        2,
+        2,
+        1,
+        1,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        9,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        7,
+        6,
+        5,
+        4,
+        0,
+    ]
+
+    rating_patterns = [
+        [5, 5, 4, 5, 4, 5, 5, 4, 5, 4, 5, 5, 4, 5, 5],
+        [5, 4, 4, 5, 4, 4, 5, 4, 3, 5, 4, 4, 5, 4],
+        [4, 4, 5, 4, 3, 4, 5, 4, 4, 3, 5, 4, 4],
+        [4, 3, 4, 4, 5, 3, 4, 4, 3, 4, 5, 4],
+        [3, 4, 4, 3, 5, 4, 3, 4, 4, 3, 4],
+    ]
+
+    for restaurant_index, restaurant in enumerate(restaurants):
+        count = review_counts[restaurant_index]
+        ratings = rating_patterns[restaurant_index % len(rating_patterns)]
+
+        selected_customers = random.sample(customers, count) if count else []
+
+        for review_index, customer in enumerate(selected_customers):
+            rating = ratings[review_index % len(ratings)]
+            content = REVIEW_TEXTS[
+                (restaurant_index + review_index) % len(REVIEW_TEXTS)
+            ]
+
+            reviews.append(
+                Review(
+                    restaurant_id=restaurant.id,
+                    user_id=customer.id,
+                    rating=rating,
+                    content=content,
+                    created_at=datetime.utcnow()
+                    - timedelta(days=(restaurant_index * 2 + review_index)),
+                )
+            )
 
     db.session.add_all(reviews)
     db.session.commit()
 
-    review_photos = [
-        ReviewPhoto(
-            review_id=reviews[0].id,
-            image_url="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
-        ),
-        ReviewPhoto(
-            review_id=reviews[0].id,
-            image_url="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=80",
-        ),
-        ReviewPhoto(
-            review_id=reviews[5].id,
-            image_url="https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=800&q=80",
-        ),
-    ]
+    return reviews
 
-    db.session.add_all(review_photos)
 
-    # Bookmark collections
-    perth_best = BookmarkCollection(
-        user_id=alex.id,
-        name="Perth best",
-        description="My favourite restaurants around Perth.",
-        is_public=True,
-    )
+def update_restaurant_review_stats(restaurants):
+    for restaurant in restaurants:
+        reviews = Review.query.filter_by(restaurant_id=restaurant.id).all()
+        total_reviews = len(reviews)
 
-    study_cafes = BookmarkCollection(
-        user_id=alex.id,
-        name="Study cafes",
-        description="Places with coffee and a good study atmosphere.",
-        is_public=False,
-    )
+        restaurant.review_count = total_reviews
+        restaurant.average_rating = (
+            round(sum(review.rating for review in reviews) / total_reviews, 1)
+            if total_reviews
+            else 0.0
+        )
 
-    dinner_shortlist = BookmarkCollection(
-        user_id=mia.id,
-        name="Dinner shortlist",
-        description="Restaurants to try for dinner.",
-        is_public=True,
-    )
-
-    db.session.add_all([perth_best, study_cafes, dinner_shortlist])
     db.session.commit()
 
-    bookmarks = [
-        Bookmark(collection_id=perth_best.id, restaurant_id=laneway_pizza.id),
-        Bookmark(collection_id=perth_best.id, restaurant_id=seoul_table.id),
-        Bookmark(collection_id=perth_best.id, restaurant_id=northbridge_cafe.id),
-        Bookmark(collection_id=study_cafes.id, restaurant_id=northbridge_cafe.id),
-        Bookmark(collection_id=study_cafes.id, restaurant_id=green_bowl.id),
-        Bookmark(collection_id=dinner_shortlist.id, restaurant_id=laneway_pizza.id),
-        Bookmark(collection_id=dinner_shortlist.id, restaurant_id=burger_corner.id),
+
+def create_review_photos(reviews):
+    # Add photos to some reviews only.
+    photo_urls = [
+        "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
     ]
+
+    review_photos = []
+
+    for index, review in enumerate(reviews[:20]):
+        if index % 3 == 0:
+            review_photos.append(
+                ReviewPhoto(
+                    review_id=review.id,
+                    image_url=photo_urls[index % len(photo_urls)],
+                )
+            )
+
+    db.session.add_all(review_photos)
+    db.session.commit()
+
+
+def create_bookmarks(customers, restaurants):
+    collection_specs = [
+        (
+            customers[0],
+            "Perth best",
+            "My favourite restaurants around Perth.",
+            True,
+            [0, 2, 5, 10],
+        ),
+        (
+            customers[0],
+            "Study cafes",
+            "Places with coffee and a good study atmosphere.",
+            False,
+            [1, 13, 25, 37],
+        ),
+        (
+            customers[1],
+            "Dinner shortlist",
+            "Restaurants to try for dinner.",
+            True,
+            [0, 3, 6, 14],
+        ),
+        (customers[2], "Healthy picks", "Fresh and lighter meals.", False, [4, 18, 30]),
+        (
+            customers[3],
+            "Date night",
+            "Places with a nicer dinner atmosphere.",
+            True,
+            [11, 23, 35],
+        ),
+    ]
+
+    collections = []
+
+    for user, name, description, is_public, _restaurant_indexes in collection_specs:
+        collections.append(
+            BookmarkCollection(
+                user_id=user.id,
+                name=name,
+                description=description,
+                is_public=is_public,
+            )
+        )
+
+    db.session.add_all(collections)
+    db.session.commit()
+
+    bookmarks = []
+
+    for collection, spec in zip(collections, collection_specs):
+        restaurant_indexes = spec[4]
+
+        for restaurant_index in restaurant_indexes:
+            bookmarks.append(
+                Bookmark(
+                    collection_id=collection.id,
+                    restaurant_id=restaurants[restaurant_index].id,
+                )
+            )
 
     db.session.add_all(bookmarks)
     db.session.commit()
+
+
+def seed_data():
+    owners, customers = create_users()
+    restaurants = create_restaurants(owners)
+
+    create_menu_items(restaurants)
+    create_all_opening_hours(restaurants)
+
+    reviews = create_reviews(restaurants, customers)
+    update_restaurant_review_stats(restaurants)
+    create_review_photos(reviews)
+
+    create_bookmarks(customers, restaurants)
 
 
 if __name__ == "__main__":
     with app.app_context():
         clear_data()
         seed_data()
+
         print("Database seeded successfully.")
+        print("Created 50 users: 5 owners and 45 customers.")
+        print("Created 40 restaurants.")
+        print("Added custom restaurant images for 20 restaurants.")
+        print("Left 20 restaurant images empty to test fallback UI.")
+        print("Created 400 menu items.")
+        print("Created opening hours for 38 restaurants.")
+        print("Created reviews and synced restaurant average_rating/review_count.")
