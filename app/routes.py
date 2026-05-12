@@ -338,6 +338,33 @@ def search():
 
     restaurants = query.all()
 
+    if location:
+        map_query_text = f"restaurants near {location}, Western Australia"
+        search_map_label = location
+    elif filter_location:
+        map_query_text = f"restaurants near {filter_location}, Western Australia"
+        search_map_label = filter_location
+    elif restaurants:
+        map_query_text = f"restaurants near {restaurants[0].address}, Australia"
+        search_map_label = restaurants[0].suburb or restaurants[0].address
+    else:
+        map_query_text = "restaurants near Perth, Western Australia"
+        search_map_label = "Perth"
+
+    search_map_query = quote_plus(map_query_text)
+    google_maps_api_key = app.config.get("GOOGLE_MAPS_API_KEY", "")
+
+    if google_maps_api_key:
+        search_map_embed_url = (
+            "https://www.google.com/maps/embed/v1/search"
+            f"?key={google_maps_api_key}&q={search_map_query}"
+        )
+    else:
+        search_map_embed_url = (
+            "https://maps.google.com/maps"
+            f"?q={search_map_query}&z=13&output=embed"
+        )
+
     categories = [
         row[0]
         for row in db.session.query(Restaurant.category)
@@ -362,6 +389,9 @@ def search():
         categories=categories,
         locations=locations,
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
+        search_map_embed_url=search_map_embed_url,
+        search_map_search_url=f"https://www.google.com/maps/search/?api=1&query={search_map_query}",
+        search_map_label=search_map_label,
     )
 
 
