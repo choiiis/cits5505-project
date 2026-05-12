@@ -65,6 +65,20 @@ def make_initials(username):
 
 
 def build_home_context():
+    home_map_query = quote_plus("restaurants near Perth, Western Australia")
+    google_maps_api_key = app.config.get("GOOGLE_MAPS_API_KEY", "")
+
+    if google_maps_api_key:
+        home_map_embed_url = (
+            "https://www.google.com/maps/embed/v1/search"
+            f"?key={google_maps_api_key}&q={home_map_query}"
+        )
+    else:
+        home_map_embed_url = (
+            "https://maps.google.com/maps"
+            f"?q={home_map_query}&z=13&output=embed"
+        )
+
     home_categories = ["Italian", "Japanese", "Cafe", "Thai", "Dessert"]
     featured_restaurants = [
         {
@@ -120,6 +134,7 @@ def build_home_context():
     return {
         "home_categories": home_categories,
         "featured_restaurants": featured_restaurants,
+        "home_map_embed_url": home_map_embed_url,
     }
 
 
