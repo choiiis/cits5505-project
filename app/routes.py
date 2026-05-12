@@ -278,7 +278,62 @@ def profile():
 
 @app.route("/search")
 def search():
-    restaurants = Restaurant.query.order_by(Restaurant.average_rating.desc()).all()
+    keyword = request.args.get("q", "").strip()
+    location = request.args.get("location", "").strip()
+    category = request.args.get("category", "").strip()
+    filter_location = request.args.get("filter_location", "").strip()
+    rating = request.args.get("rating", "").strip()
+    sort = request.args.get("sort", "rating").strip()
+
+    query = Restaurant.query
+
+    if keyword:
+        search_text = f"%{keyword}%"
+
+        query = (
+            query.outerjoin(MenuItem)
+            .filter(
+                db.or_(
+                    Restaurant.name.ilike(search_text),
+                    Restaurant.category.ilike(search_text),
+                    Restaurant.description.ilike(search_text),
+                    MenuItem.name.ilike(search_text),
+                    MenuItem.description.ilike(search_text),
+                )
+            )
+            .distinct()
+        )
+
+    if location:
+        location_text = f"%{location}%"
+        query = query.filter(
+            db.or_(
+                Restaurant.suburb.ilike(location_text),
+                Restaurant.address.ilike(location_text),
+            )
+        )
+
+    if category:
+        query = query.filter(Restaurant.category == category)
+
+    if filter_location:
+        query = query.filter(Restaurant.suburb == filter_location)
+
+    if rating:
+        try:
+            min_rating = float(rating)
+            query = query.filter(Restaurant.average_rating >= min_rating)
+        except ValueError:
+            pass
+
+    if sort == "reviews":
+        query = query.order_by(Restaurant.review_count.desc())
+    elif sort == "newest":
+        query = query.order_by(Restaurant.created_at.desc())
+    else:
+        query = query.order_by(Restaurant.average_rating.desc())
+
+    restaurants = query.all()
 
     categories = [
         row[0]

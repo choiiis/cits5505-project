@@ -1,23 +1,3 @@
-function getSearchParams() {
-    return new URLSearchParams(window.location.search);
-}
-
-function setInitialSearchValues() {
-    const params = getSearchParams();
-
-    document.getElementById("keywordSearch").value = params.get("q") || "";
-    document.getElementById("locationSearch").value = params.get("location") || "";
-}
-
-function updateSearchSummary() {
-    const params = getSearchParams();
-    const keyword = params.get("q") || "restaurants";
-    const totalResults = document.querySelectorAll(".search-restaurant-card").length;
-
-    document.getElementById("summaryText").innerHTML =
-        `${totalResults} results for "<strong>${keyword}</strong>"`;
-}
-
 function initBookmarks() {
     const bookmarkButtons = document.querySelectorAll("[data-bookmark]");
 
@@ -90,8 +70,6 @@ function initFilterToggle() {
 }
 
 function initSearchPage() {
-    setInitialSearchValues();
-    updateSearchSummary();
     initBookmarks();
     initMapToggle();
     initFilterToggle();
