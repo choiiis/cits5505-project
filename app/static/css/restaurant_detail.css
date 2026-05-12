@@ -10,6 +10,12 @@
     object-fit: cover;
 }
 
+.restaurant-hero img.restaurant-hero-image--default {
+    object-fit: contain;
+    padding: 100px 20px 100px 280px;
+    background: #f8fafc;
+}
+
 .restaurant-hero::after {
     content: "";
     position: absolute;
@@ -302,6 +308,13 @@
     display: block;
 }
 
+.menu-card-image.menu-card-image--default {
+    object-fit: contain;
+    /* box-sizing: border-box; */
+    padding: 32px;
+    background: #f8fafc;
+}
+
 .reviews-section .section-heading-row,
 .review-list,
 .review-footer {
@@ -584,6 +597,13 @@
 .contact-link:hover {
     color: var(--brand-green);
     text-decoration: underline;
+}
+
+.contact-link--website {
+    margin: 18px 0 8px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--brand-green);
 }
 
 .contact-divider {
