@@ -28,7 +28,8 @@
     <!-- Logged in -->
     <form class="review-form" id="reviewForm" method="post" action="#">
         <div class="review-user-preview">
-            <img src="{{ current_user.profile_image if current_user and current_user.profile_image else default_profile_image }}" alt="User profile">
+            <img src="{{ current_user.profile_image if current_user and current_user.profile_image else default_profile_image }}"
+                alt="User profile">
             <div>
                 <strong>{{ current_user.username if current_user else "Guest" }}</strong>
             </div>
@@ -56,8 +57,12 @@
 </aside>
 <main>
     <!-- Hero Banner -->
+    {% set hero_image = restaurant.hero_image or restaurant.thumbnail_image %}
+
     <section class="restaurant-hero">
-        <img src="{{ restaurant.hero_image }}" alt="{{ restaurant.name }} banner image">
+        <img class="{% if not hero_image %}restaurant-hero-image--default{% endif %}"
+            src="{{ hero_image or url_for('static', filename=default_restaurant_image) }}"
+            alt="{{ restaurant.name }} banner image">
 
         <!-- bookmark icon -->
         <button class="restaurant-bookmark-btn" type="button">
@@ -158,7 +163,9 @@
                         {{ restaurant.phone }}
                     </a>
                     <p class="contact-label">Website</p>
-                    <a href="{{ restaurant.website }}" target="_blank" class="contact-link">Visit website</a>
+                    <a href="{{ restaurant.website }}" target="_blank" class="contact-link">
+                        {{ restaurant.website }}
+                    </a>
                 </section>
                 <!-- Menu -->
                 <section class="detail-section" id="menu-section">
@@ -173,8 +180,18 @@
                         {% for item in menu_items %}
                         <div class="col-md-6">
                             <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                                <img class="card-img-top menu-card-image"
-                                    src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}">
+                                {% set menu_image = item.image_url %}
+
+                                {% if menu_image and menu_image.startswith('http') %}
+                                {% set menu_image_src = menu_image %}
+                                {% elif menu_image %}
+                                {% set menu_image_src = url_for('static', filename=menu_image) %}
+                                {% else %}
+                                {% set menu_image_src = url_for('static', filename=default_menu_image) %}
+                                {% endif %}
+
+                                <img class="card-img-top menu-card-image {% if not menu_image %}menu-card-image--default{% endif %}"
+                                    src="{{ menu_image_src }}" alt="{{ item.name }}">
 
                                 <div class="card-body">
                                     <h3 class="card-title h5 fw-bold">{{ item.name }}</h3>
@@ -340,8 +357,11 @@
                     {{ restaurant.phone }}
                 </a>
 
-                <p class="contact-label">Website</p>
-                <a href="{{ restaurant.website }}" target="_blank" class="contact-link">Visit website</a>
+                {% if restaurant.website %}
+                <a href="{{ restaurant.website }}" target="_blank" class="contact-link contact-link--website">
+                    Visit website ↗
+                </a>
+                {% endif %}
                 <div class="contact-divider"></div>
 
                 <button class="btn btn-success rounded-pill fw-bold w-100 py-2 open-review-panel">
