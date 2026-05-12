@@ -8,6 +8,8 @@ from datetime import datetime
 from urllib.parse import quote_plus
 
 DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
+DEFAULT_RESTAURANT_IMAGE = "images/restaurant-default.png"
+DEFAULT_MENU_IMAGE = "images/menu-default.png"
 
 
 def is_valid_login(user, password):
@@ -359,6 +361,7 @@ def search():
         restaurants=restaurants,
         categories=categories,
         locations=locations,
+        default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
     )
 
 
@@ -419,6 +422,8 @@ def restaurant_detail(restaurant_id):
         default_profile_image=DEFAULT_PROFILE_IMAGE,
         google_maps_embed_url=google_maps_embed_url,
         google_maps_search_url=f"https://www.google.com/maps/search/?api=1&query={map_query}",
+        default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
+        default_menu_image=DEFAULT_MENU_IMAGE,
     )
 
 
