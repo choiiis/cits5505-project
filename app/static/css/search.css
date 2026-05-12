@@ -290,6 +290,12 @@
     display: block;
 }
 
+.search-restaurant-image--default {
+    object-fit: contain;
+    padding: 48px;
+    background: #f8fafc;
+}
+
 .search-image-rating {
     position: absolute;
     top: 12px;

@@ -7,6 +7,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 
 DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
+DEFAULT_RESTAURANT_IMAGE = "images/restaurant-default.png"
+DEFAULT_MENU_IMAGE = "images/menu-default.png"
 
 
 def is_valid_login(user, password):
@@ -358,6 +360,7 @@ def search():
         restaurants=restaurants,
         categories=categories,
         locations=locations,
+        default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
     )
 
 
@@ -403,6 +406,8 @@ def restaurant_detail(restaurant_id):
         is_logged_in="user_id" in session,
         current_user=current_user,
         default_profile_image=DEFAULT_PROFILE_IMAGE,
+        default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
+        default_menu_image=DEFAULT_MENU_IMAGE,
     )
 
 
