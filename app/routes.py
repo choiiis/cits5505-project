@@ -5,6 +5,7 @@ from app.models import Restaurant, MenuItem, OpeningHour, Review, User
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import datetime
+from urllib.parse import quote_plus
 
 DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
 
@@ -365,6 +366,19 @@ def search():
 def restaurant_detail(restaurant_id):
     # restaurant summary
     restaurant = Restaurant.query.get_or_404(restaurant_id)
+    map_query = quote_plus(f"{restaurant.address}, Australia")
+    google_maps_api_key = app.config.get("GOOGLE_MAPS_API_KEY", "")
+
+    if google_maps_api_key:
+        google_maps_embed_url = (
+            "https://www.google.com/maps/embed/v1/place"
+            f"?key={google_maps_api_key}&q={map_query}"
+        )
+    else:
+        google_maps_embed_url = (
+            "https://maps.google.com/maps"
+            f"?q={map_query}&z=15&output=embed"
+        )
 
     # restaurant opening hours
     opening_hours = (
@@ -403,6 +417,8 @@ def restaurant_detail(restaurant_id):
         is_logged_in="user_id" in session,
         current_user=current_user,
         default_profile_image=DEFAULT_PROFILE_IMAGE,
+        google_maps_embed_url=google_maps_embed_url,
+        google_maps_search_url=f"https://www.google.com/maps/search/?api=1&query={map_query}",
     )
 
 

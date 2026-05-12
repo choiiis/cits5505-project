@@ -9,3 +9,4 @@ class Config:
         "DATABASE_URL", "sqlite:///" + os.path.join(basedir, "app.db")
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "")
