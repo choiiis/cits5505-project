@@ -32,7 +32,12 @@ function updateMapPreview() {
     });
 
     if (mapFrame) {
-        mapFrame.src = `https://maps.google.com/maps?${params.toString()}`;
+        const nextSrc = `https://maps.google.com/maps?${params.toString()}`;
+
+        if (mapFrame.src !== nextSrc) {
+            mapFrame.src = nextSrc;
+        }
+
         mapFrame.title = `Map of ${query}`;
     }
 

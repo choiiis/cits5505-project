@@ -1,6 +1,7 @@
 .hero-section {
   background: #ffffff;
   border-bottom: 1px solid var(--brand-line);
+  padding-bottom: 2.5rem !important;
 }
 
 .hero-copy {
@@ -14,9 +15,20 @@
 }
 
 .hero-search {
-  margin-bottom: -3.5rem;
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
   position: relative;
   z-index: 2;
+}
+
+.hero-search .form-control,
+.hero-search .btn {
+  min-height: 48px;
+}
+
+.hero-search .map-btn {
+  flex: 0 0 76px;
 }
 
 .home-map-panel {
@@ -56,16 +68,12 @@
   color: var(--brand-green);
 }
 
-.hero-search:has(.home-map-panel:not(.d-none)) {
-  margin-bottom: -17.25rem;
-}
-
 main {
   padding-bottom: 5rem;
 }
 
 .home-categories-section {
-  padding: 5.5rem 0 2rem;
+  padding: 2.25rem 0 2rem;
 }
 
 .category-pills-wrap {
@@ -180,12 +188,8 @@ main {
 }
 
 @media (max-width: 991.98px) {
-  .hero-search {
-    margin-bottom: 0;
-  }
-
-  .hero-search:has(.home-map-panel:not(.d-none)) {
-    margin-bottom: 0;
+  .hero-section {
+    padding-bottom: 2rem !important;
   }
 
   main {
@@ -196,7 +200,30 @@ main {
     padding-top: 2rem;
   }
 
+  .hero-search .map-btn {
+    flex: 0 0 96px;
+  }
+
   .featured-card__image {
     height: 180px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero-section {
+    padding-top: 2rem !important;
+  }
+
+  .hero-search .col-lg-3 {
+    flex-direction: column;
+  }
+
+  .hero-search .map-btn {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .home-map-panel {
+    height: 220px;
   }
 }
