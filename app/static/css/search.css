@@ -276,23 +276,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
     border: 2px solid #ffffff;
     border-radius: 50% 50% 50% 0;
     background: var(--marker-color, var(--brand-green));
     color: #ffffff;
     transform: rotate(-45deg);
     box-shadow: 0 5px 14px rgba(31, 41, 51, 0.28), 0 0 0 4px color-mix(in srgb, var(--marker-color, var(--brand-green)) 18%, transparent);
-}
-
-.search-leaflet-marker__pin span {
-    display: block;
-    font-size: 0.82rem;
-    font-variant-numeric: tabular-nums;
-    font-weight: 900;
-    line-height: 1;
-    transform: rotate(45deg);
 }
 
 .search-map-empty {

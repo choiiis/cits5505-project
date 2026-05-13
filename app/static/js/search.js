@@ -120,12 +120,10 @@ function createLeafletIcon(restaurant) {
     return L.divIcon({
         className: "search-leaflet-marker",
         html: `
-            <span class="search-leaflet-marker__pin" style="--marker-color: ${restaurant.location_color}">
-                <span>${restaurant.marker_number}</span>
-            </span>
+            <span class="search-leaflet-marker__pin" style="--marker-color: ${restaurant.location_color}"></span>
         `,
-        iconSize: [34, 34],
-        iconAnchor: [17, 34],
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
         popupAnchor: [0, -30],
     });
 }
