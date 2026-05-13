@@ -152,19 +152,32 @@
                         </div>
                     </div>
 
-                    <section id="mapPreview" class="search-map-panel mb-3 position-relative">
-                        <iframe
-                            title="Map preview for restaurants near {{ search_map_label }}"
-                            src="{{ search_map_embed_url }}"
-                            loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                            allowfullscreen>
-                        </iframe>
+                    <section id="mapPreview" class="search-map-panel mb-3 position-relative"
+                        data-map-restaurants='{{ search_map_markers|tojson }}'>
+                        <div id="restaurantMap" class="search-google-map" role="img"
+                            aria-label="Map preview for matching restaurants near {{ search_map_label }}"></div>
 
                         <div class="search-map-content">
-                            <span class="search-map-eyebrow">Live area preview</span>
+                            <span class="search-map-eyebrow">Matched results</span>
                             <h2>{{ search_map_label }}</h2>
-                            <p>{{ restaurants|length }} matching restaurants nearby</p>
+                            <p>{{ restaurants|length }} restaurants from this search</p>
+                        </div>
+
+                        <div class="search-map-fallback" id="mapFallback">
+                            {% if restaurants %}
+                            <ol>
+                                {% for restaurant in restaurants %}
+                                <li>
+                                    <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
+                                        {{ restaurant.name }}
+                                    </a>
+                                    <span>{{ restaurant.suburb or restaurant.address }}</span>
+                                </li>
+                                {% endfor %}
+                            </ol>
+                            {% else %}
+                            <p>No matching restaurants to map.</p>
+                            {% endif %}
                         </div>
 
                         <a class="search-map-link" href="{{ search_map_search_url }}" target="_blank" rel="noopener">
@@ -175,7 +188,7 @@
                     <div class="search-results-list row g-3" id="resultsList">
                         {% for restaurant in restaurants %}
                         <div class="col-12">
-                            <article class="search-restaurant-card">
+                            <article class="search-restaurant-card" data-restaurant-id="{{ restaurant.id }}">
                                 <div class="search-image-wrap">
                                     {% set restaurant_image = restaurant.thumbnail_image or restaurant.hero_image %}
 
@@ -262,4 +275,8 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% if google_maps_api_key %}
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initRestaurantSearchMap"></script>
+{% endif %}
 {% endblock %}
