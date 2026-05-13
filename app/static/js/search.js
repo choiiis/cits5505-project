@@ -51,6 +51,142 @@ function initMapToggle() {
     setMapVisible(true);
 }
 
+function getMapRestaurants() {
+    const mapPreview = document.getElementById("mapPreview");
+
+    if (!mapPreview) {
+        return [];
+    }
+
+    try {
+        return JSON.parse(mapPreview.dataset.mapRestaurants || "[]");
+    } catch (error) {
+        return [];
+    }
+}
+
+function setActiveRestaurant(restaurantId) {
+    document.querySelectorAll("[data-restaurant-id]").forEach(card => {
+        const isActive = card.dataset.restaurantId === String(restaurantId);
+        card.classList.toggle("search-restaurant-card--active", isActive);
+
+        if (isActive) {
+            card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+    });
+}
+
+function escapeHtml(value) {
+    const element = document.createElement("span");
+    element.textContent = value || "";
+    return element.innerHTML;
+}
+
+function createInfoWindowContent(restaurant) {
+    return `
+        <div class="search-map-info">
+            <strong>${escapeHtml(restaurant.name)}</strong>
+            <span>${escapeHtml(restaurant.category)} · ${escapeHtml(restaurant.suburb || restaurant.address)}</span>
+            <span>${Number(restaurant.rating).toFixed(1)} (${restaurant.review_count} reviews)</span>
+            <a href="${restaurant.detail_url}">View details</a>
+        </div>
+    `;
+}
+
+function showMapFallback() {
+    const fallback = document.getElementById("mapFallback");
+    const mapCanvas = document.getElementById("restaurantMap");
+
+    if (fallback) {
+        fallback.classList.add("is-visible");
+    }
+
+    if (mapCanvas) {
+        mapCanvas.classList.add("is-hidden");
+    }
+}
+
+function hideMapFallback() {
+    const fallback = document.getElementById("mapFallback");
+    const mapCanvas = document.getElementById("restaurantMap");
+
+    if (fallback) {
+        fallback.classList.remove("is-visible");
+    }
+
+    if (mapCanvas) {
+        mapCanvas.classList.remove("is-hidden");
+    }
+}
+
+window.initRestaurantSearchMap = function initRestaurantSearchMap() {
+    const restaurants = getMapRestaurants();
+    const mapCanvas = document.getElementById("restaurantMap");
+
+    if (!mapCanvas || !window.google || !restaurants.length) {
+        showMapFallback();
+        return;
+    }
+
+    hideMapFallback();
+
+    const map = new google.maps.Map(mapCanvas, {
+        center: { lat: -31.9523, lng: 115.8613 },
+        zoom: 12,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+    });
+
+    const geocoder = new google.maps.Geocoder();
+    const bounds = new google.maps.LatLngBounds();
+    const infoWindow = new google.maps.InfoWindow();
+    let resolvedMarkers = 0;
+    let completedGeocodes = 0;
+
+    restaurants.forEach((restaurant, index) => {
+        geocoder.geocode(
+            { address: `${restaurant.name}, ${restaurant.address}, Australia` },
+            (results, status) => {
+                completedGeocodes += 1;
+
+                if (status !== "OK" || !results[0]) {
+                    if (resolvedMarkers === 0 && completedGeocodes === restaurants.length) {
+                        showMapFallback();
+                    }
+
+                    return;
+                }
+
+                const marker = new google.maps.Marker({
+                    map,
+                    position: results[0].geometry.location,
+                    title: restaurant.name,
+                    label: String(index + 1),
+                });
+
+                marker.restaurantId = restaurant.id;
+                bounds.extend(marker.getPosition());
+                resolvedMarkers += 1;
+
+                marker.addListener("click", () => {
+                    infoWindow.setContent(createInfoWindowContent(restaurant));
+                    infoWindow.open(map, marker);
+                    setActiveRestaurant(restaurant.id);
+                });
+
+                if (resolvedMarkers === 1) {
+                    map.setCenter(marker.getPosition());
+                }
+
+                if (resolvedMarkers > 1) {
+                    map.fitBounds(bounds);
+                }
+            }
+        );
+    });
+};
+
 function initFilterToggle() {
     const filterToggle = document.getElementById("filterToggle");
     const filterPanel = document.getElementById("filterPanel");
@@ -73,6 +209,10 @@ function initSearchPage() {
     initBookmarks();
     initMapToggle();
     initFilterToggle();
+
+    if (!window.google) {
+        showMapFallback();
+    }
 }
 
 document.addEventListener("DOMContentLoaded", initSearchPage);
