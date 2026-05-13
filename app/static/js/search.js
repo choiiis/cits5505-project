@@ -42,6 +42,16 @@ function initMapToggle() {
     function setMapVisible(isVisible) {
         mapToggle.checked = isVisible;
         mapPreview.classList.toggle("d-none", !isVisible);
+
+        if (isVisible && window.restaurantSearchMap) {
+            window.setTimeout(() => {
+                window.restaurantSearchMap.invalidateSize();
+
+                if (window.restaurantSearchMapBounds && window.restaurantSearchMapBounds.isValid()) {
+                    fitRestaurantSearchMap();
+                }
+            }, 150);
+        }
     }
 
     mapToggle.addEventListener("change", event => {
@@ -111,6 +121,27 @@ function createLeafletIcon(restaurant) {
     });
 }
 
+function fitRestaurantSearchMap() {
+    if (!window.restaurantSearchMap || !window.restaurantSearchMapBounds) {
+        return;
+    }
+
+    const restaurants = getMapRestaurants();
+
+    if (!restaurants.length || !window.restaurantSearchMapBounds.isValid()) {
+        return;
+    }
+
+    if (restaurants.length === 1) {
+        window.restaurantSearchMap.setView(window.restaurantSearchMapBounds.getCenter(), 15);
+    } else {
+        window.restaurantSearchMap.fitBounds(
+            window.restaurantSearchMapBounds,
+            { padding: [64, 64], maxZoom: 14 }
+        );
+    }
+}
+
 function initRestaurantSearchMap() {
     const restaurants = getMapRestaurants();
     const mapCanvas = document.getElementById("restaurantMap");
@@ -118,6 +149,12 @@ function initRestaurantSearchMap() {
     if (!mapCanvas || !window.L) {
         setMapEmptyState(true);
         return;
+    }
+
+    if (window.restaurantSearchMap) {
+        window.restaurantSearchMap.remove();
+        window.restaurantSearchMap = null;
+        window.restaurantSearchMapBounds = null;
     }
 
     setMapEmptyState(!restaurants.length);
@@ -131,6 +168,8 @@ function initRestaurantSearchMap() {
         maxZoom: 19,
         attribution: "&copy; OpenStreetMap contributors",
     }).addTo(map);
+
+    window.restaurantSearchMap = map;
 
     if (!restaurants.length) {
         return;
@@ -154,13 +193,15 @@ function initRestaurantSearchMap() {
         });
     });
 
-    if (restaurants.length === 1) {
-        map.setView(bounds.getCenter(), 14);
-    } else {
-        map.fitBounds(bounds, { padding: [44, 44], maxZoom: 14 });
-    }
+    window.restaurantSearchMapBounds = bounds;
+    fitRestaurantSearchMap();
 
-    window.setTimeout(() => map.invalidateSize(), 0);
+    [0, 150, 400].forEach(delay => {
+        window.setTimeout(() => {
+            map.invalidateSize();
+            fitRestaurantSearchMap();
+        }, delay);
+    });
 }
 
 function initFilterToggle() {
@@ -189,3 +230,9 @@ function initSearchPage() {
 }
 
 document.addEventListener("DOMContentLoaded", initSearchPage);
+window.addEventListener("load", () => {
+    if (window.restaurantSearchMap) {
+        window.restaurantSearchMap.invalidateSize();
+        fitRestaurantSearchMap();
+    }
+});
