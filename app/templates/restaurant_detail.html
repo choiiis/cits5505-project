@@ -3,6 +3,7 @@
 {% block title %}{{ restaurant.name }} | TableTrail{% endblock %}
 
 {% block styles %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/restaurant_detail.css') }}">
 {% endblock %}
 
@@ -97,8 +98,14 @@
 
                         <!-- Map and Address -->
                         <div class="location-column">
-                            <div class="map-placeholder">
-                                Map
+                            <div class="map-placeholder restaurant-location-map-wrap">
+                                <div id="restaurantLocationMap" class="restaurant-location-map" role="img"
+                                    aria-label="Map for {{ restaurant.name }} at {{ restaurant.address }}"
+                                    data-map-marker='{{ restaurant_map_marker|tojson }}'></div>
+                                <a class="restaurant-location-map-link" href="{{ restaurant_map_search_url }}"
+                                    target="_blank" rel="noopener">
+                                    Open map
+                                </a>
                             </div>
 
                             <div class="address-card">
@@ -361,5 +368,6 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{{ url_for('static', filename='js/restaurant_detail.js') }}"></script>
 {% endblock %}
