@@ -12,6 +12,54 @@ DEFAULT_RESTAURANT_IMAGE = "images/restaurant-default.png"
 DEFAULT_MENU_IMAGE = "images/menu-default.png"
 
 
+def build_google_maps_url(restaurants):
+    if not restaurants:
+        return "https://www.google.com/maps/search/?api=1&query=restaurants+Perth+Western+Australia"
+
+    restaurant_queries = [
+        quote_plus(f"{restaurant.name}, {restaurant.address}, Australia")
+        for restaurant in restaurants[:10]
+    ]
+
+    if len(restaurant_queries) == 1:
+        return (
+            "https://www.google.com/maps/search/?api=1"
+            f"&query={restaurant_queries[0]}"
+        )
+
+    waypoints = "%7C".join(restaurant_queries[1:-1])
+    maps_url = (
+        "https://www.google.com/maps/dir/?api=1"
+        f"&origin={restaurant_queries[0]}"
+        f"&destination={restaurant_queries[-1]}"
+    )
+
+    if waypoints:
+        maps_url += f"&waypoints={waypoints}"
+
+    return maps_url
+
+
+def build_search_map_markers(restaurants):
+    return [
+        {
+            "id": restaurant.id,
+            "name": restaurant.name,
+            "category": restaurant.category,
+            "address": restaurant.address,
+            "suburb": restaurant.suburb,
+            "rating": round(restaurant.average_rating or 0, 1),
+            "review_count": restaurant.review_count,
+            "detail_url": url_for("restaurant_detail", restaurant_id=restaurant.id),
+            "google_maps_url": (
+                "https://www.google.com/maps/search/?api=1"
+                f"&query={quote_plus(f'{restaurant.name}, {restaurant.address}, Australia')}"
+            ),
+        }
+        for restaurant in restaurants
+    ]
+
+
 def is_valid_login(user, password):
     if not user or not password:
         return False
@@ -339,28 +387,15 @@ def search():
     restaurants = query.all()
 
     if active_location:
-        map_query_text = f"restaurants near {active_location}, Western Australia"
         search_map_label = active_location
     elif restaurants:
-        map_query_text = f"restaurants near {restaurants[0].address}, Australia"
         search_map_label = restaurants[0].suburb or restaurants[0].address
     else:
-        map_query_text = "restaurants near Perth, Western Australia"
         search_map_label = "Perth"
 
-    search_map_query = quote_plus(map_query_text)
     google_maps_api_key = app.config.get("GOOGLE_MAPS_API_KEY", "")
-
-    if google_maps_api_key:
-        search_map_embed_url = (
-            "https://www.google.com/maps/embed/v1/search"
-            f"?key={google_maps_api_key}&q={search_map_query}"
-        )
-    else:
-        search_map_embed_url = (
-            "https://maps.google.com/maps"
-            f"?q={search_map_query}&z=13&output=embed"
-        )
+    search_map_markers = build_search_map_markers(restaurants)
+    search_map_search_url = build_google_maps_url(restaurants)
 
     summary_parts = [keyword if keyword else "restaurants"]
 
@@ -399,8 +434,9 @@ def search():
         categories=categories,
         locations=locations,
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
-        search_map_embed_url=search_map_embed_url,
-        search_map_search_url=f"https://www.google.com/maps/search/?api=1&query={search_map_query}",
+        google_maps_api_key=google_maps_api_key,
+        search_map_markers=search_map_markers,
+        search_map_search_url=search_map_search_url,
         search_map_label=search_map_label,
         search_summary_label=search_summary_label,
     )
