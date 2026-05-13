@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Bookmarks | TableTrail{% endblock %}
+
+{% block content %}
+<main class="container py-5">
+    <section>
+        <h1 class="h3 fw-bold mb-2">Saved Restaurants</h1>
+        <p class="text-secondary mb-4">
+            This page is being migrated from the static bookmarks page into Flask and Jinja.
+        </p>
+
+        <a class="btn btn-success" href="{{ url_for('search') }}">
+            Find more restaurants
+        </a>
+    </section>
+</main>
+{% endblock %}

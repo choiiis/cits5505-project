@@ -406,6 +406,11 @@ def search():
     )
 
 
+@app.route("/bookmarks")
+def bookmarks():
+    return render_template("bookmarks.html")
+
+
 @app.route("/restaurants/<int:restaurant_id>")
 def restaurant_detail(restaurant_id):
     # restaurant summary
