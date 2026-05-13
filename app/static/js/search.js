@@ -42,6 +42,16 @@ function initMapToggle() {
     function setMapVisible(isVisible) {
         mapToggle.checked = isVisible;
         mapPreview.classList.toggle("d-none", !isVisible);
+
+        if (isVisible && window.restaurantSearchMap) {
+            window.setTimeout(() => {
+                window.restaurantSearchMap.invalidateSize();
+
+                if (window.restaurantSearchMapBounds && window.restaurantSearchMapBounds.isValid()) {
+                    fitRestaurantSearchMap();
+                }
+            }, 150);
+        }
     }
 
     mapToggle.addEventListener("change", event => {
@@ -49,6 +59,176 @@ function initMapToggle() {
     });
 
     setMapVisible(true);
+}
+
+function getMapRestaurants() {
+    const mapPreview = document.getElementById("mapPreview");
+
+    if (!mapPreview) {
+        return [];
+    }
+
+    try {
+        return JSON.parse(mapPreview.dataset.mapRestaurants || "[]");
+    } catch (error) {
+        return [];
+    }
+}
+
+function setActiveRestaurant(restaurantId) {
+    document.querySelectorAll("[data-restaurant-id]").forEach(card => {
+        const isActive = card.dataset.restaurantId === String(restaurantId);
+        card.classList.toggle("search-restaurant-card--active", isActive);
+
+        if (isActive) {
+            card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+    });
+}
+
+function escapeHtml(value) {
+    const element = document.createElement("span");
+    element.textContent = value || "";
+    return element.innerHTML;
+}
+
+function createInfoWindowContent(restaurant) {
+    return `
+        <div class="search-map-info">
+            <strong>${escapeHtml(restaurant.name)}</strong>
+            <span>
+                ${escapeHtml(restaurant.category)}
+                <span class="search-map-location-chip" style="--marker-color: ${restaurant.location_color}">
+                    ${escapeHtml(restaurant.suburb || restaurant.address)}
+                </span>
+            </span>
+            <span>${Number(restaurant.rating).toFixed(1)} (${restaurant.review_count} reviews)</span>
+            <a href="${restaurant.detail_url}">View details</a>
+        </div>
+    `;
+}
+
+function setMapEmptyState(isVisible) {
+    const emptyState = document.getElementById("mapFallbackEmpty");
+
+    if (emptyState) {
+        emptyState.classList.toggle("is-visible", isVisible);
+    }
+}
+
+function createLeafletIcon(restaurant) {
+    return L.divIcon({
+        className: "search-leaflet-marker",
+        html: `
+            <span class="search-leaflet-marker__pin" style="--marker-color: ${restaurant.location_color}"></span>
+        `,
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
+        popupAnchor: [0, -30],
+    });
+}
+
+function fitRestaurantSearchMap() {
+    if (!window.restaurantSearchMap || !window.restaurantSearchMapBounds) {
+        return;
+    }
+
+    const restaurants = getMapRestaurants();
+
+    if (!restaurants.length || !window.restaurantSearchMapBounds.isValid()) {
+        return;
+    }
+
+    if (restaurants.length === 1) {
+        window.restaurantSearchMap.setView(window.restaurantSearchMapBounds.getCenter(), 15);
+    } else {
+        window.restaurantSearchMap.fitBounds(
+            window.restaurantSearchMapBounds,
+            { padding: [64, 64], maxZoom: 14 }
+        );
+    }
+}
+
+function whenMapContainerIsReady(mapCanvas, callback, attempt = 0) {
+    const hasSize = mapCanvas.offsetWidth > 0 && mapCanvas.offsetHeight > 0;
+
+    if (hasSize || attempt >= 20) {
+        callback();
+        return;
+    }
+
+    window.setTimeout(() => {
+        whenMapContainerIsReady(mapCanvas, callback, attempt + 1);
+    }, 50);
+}
+
+function initRestaurantSearchMap() {
+    const restaurants = getMapRestaurants();
+    const mapCanvas = document.getElementById("restaurantMap");
+
+    if (!mapCanvas || !window.L) {
+        setMapEmptyState(true);
+        return;
+    }
+
+    if (window.restaurantSearchMap) {
+        window.restaurantSearchMap.remove();
+        window.restaurantSearchMap = null;
+        window.restaurantSearchMapBounds = null;
+    }
+
+    whenMapContainerIsReady(mapCanvas, () => {
+        renderRestaurantSearchMap(mapCanvas, restaurants);
+    });
+}
+
+function renderRestaurantSearchMap(mapCanvas, restaurants) {
+    setMapEmptyState(!restaurants.length);
+
+    const map = L.map(mapCanvas, {
+        scrollWheelZoom: false,
+        zoomControl: true,
+    }).setView([-31.9523, 115.8613], 12);
+
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        subdomains: "abcd",
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+    }).addTo(map);
+
+    window.restaurantSearchMap = map;
+
+    if (!restaurants.length) {
+        return;
+    }
+
+    const bounds = L.latLngBounds();
+
+    restaurants.forEach(restaurant => {
+        const position = [restaurant.latitude, restaurant.longitude];
+        const marker = L.marker(position, {
+            icon: createLeafletIcon(restaurant),
+            title: restaurant.name,
+        }).addTo(map);
+
+        marker.restaurantId = restaurant.id;
+        bounds.extend(position);
+
+        marker.bindPopup(createInfoWindowContent(restaurant));
+        marker.on("click", () => {
+            setActiveRestaurant(restaurant.id);
+        });
+    });
+
+    window.restaurantSearchMapBounds = bounds;
+    fitRestaurantSearchMap();
+
+    [0, 150, 400].forEach(delay => {
+        window.setTimeout(() => {
+            map.invalidateSize();
+            fitRestaurantSearchMap();
+        }, delay);
+    });
 }
 
 function initFilterToggle() {
@@ -73,6 +253,13 @@ function initSearchPage() {
     initBookmarks();
     initMapToggle();
     initFilterToggle();
+    initRestaurantSearchMap();
 }
 
 document.addEventListener("DOMContentLoaded", initSearchPage);
+window.addEventListener("load", () => {
+    if (window.restaurantSearchMap) {
+        window.restaurantSearchMap.invalidateSize();
+        fitRestaurantSearchMap();
+    }
+});
