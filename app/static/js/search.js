@@ -96,7 +96,12 @@ function createInfoWindowContent(restaurant) {
     return `
         <div class="search-map-info">
             <strong>${escapeHtml(restaurant.name)}</strong>
-            <span>${escapeHtml(restaurant.category)} · ${escapeHtml(restaurant.suburb || restaurant.address)}</span>
+            <span>
+                ${escapeHtml(restaurant.category)}
+                <span class="search-map-location-chip" style="--marker-color: ${restaurant.location_color}">
+                    ${escapeHtml(restaurant.suburb || restaurant.address)}
+                </span>
+            </span>
             <span>${Number(restaurant.rating).toFixed(1)} (${restaurant.review_count} reviews)</span>
             <a href="${restaurant.detail_url}">View details</a>
         </div>
@@ -114,7 +119,11 @@ function setMapEmptyState(isVisible) {
 function createLeafletIcon(restaurant) {
     return L.divIcon({
         className: "search-leaflet-marker",
-        html: `<span>${restaurant.marker_number}</span>`,
+        html: `
+            <span class="search-leaflet-marker__pin" style="--marker-color: ${restaurant.location_color}">
+                <span>${restaurant.marker_number}</span>
+            </span>
+        `,
         iconSize: [34, 34],
         iconAnchor: [17, 34],
         popupAnchor: [0, -30],

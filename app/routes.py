@@ -37,6 +37,18 @@ SEARCH_MAP_COORDINATES = {
     "Belmont": {"lat": -31.9638, "lng": 115.9345},
     "Hillarys": {"lat": -31.8064, "lng": 115.7405},
 }
+SEARCH_MAP_LOCATION_COLORS = [
+    "#15803d",
+    "#2563eb",
+    "#dc2626",
+    "#9333ea",
+    "#ea580c",
+    "#0891b2",
+    "#be123c",
+    "#4f46e5",
+    "#65a30d",
+    "#c2410c",
+]
 
 
 def build_openstreetmap_url(restaurants):
@@ -58,15 +70,21 @@ def build_openstreetmap_url(restaurants):
 
 def build_search_map_markers(restaurants):
     markers = []
+    location_colors = {}
 
     for index, restaurant in enumerate(restaurants):
-        coordinates = SEARCH_MAP_COORDINATES.get(restaurant.suburb or "")
+        location_key = restaurant.suburb or "Other"
+        coordinates = SEARCH_MAP_COORDINATES.get(location_key)
 
         if not coordinates:
             coordinates = {
                 "lat": -31.9523 + (((restaurant.id * 17) % 40) - 20) / 1000,
                 "lng": 115.8613 + (((restaurant.id * 29) % 40) - 20) / 1000,
             }
+
+        if location_key not in location_colors:
+            color_index = len(location_colors) % len(SEARCH_MAP_LOCATION_COLORS)
+            location_colors[location_key] = SEARCH_MAP_LOCATION_COLORS[color_index]
 
         markers.append(
             {
@@ -75,6 +93,7 @@ def build_search_map_markers(restaurants):
                 "category": restaurant.category,
                 "address": restaurant.address,
                 "suburb": restaurant.suburb,
+                "location_color": location_colors[location_key],
                 "rating": round(restaurant.average_rating or 0, 1),
                 "review_count": restaurant.review_count,
                 "marker_number": index + 1,
