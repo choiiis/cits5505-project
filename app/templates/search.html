@@ -164,20 +164,11 @@
                         </div>
 
                         <div class="search-map-fallback" id="mapFallback">
-                            {% if restaurants %}
-                            <ol>
-                                {% for restaurant in restaurants %}
-                                <li>
-                                    <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
-                                        {{ restaurant.name }}
-                                    </a>
-                                    <span>{{ restaurant.suburb or restaurant.address }}</span>
-                                </li>
-                                {% endfor %}
-                            </ol>
-                            {% else %}
-                            <p>No matching restaurants to map.</p>
-                            {% endif %}
+                            <div class="search-map-roads" aria-hidden="true"></div>
+                            <div class="search-map-pin-layer" id="mapFallbackPins"></div>
+                            <div class="search-map-empty" id="mapFallbackEmpty">
+                                No matching restaurants to map.
+                            </div>
                         </div>
 
                         <a class="search-map-link" href="{{ search_map_search_url }}" target="_blank" rel="noopener">

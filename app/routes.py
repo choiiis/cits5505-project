@@ -10,6 +10,33 @@ from urllib.parse import quote_plus
 DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
 DEFAULT_RESTAURANT_IMAGE = "images/restaurant-default.png"
 DEFAULT_MENU_IMAGE = "images/menu-default.png"
+SEARCH_MAP_POSITIONS = {
+    "Perth CBD": {"x": 52, "y": 42},
+    "Northbridge": {"x": 47, "y": 34},
+    "Subiaco": {"x": 31, "y": 42},
+    "Victoria Park": {"x": 59, "y": 57},
+    "East Victoria Park": {"x": 63, "y": 62},
+    "Fremantle": {"x": 18, "y": 72},
+    "Cottesloe": {"x": 19, "y": 47},
+    "South Perth": {"x": 52, "y": 52},
+    "Nedlands": {"x": 27, "y": 50},
+    "Wembley": {"x": 33, "y": 32},
+    "Inglewood": {"x": 62, "y": 27},
+    "Carlisle": {"x": 67, "y": 55},
+    "Willetton": {"x": 63, "y": 75},
+    "West Leederville": {"x": 38, "y": 38},
+    "Mount Lawley": {"x": 56, "y": 29},
+    "Leederville": {"x": 42, "y": 33},
+    "Scarborough": {"x": 17, "y": 25},
+    "Claremont": {"x": 24, "y": 54},
+    "Crawley": {"x": 35, "y": 53},
+    "Applecross": {"x": 51, "y": 68},
+    "Booragoon": {"x": 48, "y": 76},
+    "Cannington": {"x": 76, "y": 68},
+    "Morley": {"x": 72, "y": 23},
+    "Belmont": {"x": 73, "y": 43},
+    "Hillarys": {"x": 19, "y": 16},
+}
 
 
 def build_google_maps_url(restaurants):
@@ -41,8 +68,19 @@ def build_google_maps_url(restaurants):
 
 
 def build_search_map_markers(restaurants):
-    return [
-        {
+    markers = []
+
+    for index, restaurant in enumerate(restaurants):
+        position = SEARCH_MAP_POSITIONS.get(restaurant.suburb or "")
+
+        if not position:
+            position = {
+                "x": 16 + ((restaurant.id * 17) % 68),
+                "y": 18 + ((restaurant.id * 29) % 62),
+            }
+
+        markers.append(
+            {
             "id": restaurant.id,
             "name": restaurant.name,
             "category": restaurant.category,
@@ -50,14 +88,18 @@ def build_search_map_markers(restaurants):
             "suburb": restaurant.suburb,
             "rating": round(restaurant.average_rating or 0, 1),
             "review_count": restaurant.review_count,
+            "marker_number": index + 1,
+            "map_x": position["x"],
+            "map_y": position["y"],
             "detail_url": url_for("restaurant_detail", restaurant_id=restaurant.id),
             "google_maps_url": (
                 "https://www.google.com/maps/search/?api=1"
                 f"&query={quote_plus(f'{restaurant.name}, {restaurant.address}, Australia')}"
             ),
-        }
-        for restaurant in restaurants
-    ]
+            }
+        )
+
+    return markers
 
 
 def is_valid_login(user, password):

@@ -93,10 +93,58 @@ function createInfoWindowContent(restaurant) {
     `;
 }
 
+function createFallbackPin(restaurant) {
+    const pin = document.createElement("button");
+    pin.className = "search-map-fallback-pin";
+    pin.type = "button";
+    pin.style.left = `${restaurant.map_x}%`;
+    pin.style.top = `${restaurant.map_y}%`;
+    pin.dataset.restaurantId = restaurant.id;
+    pin.setAttribute(
+        "aria-label",
+        `${restaurant.marker_number}. ${restaurant.name}, ${restaurant.suburb || restaurant.address}`
+    );
+    pin.innerHTML = `
+        <span class="search-map-fallback-pin__marker">
+            <span>${restaurant.marker_number}</span>
+        </span>
+        <span class="search-map-fallback-pin__label">
+            <strong>${escapeHtml(restaurant.name)}</strong>
+            <span>${escapeHtml(restaurant.suburb || restaurant.address)}</span>
+        </span>
+    `;
+
+    pin.addEventListener("click", () => {
+        setActiveRestaurant(restaurant.id);
+    });
+
+    return pin;
+}
+
+function renderFallbackPins(restaurants) {
+    const pinLayer = document.getElementById("mapFallbackPins");
+    const emptyState = document.getElementById("mapFallbackEmpty");
+
+    if (!pinLayer) {
+        return;
+    }
+
+    pinLayer.replaceChildren();
+
+    if (emptyState) {
+        emptyState.classList.toggle("is-visible", !restaurants.length);
+    }
+
+    restaurants.forEach(restaurant => {
+        pinLayer.appendChild(createFallbackPin(restaurant));
+    });
+}
+
 function showMapFallback() {
     const fallback = document.getElementById("mapFallback");
     const mapCanvas = document.getElementById("restaurantMap");
     const mapPreview = document.getElementById("mapPreview");
+    const restaurants = getMapRestaurants();
 
     if (mapPreview) {
         mapPreview.classList.add("is-fallback-visible");
@@ -109,6 +157,8 @@ function showMapFallback() {
     if (mapCanvas) {
         mapCanvas.classList.add("is-hidden");
     }
+
+    renderFallbackPins(restaurants);
 }
 
 function hideMapFallback() {
