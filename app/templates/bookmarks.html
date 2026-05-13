@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Bookmarks | TableTrail{% endblock %}
+
+{% block body_attrs %}data-page="bookmarks"{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bookmarks.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="bookmarks-page">
+    <section class="container py-4 py-md-5">
+        <div class="shared-page-header mb-4">
+            <div class="shared-page-header__content">
+                <h1 class="h3 fw-bold mb-2">Saved Restaurants</h1>
+                <p class="text-secondary">Your bookmark list for places to try next.</p>
+            </div>
+            <a class="btn btn-success align-self-start align-self-md-center" href="{{ url_for('search') }}">
+                Find more
+            </a>
+        </div>
+
+        <section class="bookmark-stage-shell" aria-label="Saved restaurants section">
+            <div class="row g-3" id="bookmarkMount">
+                {% for restaurant in saved_restaurants %}
+                <div class="col-md-6 col-xl-4" data-bookmark-card>
+                    <article class="bookmark-card">
+                        <img src="{{ restaurant.image }}" class="bookmark-card__image" alt="{{ restaurant.name }}">
+                        <div class="bookmark-card__body">
+                            <span class="bookmark-card__category">{{ restaurant.category }}</span>
+                            <h2 class="bookmark-card__title">{{ restaurant.name }}</h2>
+                            <p class="bookmark-card__meta">{{ restaurant.location }} · {{ restaurant.price }}</p>
+                            <p class="bookmark-card__rating">
+                                {{ restaurant.star_text }}
+                                <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>
+                            </p>
+                            <p class="bookmark-card__description">{{ restaurant.description }}</p>
+                            <div class="bookmark-card__actions">
+                                <a class="btn btn-dark"
+                                    href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
+                                    View details
+                                </a>
+                                <button class="btn btn-outline-danger" data-remove-bookmark type="button">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                {% endfor %}
+
+                <div class="col-12 {% if saved_restaurants %}d-none{% endif %}" id="bookmarkEmptyState">
+                    <div class="bookmark-empty-state">
+                        Your saved restaurant list is empty. Explore more places and save your favourites.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/bookmarks.js') }}"></script>
+{% endblock %}

@@ -486,6 +486,50 @@ def search():
     )
 
 
+@app.route("/bookmarks")
+def bookmarks():
+    saved_restaurants = [
+        {
+            "id": 5,
+            "name": "Green Bowl Kitchen",
+            "category": "Healthy",
+            "location": "Subiaco",
+            "price": "$$",
+            "rating": 4.4,
+            "star_text": make_star_text(4.4),
+            "review_count": 3,
+            "description": "Fresh bowls, salads, smoothies, and vegan-friendly meals.",
+            "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "id": 1,
+            "name": "Laneway Pizza Co.",
+            "category": "Italian",
+            "location": "Perth CBD",
+            "price": "$$",
+            "rating": 4.7,
+            "star_text": make_star_text(4.7),
+            "review_count": 3,
+            "description": "A casual pizza spot in Perth CBD.",
+            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "id": 2,
+            "name": "Northbridge Coffee Lab",
+            "category": "Cafe",
+            "location": "Northbridge",
+            "price": "$$",
+            "rating": 4.5,
+            "star_text": make_star_text(4.5),
+            "review_count": 2,
+            "description": "Specialty coffee and brunch near Northbridge.",
+            "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+        },
+    ]
+
+    return render_template("bookmarks.html", saved_restaurants=saved_restaurants)
+
+
 @app.route("/restaurants/<int:restaurant_id>")
 def restaurant_detail(restaurant_id):
     # restaurant summary
