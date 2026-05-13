@@ -142,6 +142,19 @@ function fitRestaurantSearchMap() {
     }
 }
 
+function whenMapContainerIsReady(mapCanvas, callback, attempt = 0) {
+    const hasSize = mapCanvas.offsetWidth > 0 && mapCanvas.offsetHeight > 0;
+
+    if (hasSize || attempt >= 20) {
+        callback();
+        return;
+    }
+
+    window.setTimeout(() => {
+        whenMapContainerIsReady(mapCanvas, callback, attempt + 1);
+    }, 50);
+}
+
 function initRestaurantSearchMap() {
     const restaurants = getMapRestaurants();
     const mapCanvas = document.getElementById("restaurantMap");
@@ -157,6 +170,12 @@ function initRestaurantSearchMap() {
         window.restaurantSearchMapBounds = null;
     }
 
+    whenMapContainerIsReady(mapCanvas, () => {
+        renderRestaurantSearchMap(mapCanvas, restaurants);
+    });
+}
+
+function renderRestaurantSearchMap(mapCanvas, restaurants) {
     setMapEmptyState(!restaurants.length);
 
     const map = L.map(mapCanvas, {
@@ -164,9 +183,10 @@ function initRestaurantSearchMap() {
         zoomControl: true,
     }).setView([-31.9523, 115.8613], 12);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        subdomains: "abcd",
         maxZoom: 19,
-        attribution: "&copy; OpenStreetMap contributors",
+        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
     }).addTo(map);
 
     window.restaurantSearchMap = map;
