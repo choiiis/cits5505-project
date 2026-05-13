@@ -9,6 +9,72 @@ document.addEventListener("DOMContentLoaded", function () {
     const reviewLoginMessage = document.getElementById("reviewLoginMessage");
     const reviewForm = document.getElementById("reviewForm");
 
+    function escapeHtml(value) {
+        return String(value || "").replace(/[&<>"']/g, function (character) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;",
+            }[character];
+        });
+    }
+
+    function initRestaurantLocationMap() {
+        const mapCanvas = document.getElementById("restaurantLocationMap");
+
+        if (!mapCanvas || !window.L) {
+            return;
+        }
+
+        let markerData = null;
+
+        try {
+            markerData = JSON.parse(mapCanvas.dataset.mapMarker || "null");
+        } catch (error) {
+            markerData = null;
+        }
+
+        if (!markerData || !markerData.latitude || !markerData.longitude) {
+            mapCanvas.classList.add("restaurant-location-map--empty");
+            mapCanvas.textContent = "Map unavailable";
+            return;
+        }
+
+        const position = [markerData.latitude, markerData.longitude];
+        const map = L.map(mapCanvas, {
+            scrollWheelZoom: false,
+            zoomControl: true,
+        }).setView(position, 15);
+
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+            attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+            maxZoom: 19,
+        }).addTo(map);
+
+        const markerIcon = L.divIcon({
+            className: "restaurant-location-marker",
+            html: '<span class="restaurant-location-marker__pin"></span>',
+            iconSize: [28, 28],
+            iconAnchor: [14, 28],
+            popupAnchor: [0, -28],
+        });
+
+        L.marker(position, {
+            icon: markerIcon,
+            title: markerData.name,
+        })
+            .addTo(map)
+            .bindPopup(
+                `<strong>${escapeHtml(markerData.name)}</strong><br>${escapeHtml(markerData.address)}`
+            );
+
+        setTimeout(function () {
+            map.invalidateSize();
+        }, 100);
+    }
+
     function openReviewPanel() {
         if (!reviewOverlay || !reviewSlidePanel) return;
 
@@ -53,4 +119,6 @@ document.addEventListener("DOMContentLoaded", function () {
             reviewForm.style.display = "none";
         }
     }
+
+    initRestaurantLocationMap();
 });
