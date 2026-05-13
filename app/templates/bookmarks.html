@@ -2,6 +2,10 @@
 
 {% block title %}Bookmarks | TableTrail{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bookmarks.css') }}">
+{% endblock %}
+
 {% block content %}
 <main class="container py-5">
     <section>
@@ -15,4 +19,8 @@
         </a>
     </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/bookmarks.js') }}"></script>
 {% endblock %}
