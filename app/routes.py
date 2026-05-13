@@ -68,6 +68,11 @@ def build_openstreetmap_url(restaurants):
     )
 
 
+def build_restaurant_map_marker(restaurant):
+    markers = build_search_map_markers([restaurant])
+    return markers[0] if markers else None
+
+
 def build_search_map_markers(restaurants):
     markers = []
     location_colors = {}
@@ -515,6 +520,8 @@ def restaurant_detail(restaurant_id):
 
     review_summary = build_review_summary(reviews)
     star_text = make_star_text(review_summary["average_rating"])
+    restaurant_map_marker = build_restaurant_map_marker(restaurant)
+    restaurant_map_search_url = build_openstreetmap_url([restaurant])
 
     return render_template(
         "restaurant_detail.html",
@@ -530,6 +537,8 @@ def restaurant_detail(restaurant_id):
         default_profile_image=DEFAULT_PROFILE_IMAGE,
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
         default_menu_image=DEFAULT_MENU_IMAGE,
+        restaurant_map_marker=restaurant_map_marker,
+        restaurant_map_search_url=restaurant_map_search_url,
     )
 
 
