@@ -213,6 +213,10 @@
     box-shadow: 0 8px 24px rgba(31, 41, 51, 0.06);
 }
 
+.search-map-panel.is-fallback-visible {
+    overflow: visible;
+}
+
 .search-google-map {
     display: block;
     width: 100%;
@@ -227,7 +231,7 @@
 .search-map-fallback {
     display: none;
     min-height: 280px;
-    padding: 92px 18px 18px;
+    padding: 0 18px 18px;
     background:
         linear-gradient(rgba(255, 255, 255, 0.72) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.72) 1px, transparent 1px),
@@ -240,18 +244,32 @@
 }
 
 .search-map-fallback ol {
+    counter-reset: mapped-restaurants;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 10px;
     margin: 0;
-    padding-left: 22px;
+    padding: 0;
+    list-style: none;
 }
 
 .search-map-fallback li {
+    counter-increment: mapped-restaurants;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 8px;
     padding: 10px 12px;
     border: 1px solid rgba(217, 226, 236, 0.9);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.94);
+    min-width: 0;
+}
+
+.search-map-fallback li::before {
+    content: counter(mapped-restaurants) ".";
+    color: var(--brand-ink);
+    font-size: 0.9rem;
+    line-height: 1.35;
 }
 
 .search-map-fallback a {
@@ -259,6 +277,10 @@
     color: var(--brand-ink);
     font-weight: 800;
     text-decoration: none;
+}
+
+.search-map-fallback li span {
+    grid-column: 2;
 }
 
 .search-map-fallback a:hover {
@@ -283,6 +305,14 @@
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 0 8px 24px rgba(31, 41, 51, 0.14);
+}
+
+.search-map-panel.is-fallback-visible .search-map-content {
+    position: relative;
+    top: auto;
+    left: auto;
+    max-width: none;
+    margin: 16px 16px 10px;
 }
 
 .search-map-eyebrow {

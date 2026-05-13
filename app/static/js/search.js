@@ -96,6 +96,11 @@ function createInfoWindowContent(restaurant) {
 function showMapFallback() {
     const fallback = document.getElementById("mapFallback");
     const mapCanvas = document.getElementById("restaurantMap");
+    const mapPreview = document.getElementById("mapPreview");
+
+    if (mapPreview) {
+        mapPreview.classList.add("is-fallback-visible");
+    }
 
     if (fallback) {
         fallback.classList.add("is-visible");
@@ -109,6 +114,11 @@ function showMapFallback() {
 function hideMapFallback() {
     const fallback = document.getElementById("mapFallback");
     const mapCanvas = document.getElementById("restaurantMap");
+    const mapPreview = document.getElementById("mapPreview");
+
+    if (mapPreview) {
+        mapPreview.classList.remove("is-fallback-visible");
+    }
 
     if (fallback) {
         fallback.classList.remove("is-visible");
