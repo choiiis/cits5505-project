@@ -93,159 +93,75 @@ function createInfoWindowContent(restaurant) {
     `;
 }
 
-function createFallbackPin(restaurant) {
-    const pin = document.createElement("button");
-    pin.className = "search-map-fallback-pin";
-    pin.type = "button";
-    pin.style.left = `${restaurant.map_x}%`;
-    pin.style.top = `${restaurant.map_y}%`;
-    pin.dataset.restaurantId = restaurant.id;
-    pin.setAttribute(
-        "aria-label",
-        `${restaurant.marker_number}. ${restaurant.name}, ${restaurant.suburb || restaurant.address}`
-    );
-    pin.innerHTML = `
-        <span class="search-map-fallback-pin__marker">
-            <span>${restaurant.marker_number}</span>
-        </span>
-        <span class="search-map-fallback-pin__label">
-            <strong>${escapeHtml(restaurant.name)}</strong>
-            <span>${escapeHtml(restaurant.suburb || restaurant.address)}</span>
-        </span>
-    `;
-
-    pin.addEventListener("click", () => {
-        setActiveRestaurant(restaurant.id);
-    });
-
-    return pin;
-}
-
-function renderFallbackPins(restaurants) {
-    const pinLayer = document.getElementById("mapFallbackPins");
+function setMapEmptyState(isVisible) {
     const emptyState = document.getElementById("mapFallbackEmpty");
 
-    if (!pinLayer) {
+    if (emptyState) {
+        emptyState.classList.toggle("is-visible", isVisible);
+    }
+}
+
+function createLeafletIcon(restaurant) {
+    return L.divIcon({
+        className: "search-leaflet-marker",
+        html: `<span>${restaurant.marker_number}</span>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 34],
+        popupAnchor: [0, -30],
+    });
+}
+
+function initRestaurantSearchMap() {
+    const restaurants = getMapRestaurants();
+    const mapCanvas = document.getElementById("restaurantMap");
+
+    if (!mapCanvas || !window.L) {
+        setMapEmptyState(true);
         return;
     }
 
-    pinLayer.replaceChildren();
+    setMapEmptyState(!restaurants.length);
 
-    if (emptyState) {
-        emptyState.classList.toggle("is-visible", !restaurants.length);
+    const map = L.map(mapCanvas, {
+        scrollWheelZoom: false,
+        zoomControl: true,
+    }).setView([-31.9523, 115.8613], 12);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    if (!restaurants.length) {
+        return;
     }
+
+    const bounds = L.latLngBounds();
 
     restaurants.forEach(restaurant => {
-        pinLayer.appendChild(createFallbackPin(restaurant));
-    });
-}
+        const position = [restaurant.latitude, restaurant.longitude];
+        const marker = L.marker(position, {
+            icon: createLeafletIcon(restaurant),
+            title: restaurant.name,
+        }).addTo(map);
 
-function showMapFallback() {
-    const fallback = document.getElementById("mapFallback");
-    const mapCanvas = document.getElementById("restaurantMap");
-    const mapPreview = document.getElementById("mapPreview");
-    const restaurants = getMapRestaurants();
+        marker.restaurantId = restaurant.id;
+        bounds.extend(position);
 
-    if (mapPreview) {
-        mapPreview.classList.add("is-fallback-visible");
-    }
-
-    if (fallback) {
-        fallback.classList.add("is-visible");
-    }
-
-    if (mapCanvas) {
-        mapCanvas.classList.add("is-hidden");
-    }
-
-    renderFallbackPins(restaurants);
-}
-
-function hideMapFallback() {
-    const fallback = document.getElementById("mapFallback");
-    const mapCanvas = document.getElementById("restaurantMap");
-    const mapPreview = document.getElementById("mapPreview");
-
-    if (mapPreview) {
-        mapPreview.classList.remove("is-fallback-visible");
-    }
-
-    if (fallback) {
-        fallback.classList.remove("is-visible");
-    }
-
-    if (mapCanvas) {
-        mapCanvas.classList.remove("is-hidden");
-    }
-}
-
-window.initRestaurantSearchMap = function initRestaurantSearchMap() {
-    const restaurants = getMapRestaurants();
-    const mapCanvas = document.getElementById("restaurantMap");
-
-    if (!mapCanvas || !window.google || !restaurants.length) {
-        showMapFallback();
-        return;
-    }
-
-    hideMapFallback();
-
-    const map = new google.maps.Map(mapCanvas, {
-        center: { lat: -31.9523, lng: 115.8613 },
-        zoom: 12,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false,
+        marker.bindPopup(createInfoWindowContent(restaurant));
+        marker.on("click", () => {
+            setActiveRestaurant(restaurant.id);
+        });
     });
 
-    const geocoder = new google.maps.Geocoder();
-    const bounds = new google.maps.LatLngBounds();
-    const infoWindow = new google.maps.InfoWindow();
-    let resolvedMarkers = 0;
-    let completedGeocodes = 0;
+    if (restaurants.length === 1) {
+        map.setView(bounds.getCenter(), 14);
+    } else {
+        map.fitBounds(bounds, { padding: [44, 44], maxZoom: 14 });
+    }
 
-    restaurants.forEach((restaurant, index) => {
-        geocoder.geocode(
-            { address: `${restaurant.name}, ${restaurant.address}, Australia` },
-            (results, status) => {
-                completedGeocodes += 1;
-
-                if (status !== "OK" || !results[0]) {
-                    if (resolvedMarkers === 0 && completedGeocodes === restaurants.length) {
-                        showMapFallback();
-                    }
-
-                    return;
-                }
-
-                const marker = new google.maps.Marker({
-                    map,
-                    position: results[0].geometry.location,
-                    title: restaurant.name,
-                    label: String(index + 1),
-                });
-
-                marker.restaurantId = restaurant.id;
-                bounds.extend(marker.getPosition());
-                resolvedMarkers += 1;
-
-                marker.addListener("click", () => {
-                    infoWindow.setContent(createInfoWindowContent(restaurant));
-                    infoWindow.open(map, marker);
-                    setActiveRestaurant(restaurant.id);
-                });
-
-                if (resolvedMarkers === 1) {
-                    map.setCenter(marker.getPosition());
-                }
-
-                if (resolvedMarkers > 1) {
-                    map.fitBounds(bounds);
-                }
-            }
-        );
-    });
-};
+    window.setTimeout(() => map.invalidateSize(), 0);
+}
 
 function initFilterToggle() {
     const filterToggle = document.getElementById("filterToggle");
@@ -269,10 +185,7 @@ function initSearchPage() {
     initBookmarks();
     initMapToggle();
     initFilterToggle();
-
-    if (!window.google) {
-        showMapFallback();
-    }
+    initRestaurantSearchMap();
 }
 
 document.addEventListener("DOMContentLoaded", initSearchPage);

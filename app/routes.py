@@ -10,92 +10,77 @@ from urllib.parse import quote_plus
 DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
 DEFAULT_RESTAURANT_IMAGE = "images/restaurant-default.png"
 DEFAULT_MENU_IMAGE = "images/menu-default.png"
-SEARCH_MAP_POSITIONS = {
-    "Perth CBD": {"x": 52, "y": 42},
-    "Northbridge": {"x": 47, "y": 34},
-    "Subiaco": {"x": 31, "y": 42},
-    "Victoria Park": {"x": 59, "y": 57},
-    "East Victoria Park": {"x": 63, "y": 62},
-    "Fremantle": {"x": 18, "y": 72},
-    "Cottesloe": {"x": 19, "y": 47},
-    "South Perth": {"x": 52, "y": 52},
-    "Nedlands": {"x": 27, "y": 50},
-    "Wembley": {"x": 33, "y": 32},
-    "Inglewood": {"x": 62, "y": 27},
-    "Carlisle": {"x": 67, "y": 55},
-    "Willetton": {"x": 63, "y": 75},
-    "West Leederville": {"x": 38, "y": 38},
-    "Mount Lawley": {"x": 56, "y": 29},
-    "Leederville": {"x": 42, "y": 33},
-    "Scarborough": {"x": 17, "y": 25},
-    "Claremont": {"x": 24, "y": 54},
-    "Crawley": {"x": 35, "y": 53},
-    "Applecross": {"x": 51, "y": 68},
-    "Booragoon": {"x": 48, "y": 76},
-    "Cannington": {"x": 76, "y": 68},
-    "Morley": {"x": 72, "y": 23},
-    "Belmont": {"x": 73, "y": 43},
-    "Hillarys": {"x": 19, "y": 16},
+SEARCH_MAP_COORDINATES = {
+    "Perth CBD": {"lat": -31.9523, "lng": 115.8613},
+    "Northbridge": {"lat": -31.9466, "lng": 115.8552},
+    "Subiaco": {"lat": -31.9485, "lng": 115.8246},
+    "Victoria Park": {"lat": -31.9762, "lng": 115.8960},
+    "East Victoria Park": {"lat": -31.9889, "lng": 115.9025},
+    "Fremantle": {"lat": -32.0569, "lng": 115.7439},
+    "Cottesloe": {"lat": -31.9940, "lng": 115.7609},
+    "South Perth": {"lat": -31.9805, "lng": 115.8677},
+    "Nedlands": {"lat": -31.9813, "lng": 115.8069},
+    "Wembley": {"lat": -31.9339, "lng": 115.8175},
+    "Inglewood": {"lat": -31.9207, "lng": 115.8878},
+    "Carlisle": {"lat": -31.9791, "lng": 115.9182},
+    "Willetton": {"lat": -32.0521, "lng": 115.8870},
+    "West Leederville": {"lat": -31.9415, "lng": 115.8339},
+    "Mount Lawley": {"lat": -31.9340, "lng": 115.8717},
+    "Leederville": {"lat": -31.9367, "lng": 115.8412},
+    "Scarborough": {"lat": -31.8958, "lng": 115.7643},
+    "Claremont": {"lat": -31.9811, "lng": 115.7799},
+    "Crawley": {"lat": -31.9802, "lng": 115.8170},
+    "Applecross": {"lat": -32.0166, "lng": 115.8350},
+    "Booragoon": {"lat": -32.0390, "lng": 115.8320},
+    "Cannington": {"lat": -32.0169, "lng": 115.9364},
+    "Morley": {"lat": -31.8878, "lng": 115.8999},
+    "Belmont": {"lat": -31.9638, "lng": 115.9345},
+    "Hillarys": {"lat": -31.8064, "lng": 115.7405},
 }
 
 
-def build_google_maps_url(restaurants):
+def build_openstreetmap_url(restaurants):
     if not restaurants:
-        return "https://www.google.com/maps/search/?api=1&query=restaurants+Perth+Western+Australia"
+        return "https://www.openstreetmap.org/#map=12/-31.9523/115.8613"
 
-    restaurant_queries = [
-        quote_plus(f"{restaurant.name}, {restaurant.address}, Australia")
-        for restaurant in restaurants[:10]
-    ]
+    coordinates = SEARCH_MAP_COORDINATES.get(restaurants[0].suburb or "")
 
-    if len(restaurant_queries) == 1:
-        return (
-            "https://www.google.com/maps/search/?api=1"
-            f"&query={restaurant_queries[0]}"
-        )
+    if not coordinates:
+        coordinates = {"lat": -31.9523, "lng": 115.8613}
 
-    waypoints = "%7C".join(restaurant_queries[1:-1])
-    maps_url = (
-        "https://www.google.com/maps/dir/?api=1"
-        f"&origin={restaurant_queries[0]}"
-        f"&destination={restaurant_queries[-1]}"
+    query = quote_plus(f"{restaurants[0].name}, {restaurants[0].address}, Australia")
+    return (
+        "https://www.openstreetmap.org/search"
+        f"?query={query}"
+        f"#map=14/{coordinates['lat']}/{coordinates['lng']}"
     )
-
-    if waypoints:
-        maps_url += f"&waypoints={waypoints}"
-
-    return maps_url
 
 
 def build_search_map_markers(restaurants):
     markers = []
 
     for index, restaurant in enumerate(restaurants):
-        position = SEARCH_MAP_POSITIONS.get(restaurant.suburb or "")
+        coordinates = SEARCH_MAP_COORDINATES.get(restaurant.suburb or "")
 
-        if not position:
-            position = {
-                "x": 16 + ((restaurant.id * 17) % 68),
-                "y": 18 + ((restaurant.id * 29) % 62),
+        if not coordinates:
+            coordinates = {
+                "lat": -31.9523 + (((restaurant.id * 17) % 40) - 20) / 1000,
+                "lng": 115.8613 + (((restaurant.id * 29) % 40) - 20) / 1000,
             }
 
         markers.append(
             {
-            "id": restaurant.id,
-            "name": restaurant.name,
-            "category": restaurant.category,
-            "address": restaurant.address,
-            "suburb": restaurant.suburb,
-            "rating": round(restaurant.average_rating or 0, 1),
-            "review_count": restaurant.review_count,
-            "marker_number": index + 1,
-            "map_x": position["x"],
-            "map_y": position["y"],
-            "detail_url": url_for("restaurant_detail", restaurant_id=restaurant.id),
-            "google_maps_url": (
-                "https://www.google.com/maps/search/?api=1"
-                f"&query={quote_plus(f'{restaurant.name}, {restaurant.address}, Australia')}"
-            ),
+                "id": restaurant.id,
+                "name": restaurant.name,
+                "category": restaurant.category,
+                "address": restaurant.address,
+                "suburb": restaurant.suburb,
+                "rating": round(restaurant.average_rating or 0, 1),
+                "review_count": restaurant.review_count,
+                "marker_number": index + 1,
+                "latitude": coordinates["lat"],
+                "longitude": coordinates["lng"],
+                "detail_url": url_for("restaurant_detail", restaurant_id=restaurant.id),
             }
         )
 
@@ -435,9 +420,8 @@ def search():
     else:
         search_map_label = "Perth"
 
-    google_maps_api_key = app.config.get("GOOGLE_MAPS_API_KEY", "")
     search_map_markers = build_search_map_markers(restaurants)
-    search_map_search_url = build_google_maps_url(restaurants)
+    search_map_search_url = build_openstreetmap_url(restaurants)
 
     summary_parts = [keyword if keyword else "restaurants"]
 
@@ -476,7 +460,6 @@ def search():
         categories=categories,
         locations=locations,
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
-        google_maps_api_key=google_maps_api_key,
         search_map_markers=search_map_markers,
         search_map_search_url=search_map_search_url,
         search_map_label=search_map_label,

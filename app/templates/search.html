@@ -3,6 +3,8 @@
 {% block title %}Search Restaurants | TableTrail{% endblock %}
 
 {% block styles %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIINfQ8N3bqkH8RzV9G2T1pYl8h+6t7IuFc=" crossorigin="">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
 {% endblock %}
 
@@ -154,7 +156,7 @@
 
                     <section id="mapPreview" class="search-map-panel mb-3 position-relative"
                         data-map-restaurants='{{ search_map_markers|tojson }}'>
-                        <div id="restaurantMap" class="search-google-map" role="img"
+                        <div id="restaurantMap" class="search-leaflet-map" role="img"
                             aria-label="Map preview for matching restaurants near {{ search_map_label }}"></div>
 
                         <div class="search-map-content">
@@ -163,12 +165,8 @@
                             <p>{{ restaurants|length }} restaurants from this search</p>
                         </div>
 
-                        <div class="search-map-fallback" id="mapFallback">
-                            <div class="search-map-roads" aria-hidden="true"></div>
-                            <div class="search-map-pin-layer" id="mapFallbackPins"></div>
-                            <div class="search-map-empty" id="mapFallbackEmpty">
-                                No matching restaurants to map.
-                            </div>
+                        <div class="search-map-empty" id="mapFallbackEmpty">
+                            No matching restaurants to map.
                         </div>
 
                         <a class="search-map-link" href="{{ search_map_search_url }}" target="_blank" rel="noopener">
@@ -265,9 +263,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="{{ url_for('static', filename='js/search.js') }}"></script>
-{% if google_maps_api_key %}
-<script async defer
-    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initRestaurantSearchMap"></script>
-{% endif %}
 {% endblock %}
