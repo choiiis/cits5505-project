@@ -95,13 +95,14 @@
 
                     <div class="location-hours-grid">
 
-                        <!-- Map and Address -->
-                        <div class="location-column">
-                            <div class="map-placeholder">
-                                Map
-                            </div>
+                            <!-- Map and Address -->
+                            <div class="location-column">
+                                <div class="map-placeholder">
+                                    <iframe class="restaurant-map-preview" src="{{ restaurant_map_embed_url }}"
+                                        title="Map for {{ restaurant.name }}" loading="lazy"></iframe>
+                                </div>
 
-                            <div class="address-card">
+                                <div class="address-card">
                                 <div class="address-icon">
                                     📍
                                 </div>

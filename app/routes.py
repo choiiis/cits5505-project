@@ -68,6 +68,27 @@ def build_openstreetmap_url(restaurants):
     )
 
 
+def build_openstreetmap_embed_url(restaurant):
+    coordinates = SEARCH_MAP_COORDINATES.get(restaurant.suburb or "")
+
+    if not coordinates:
+        coordinates = {
+            "lat": -31.9523 + (((restaurant.id * 17) % 40) - 20) / 1000,
+            "lng": 115.8613 + (((restaurant.id * 29) % 40) - 20) / 1000,
+        }
+
+    lat = coordinates["lat"]
+    lng = coordinates["lng"]
+    bbox = f"{lng - 0.008},{lat - 0.006},{lng + 0.008},{lat + 0.006}"
+
+    return (
+        "https://www.openstreetmap.org/export/embed.html"
+        f"?bbox={quote_plus(bbox)}"
+        "&layer=mapnik"
+        f"&marker={lat}%2C{lng}"
+    )
+
+
 def build_search_map_markers(restaurants):
     markers = []
     location_colors = {}
@@ -559,6 +580,7 @@ def restaurant_detail(restaurant_id):
 
     review_summary = build_review_summary(reviews)
     star_text = make_star_text(review_summary["average_rating"])
+    restaurant_map_embed_url = build_openstreetmap_embed_url(restaurant)
 
     return render_template(
         "restaurant_detail.html",
@@ -574,6 +596,7 @@ def restaurant_detail(restaurant_id):
         default_profile_image=DEFAULT_PROFILE_IMAGE,
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
         default_menu_image=DEFAULT_MENU_IMAGE,
+        restaurant_map_embed_url=restaurant_map_embed_url,
     )
 
 

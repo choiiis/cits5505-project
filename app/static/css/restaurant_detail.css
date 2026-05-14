@@ -192,6 +192,13 @@
     align-items: center;
     justify-content: center;
     font-weight: 800;
+    overflow: hidden;
+}
+
+.restaurant-map-preview {
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
 
 .hours-card {
