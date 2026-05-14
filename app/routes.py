@@ -1,3 +1,6 @@
+import smtplib
+from email.message import EmailMessage
+
 from flask import flash, redirect, render_template, request, session, url_for
 from app import app, db
 from app.utils import make_star_text
@@ -5,11 +8,13 @@ from app.models import Restaurant, MenuItem, OpeningHour, Review, User
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import datetime
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from urllib.parse import quote_plus
 
 DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
 DEFAULT_RESTAURANT_IMAGE = "images/restaurant-default.png"
 DEFAULT_MENU_IMAGE = "images/menu-default.png"
+PASSWORD_RESET_MAX_AGE_SECONDS = 3600
 SEARCH_MAP_COORDINATES = {
     "Perth CBD": {"lat": -31.9523, "lng": 115.8613},
     "Northbridge": {"lat": -31.9466, "lng": 115.8552},
@@ -49,6 +54,45 @@ SEARCH_MAP_LOCATION_COLORS = [
     "#65a30d",
     "#c2410c",
 ]
+
+
+def get_password_reset_serializer():
+    return URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
+
+def generate_password_reset_token(email):
+    serializer = get_password_reset_serializer()
+    return serializer.dumps(email, salt="password-reset")
+
+
+def verify_password_reset_token(token):
+    serializer = get_password_reset_serializer()
+    return serializer.loads(
+        token,
+        salt="password-reset",
+        max_age=PASSWORD_RESET_MAX_AGE_SECONDS,
+    )
+
+
+def send_email(to_email, subject, body):
+    username = app.config.get("MAIL_USERNAME")
+    password = app.config.get("MAIL_PASSWORD")
+    sender_email = app.config.get("MAIL_DEFAULT_SENDER") or username
+
+    if not username or not password or not sender_email:
+        raise RuntimeError("SMTP email is not configured.")
+
+    message = EmailMessage()
+    message["Subject"] = subject
+    message["From"] = f"{app.config.get('MAIL_SENDER_NAME', 'TableTrail')} <{sender_email}>"
+    message["To"] = to_email
+    message.set_content(body)
+
+    with smtplib.SMTP(app.config["MAIL_SERVER"], app.config["MAIL_PORT"]) as smtp:
+        if app.config.get("MAIL_USE_TLS", True):
+            smtp.starttls()
+        smtp.login(username, password)
+        smtp.send_message(message)
 
 
 def build_openstreetmap_url(restaurants):
@@ -276,13 +320,62 @@ def forgot_password():
             flash("Please enter your email address.", "danger")
             return render_template("forgot_password.html")
 
-        User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            token = generate_password_reset_token(user.email)
+            reset_url = url_for("reset_password", token=token, _external=True)
+            email_body = (
+                f"Hi {user.username},\n\n"
+                "We received a request to reset your TableTrail password.\n\n"
+                f"Reset your password here:\n{reset_url}\n\n"
+                "This link expires in 1 hour. If you did not request this, you can ignore this email.\n\n"
+                "TableTrail"
+            )
+
+            try:
+                send_email(user.email, "Reset your TableTrail password", email_body)
+            except Exception:
+                app.logger.exception("Failed to send password reset email")
+                flash("Email could not be sent. Please check SMTP settings.", "danger")
+                return render_template("forgot_password.html")
+
         flash(
-            "If an account exists for that email, reset instructions will be sent.",
+            "If an account exists for that email, reset instructions have been sent.",
             "success",
         )
 
     return render_template("forgot_password.html")
+
+
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    try:
+        email = verify_password_reset_token(token)
+    except SignatureExpired:
+        flash("This reset link has expired. Please request a new one.", "danger")
+        return render_template("reset_password.html", token=None)
+    except BadSignature:
+        flash("This reset link is invalid. Please request a new one.", "danger")
+        return render_template("reset_password.html", token=None)
+
+    user = User.query.filter_by(email=email).first_or_404()
+
+    if request.method == "POST":
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if len(password) < 8:
+            flash("Password must be at least 8 characters.", "danger")
+        elif password != confirm_password:
+            flash("Passwords do not match.", "danger")
+        else:
+            user.password_hash = generate_password_hash(password)
+            db.session.commit()
+            flash("Your password has been reset. You can now log in.", "success")
+            return redirect(url_for("login"))
+
+    return render_template("reset_password.html", token=token)
 
 
 @app.route("/signup", methods=["GET", "POST"])
