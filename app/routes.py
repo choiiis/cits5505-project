@@ -404,7 +404,7 @@ def search():
     sort = request.args.get("sort", "rating").strip()
     active_location = filter_location or location
 
-    query = Restaurant.query
+    query = Restaurant.query.filter(Restaurant.status == "approved")
 
     if keyword:
         search_text = f"%{keyword}%"

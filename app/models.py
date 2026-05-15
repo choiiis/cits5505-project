@@ -11,10 +11,17 @@ class User(db.Model):
 
     profile_image = db.Column(db.String(255))
     role = db.Column(db.String(20), nullable=False, default="customer")
+    status = db.Column(db.String(20), nullable=False, default="active", index=True)
+
     abn_number = db.Column(db.String(20))
     contact_number = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
     reviews = db.relationship(
         "Review", back_populates="user", cascade="all, delete-orphan"
     )
@@ -45,8 +52,16 @@ class Restaurant(db.Model):
     average_rating = db.Column(db.Float, nullable=False, default=0.0)
     review_count = db.Column(db.Integer, nullable=False, default=0)
 
+    status = db.Column(db.String(20), nullable=False, default="pending", index=True)
+
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
     owner = db.relationship("User", back_populates="owned_restaurants")
 
