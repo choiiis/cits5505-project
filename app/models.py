@@ -134,6 +134,8 @@ class Review(db.Model):
     rating = db.Column(db.Integer, nullable=False)
     content = db.Column(db.Text, nullable=False)
 
+    status = db.Column(db.String(20), nullable=False, default="active", index=True)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 

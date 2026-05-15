@@ -21,6 +21,7 @@ USER_STATUS_PATTERN = [
     "active",
     "active",
     "active",
+    "active",
     "suspended",
 ]
 
@@ -28,8 +29,19 @@ RESTAURANT_STATUS_PATTERN = [
     "approved",
     "approved",
     "approved",
+    "approved",
+    "approved",
     "pending",
     "reported",
+]
+
+REVIEW_STATUS_PATTERN = [
+    "active",
+    "active",
+    "active",
+    "active",
+    "reported",
+    "hidden",
 ]
 
 PROFILE_IMAGES = [
@@ -958,6 +970,9 @@ def create_reviews(restaurants, customers):
             content = REVIEW_TEXTS[
                 (restaurant_index + review_index) % len(REVIEW_TEXTS)
             ]
+            review_status = REVIEW_STATUS_PATTERN[
+                (restaurant_index + review_index) % len(REVIEW_STATUS_PATTERN)
+            ]
 
             reviews.append(
                 Review(
@@ -965,7 +980,10 @@ def create_reviews(restaurants, customers):
                     user_id=customer.id,
                     rating=rating,
                     content=content,
+                    status=review_status,
                     created_at=datetime.utcnow()
+                    - timedelta(days=(restaurant_index * 2 + review_index)),
+                    updated_at=datetime.utcnow()
                     - timedelta(days=(restaurant_index * 2 + review_index)),
                 )
             )
