@@ -17,6 +17,33 @@ random.seed(42)
 
 DEFAULT_PASSWORD_HASH = "dev-password-hash"
 
+USER_STATUS_PATTERN = [
+    "active",
+    "active",
+    "active",
+    "active",
+    "suspended",
+]
+
+RESTAURANT_STATUS_PATTERN = [
+    "approved",
+    "approved",
+    "approved",
+    "approved",
+    "approved",
+    "pending",
+    "reported",
+]
+
+REVIEW_STATUS_PATTERN = [
+    "active",
+    "active",
+    "active",
+    "active",
+    "reported",
+    "hidden",
+]
+
 PROFILE_IMAGES = [
     "https://randomuser.me/api/portraits/women/44.jpg",
     "https://randomuser.me/api/portraits/men/32.jpg",
@@ -648,6 +675,17 @@ def create_opening_hours(
 
 
 def create_users():
+    admin_user = User(
+        email="admin@example.com",
+        username="Admin User",
+        password_hash=DEFAULT_PASSWORD_HASH,
+        profile_image=None,
+        role="admin",
+        status="active",
+        created_at=datetime.utcnow() - timedelta(days=70),
+        updated_at=datetime.utcnow() - timedelta(days=1),
+    )
+
     owner_specs = [
         ("owner1@example.com", "Mia Owner", "51824753556", "+61 8 2000 0001"),
         ("owner2@example.com", "Daniel Owner", "23684597120", "+61 8 2000 0002"),
@@ -656,7 +694,7 @@ def create_users():
         ("owner5@example.com", "Grace Owner", "61273948015", "+61 8 2000 0005"),
     ]
 
-    users = []
+    users = [admin_user]
 
     for index, (email, username, abn_number, contact_number) in enumerate(owner_specs):
         users.append(
@@ -668,8 +706,11 @@ def create_users():
                     PROFILE_IMAGES[index] if index < len(PROFILE_IMAGES) else None
                 ),
                 role="owner",
+                status=USER_STATUS_PATTERN[index % len(USER_STATUS_PATTERN)],
                 abn_number=abn_number,
                 contact_number=contact_number,
+                created_at=datetime.utcnow() - timedelta(days=65 - index),
+                updated_at=datetime.utcnow() - timedelta(days=index + 1),
             )
         )
 
@@ -733,6 +774,9 @@ def create_users():
                     else None
                 ),
                 role="customer",
+                status=USER_STATUS_PATTERN[index % len(USER_STATUS_PATTERN)],
+                created_at=datetime.utcnow() - timedelta(days=60 - (index % 40)),
+                updated_at=datetime.utcnow() - timedelta(days=index % 12),
             )
         )
 
@@ -752,6 +796,7 @@ def create_restaurants(owners):
         RESTAURANT_DATA
     ):
         image_url = RESTAURANT_IMAGE_OVERRIDES.get(name)
+        status = RESTAURANT_STATUS_PATTERN[index % len(RESTAURANT_STATUS_PATTERN)]
 
         restaurant = Restaurant(
             name=name,
@@ -765,8 +810,10 @@ def create_restaurants(owners):
             hero_image=image_url,
             average_rating=0.0,
             review_count=0,
+            status=status,
             owner_id=owners[index % len(owners)].id,
             created_at=datetime.utcnow() - timedelta(days=40 - index),
+            updated_at=datetime.utcnow() - timedelta(days=index % 10),
         )
 
         restaurants.append(restaurant)
@@ -923,6 +970,9 @@ def create_reviews(restaurants, customers):
             content = REVIEW_TEXTS[
                 (restaurant_index + review_index) % len(REVIEW_TEXTS)
             ]
+            review_status = REVIEW_STATUS_PATTERN[
+                (restaurant_index + review_index) % len(REVIEW_STATUS_PATTERN)
+            ]
 
             reviews.append(
                 Review(
@@ -930,7 +980,10 @@ def create_reviews(restaurants, customers):
                     user_id=customer.id,
                     rating=rating,
                     content=content,
+                    status=review_status,
                     created_at=datetime.utcnow()
+                    - timedelta(days=(restaurant_index * 2 + review_index)),
+                    updated_at=datetime.utcnow()
                     - timedelta(days=(restaurant_index * 2 + review_index)),
                 )
             )

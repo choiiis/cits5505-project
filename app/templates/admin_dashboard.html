@@ -9,147 +9,440 @@
 {% block content %}
 <main class="admin-page">
     <section class="admin-hero">
-        <div class="container admin-hero__inner">
-            <div>
-                <p class="admin-label">Admin Panel</p>
+        <div class="container-fluid px-5 admin-hero__inner">
+            <div class="admin-hero__content">
                 <h1>Admin Dashboard</h1>
+
                 <p class="admin-subtitle">
                     Manage restaurant listings, user accounts, approval status, and reported content from one place.
                 </p>
             </div>
-
-            <a href="{{ url_for('home') }}" class="admin-view-link">
-                Back to home
-            </a>
         </div>
     </section>
 
     <section class="admin-dashboard-section">
-        <div class="container">
+        <div class="container-fluid px-5">
 
             <section class="admin-stats">
-                {% for stat in admin_stats %}
-                <div class="admin-stat-card">
-                    <span>{{ stat.label }}</span>
-                    <strong>{{ stat.value }}</strong>
+                {% for stat in overview_cards %}
+                <div class="admin-stat-card admin-stat-card--{{ loop.index }}">
+                    <div class="admin-stat-card__icon">
+                        {% if loop.index == 1 %}
+                        👥
+                        {% elif loop.index == 2 %}
+                        🏪
+                        {% elif loop.index == 3 %}
+                        ⏳
+                        {% else %}
+                        ⚠
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <span>{{ stat.label }}</span>
+                        <strong>{{ stat.value }}</strong>
+                    </div>
                 </div>
                 {% endfor %}
             </section>
 
             <section class="admin-card">
-                <div class="admin-card__heading">
-                    <h2>Restaurant Management</h2>
-                    <p>
-                        Review restaurant listings, check their current status, and prepare them for approval or further review.
-                    </p>
-                </div>
+                <form method="post" action="{{ url_for('update_restaurant_records') }}">
+                    <div class="admin-card__heading admin-card__heading--with-action">
+                        <div class="admin-card__title-row">
+                            <div class="admin-section-icon">🏪</div>
 
-                <div class="admin-toolbar">
-                    <button type="button" class="admin-action-button">Review pending</button>
-                    <button type="button" class="admin-action-button admin-action-button--secondary">
-                        View all restaurants
-                    </button>
-                </div>
+                            <div>
+                                <h2>Restaurant Management</h2>
+                                <p>
+                                    Search restaurant records, filter by listing status, and update approval status.
+                                </p>
+                            </div>
+                        </div>
 
-                <div class="admin-table-wrap">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Restaurant</th>
-                                <th>Category</th>
-                                <th>Owner</th>
-                                <th>Status</th>
-                                <th>Rating</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {% for restaurant in restaurants %}
-                            <tr>
-                                <td>{{ restaurant.name }}</td>
-                                <td>{{ restaurant.category }}</td>
-                                <td>{{ restaurant.owner }}</td>
-                                <td>
-                                    <span class="admin-status {{ restaurant.status_class }}">
-                                        {{ restaurant.status }}
-                                    </span>
-                                </td>
-                                <td>{{ restaurant.rating }}</td>
-                                <td>
-                                    <button type="button" class="admin-table-button">
-                                        {{ restaurant.action }}
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="admin-card">
-                <div class="admin-card__heading">
-                    <h2>User Management</h2>
-                    <p>
-                        View customer, owner, and admin accounts. This frontend layout can later connect to role-based backend logic.
-                    </p>
-                </div>
-
-                <div class="admin-table-wrap">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {% for user in users %}
-                            <tr>
-                                <td>{{ user.name }}</td>
-                                <td>{{ user.email }}</td>
-                                <td>{{ user.role }}</td>
-                                <td>
-                                    <span class="admin-status {{ user.status_class }}">
-                                        {{ user.status }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button type="button" class="admin-table-button">
-                                        {{ user.action }}
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="admin-card">
-                <div class="admin-card__heading">
-                    <h2>Admin Tasks</h2>
-                    <p>
-                        These cards show the main admin-side features that can be connected to database logic later.
-                    </p>
-                </div>
-
-                <div class="admin-task-grid">
-                    {% for task in admin_tasks %}
-                    <div class="admin-task-card">
-                        <h3>{{ task.title }}</h3>
-                        <p>{{ task.description }}</p>
+                        <button type="submit" class="admin-save-button">
+                            Save changes
+                        </button>
                     </div>
-                    {% endfor %}
-                </div>
+
+                    <div class="admin-filter-bar">
+                        <div class="admin-filter-field">
+                            <label for="restaurantQ">Search</label>
+                            <input type="search" id="restaurantQ" name="restaurant_q" value="{{ restaurant_q }}"
+                                placeholder="Restaurant, category, owner, suburb" form="restaurantFilterForm">
+                        </div>
+
+                        <div class="admin-filter-field">
+                            <label for="restaurantStatus">Status</label>
+                            <select id="restaurantStatus" name="restaurant_status" form="restaurantFilterForm">
+                                <option value="">All statuses</option>
+                                <option value="approved" {% if restaurant_status=="approved" %}selected{% endif %}>
+                                    Approved
+                                </option>
+                                <option value="pending" {% if restaurant_status=="pending" %}selected{% endif %}>
+                                    Pending
+                                </option>
+                                <option value="reported" {% if restaurant_status=="reported" %}selected{% endif %}>
+                                    Reported
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="admin-filter-field">
+                            <label for="restaurantSort">Sort</label>
+                            <select id="restaurantSort" name="restaurant_sort" form="restaurantFilterForm">
+                                <option value="recent" {% if restaurant_sort=="recent" %}selected{% endif %}>
+                                    Newest first
+                                </option>
+                                <option value="oldest" {% if restaurant_sort=="oldest" %}selected{% endif %}>
+                                    Oldest first
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="admin-filter-button" form="restaurantFilterForm">
+                            Apply
+                        </button>
+                    </div>
+
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Restaurant</th>
+                                    <th>Category</th>
+                                    <th>Owner</th>
+                                    <th>Status</th>
+                                    <th>Rating</th>
+                                    <th>Submitted</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for restaurant in restaurants %}
+                                <tr class="admin-clickable-row"
+                                    data-row-url="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
+                                    <td>
+                                        <strong class="admin-primary-text">{{ restaurant.name }}</strong>
+                                    </td>
+                                    <td>{{ restaurant.category }}</td>
+                                    <td>{{ restaurant.owner.username if restaurant.owner else "Unassigned" }}</td>
+                                    <td>
+                                        <select name="restaurant_status_{{ restaurant.id }}"
+                                            class="admin-status-select admin-status-select--{{ restaurant.status }}"
+                                            data-status-select onclick="event.stopPropagation()">
+                                            <option value="approved" {% if restaurant.status=="approved" %}selected{%
+                                                endif %}>
+                                                Approved
+                                            </option>
+                                            <option value="pending" {% if restaurant.status=="pending" %}selected{%
+                                                endif %}>
+                                                Pending
+                                            </option>
+                                            <option value="reported" {% if restaurant.status=="reported" %}selected{%
+                                                endif %}>
+                                                Reported
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <span class="admin-rating">{{ "%.1f"|format(restaurant.average_rating) }}
+                                            ★</span>
+                                    </td>
+                                    <td>{{ restaurant.created_at.strftime("%d %b %Y") }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="admin-empty-cell">No restaurant records found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+                <form id="restaurantFilterForm" method="get" action="{{ url_for('admin_dashboard') }}">
+                    <input type="hidden" name="user_status" value="{{ user_status }}">
+                    <input type="hidden" name="user_q" value="{{ user_q }}">
+                    <input type="hidden" name="user_sort" value="{{ user_sort }}">
+                    <input type="hidden" name="review_status" value="{{ review_status }}">
+                    <input type="hidden" name="review_q" value="{{ review_q }}">
+                    <input type="hidden" name="review_sort" value="{{ review_sort }}">
+                </form>
+            </section>
+
+            <section class="admin-card">
+                <form method="post" action="{{ url_for('update_user_records') }}">
+                    <div class="admin-card__heading admin-card__heading--with-action">
+                        <div class="admin-card__title-row">
+                            <div class="admin-section-icon">👤</div>
+
+                            <div>
+                                <h2>User Management</h2>
+                                <p>
+                                    Search users, filter account status, and update roles or account status.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="admin-save-button">
+                            Save changes
+                        </button>
+                    </div>
+
+                    <div class="admin-filter-bar">
+                        <div class="admin-filter-field">
+                            <label for="userQ">Search</label>
+                            <input type="search" id="userQ" name="user_q" value="{{ user_q }}"
+                                placeholder="User, email, role" form="userFilterForm">
+                        </div>
+
+                        <div class="admin-filter-field">
+                            <label for="userStatus">Status</label>
+                            <select id="userStatus" name="user_status" form="userFilterForm">
+                                <option value="">All statuses</option>
+                                <option value="active" {% if user_status=="active" %}selected{% endif %}>
+                                    Active
+                                </option>
+                                <option value="suspended" {% if user_status=="suspended" %}selected{% endif %}>
+                                    Suspended
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="admin-filter-field">
+                            <label for="userSort">Sort</label>
+                            <select id="userSort" name="user_sort" form="userFilterForm">
+                                <option value="recent" {% if user_sort=="recent" %}selected{% endif %}>
+                                    Newest first
+                                </option>
+                                <option value="oldest" {% if user_sort=="oldest" %}selected{% endif %}>
+                                    Oldest first
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="admin-filter-button" form="userFilterForm">
+                            Apply
+                        </button>
+                    </div>
+
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Account Status</th>
+                                    <th>Owned Restaurants</th>
+                                    <th>Reviews</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <strong class="admin-primary-text">{{ user.username }}</strong>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <select name="user_role_{{ user.id }}" class="admin-table-select">
+                                            <option value="customer" {% if user.role=="customer" %}selected{% endif %}>
+                                                Customer
+                                            </option>
+                                            <option value="owner" {% if user.role=="owner" %}selected{% endif %}>
+                                                Owner
+                                            </option>
+                                            <option value="admin" {% if user.role=="admin" %}selected{% endif %}>
+                                                Admin
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="user_status_{{ user.id }}"
+                                            class="admin-status-select admin-status-select--{{ user.status }}"
+                                            data-status-select>
+                                            <option value="active" {% if user.status=="active" %}selected{% endif %}>
+                                                Active
+                                            </option>
+                                            <option value="suspended" {% if user.status=="suspended" %}selected{% endif
+                                                %}>
+                                                Suspended
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>{{ user.owned_restaurants|length }}</td>
+                                    <td>{{ user.reviews|length }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="admin-empty-cell">No user records found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+                <form id="userFilterForm" method="get" action="{{ url_for('admin_dashboard') }}">
+                    <input type="hidden" name="restaurant_status" value="{{ restaurant_status }}">
+                    <input type="hidden" name="restaurant_q" value="{{ restaurant_q }}">
+                    <input type="hidden" name="restaurant_sort" value="{{ restaurant_sort }}">
+                    <input type="hidden" name="review_status" value="{{ review_status }}">
+                    <input type="hidden" name="review_q" value="{{ review_q }}">
+                    <input type="hidden" name="review_sort" value="{{ review_sort }}">
+                </form>
+            </section>
+
+            <section class="admin-card">
+                <form method="post" action="{{ url_for('update_review_records') }}">
+                    <div class="admin-card__heading admin-card__heading--with-action">
+                        <div class="admin-card__title-row">
+                            <div class="admin-section-icon">🛡</div>
+
+                            <div>
+                                <h2>Review Management</h2>
+                                <p>
+                                    Search reviews, update moderation status, or delete inappropriate content.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="admin-save-button">
+                            Save changes
+                        </button>
+                    </div>
+
+                    <div class="admin-filter-bar">
+                        <div class="admin-filter-field">
+                            <label for="reviewQ">Search</label>
+                            <input type="search" id="reviewQ" name="review_q" value="{{ review_q }}"
+                                placeholder="Restaurant, reviewer, review text" form="reviewFilterForm">
+                        </div>
+
+                        <div class="admin-filter-field">
+                            <label for="reviewStatus">Status</label>
+                            <select id="reviewStatus" name="review_status" form="reviewFilterForm">
+                                <option value="">All statuses</option>
+                                <option value="active" {% if review_status=="active" %}selected{% endif %}>
+                                    Active
+                                </option>
+                                <option value="reported" {% if review_status=="reported" %}selected{% endif %}>
+                                    Reported
+                                </option>
+                                <option value="hidden" {% if review_status=="hidden" %}selected{% endif %}>
+                                    Hidden
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="admin-filter-field">
+                            <label for="reviewSort">Sort</label>
+                            <select id="reviewSort" name="review_sort" form="reviewFilterForm">
+                                <option value="recent" {% if review_sort=="recent" %}selected{% endif %}>
+                                    Newest first
+                                </option>
+                                <option value="oldest" {% if review_sort=="oldest" %}selected{% endif %}>
+                                    Oldest first
+                                </option>
+                                <option value="highest_rating" {% if review_sort=="highest_rating" %}selected{% endif
+                                    %}>
+                                    Highest Rating
+                                </option>
+                                <option value="lowest_rating" {% if review_sort=="lowest_rating" %}selected{% endif %}>
+                                    Lowest Rating
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="admin-filter-button" form="reviewFilterForm">
+                            Apply
+                        </button>
+                    </div>
+
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Restaurant</th>
+                                    <th>Reviewer</th>
+                                    <th>Rating</th>
+                                    <th>Review</th>
+                                    <th>Status</th>
+                                    <th>Submitted</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for review in reviews %}
+                                <tr class="admin-clickable-row"
+                                    data-row-url="{{ url_for('restaurant_detail', restaurant_id=review.restaurant_id) }}">
+                                    <td>
+                                        <strong class="admin-primary-text">{{ review.restaurant.name }}</strong>
+                                    </td>
+                                    <td>{{ review.user.username }}</td>
+                                    <td>
+                                        <span class="admin-rating">{{ review.rating }}/5 ★</span>
+                                    </td>
+                                    <td class="admin-review-content">{{ review.content }}</td>
+                                    <td>
+                                        <select name="review_status_{{ review.id }}"
+                                            class="admin-status-select admin-status-select--{{ review.status }}"
+                                            data-status-select onclick="event.stopPropagation()">
+                                            <option value="active" {% if review.status=="active" %}selected{% endif %}>
+                                                Active
+                                            </option>
+                                            <option value="reported" {% if review.status=="reported" %}selected{% endif
+                                                %}>
+                                                Reported
+                                            </option>
+                                            <option value="hidden" {% if review.status=="hidden" %}selected{% endif %}>
+                                                Hidden
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>{{ review.created_at.strftime("%d %b %Y") }}</td>
+                                    <td>
+                                        <button type="submit" class="admin-delete-button"
+                                            form="deleteReviewForm{{ review.id }}"
+                                            onclick="event.stopPropagation(); return confirm('Delete this review? This action cannot be undone.');">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="admin-empty-cell">No review records found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+                {% for review in reviews %}
+                <form id="deleteReviewForm{{ review.id }}" method="post"
+                    action="{{ url_for('delete_review_record', review_id=review.id) }}"></form>
+                {% endfor %}
+
+                <form id="reviewFilterForm" method="get" action="{{ url_for('admin_dashboard') }}">
+                    <input type="hidden" name="restaurant_status" value="{{ restaurant_status }}">
+                    <input type="hidden" name="restaurant_q" value="{{ restaurant_q }}">
+                    <input type="hidden" name="restaurant_sort" value="{{ restaurant_sort }}">
+                    <input type="hidden" name="user_status" value="{{ user_status }}">
+                    <input type="hidden" name="user_q" value="{{ user_q }}">
+                    <input type="hidden" name="user_sort" value="{{ user_sort }}">
+                </form>
             </section>
 
         </div>
     </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
 {% endblock %}

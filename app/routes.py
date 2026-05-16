@@ -404,7 +404,7 @@ def search():
     sort = request.args.get("sort", "rating").strip()
     active_location = filter_location or location
 
-    query = Restaurant.query
+    query = Restaurant.query.filter(Restaurant.status == "approved")
 
     if keyword:
         search_text = f"%{keyword}%"
@@ -569,10 +569,14 @@ def restaurant_detail(restaurant_id):
     menu_items = MenuItem.query.filter_by(restaurant_id=restaurant.id).all()
 
     reviews = (
-        Review.query.filter_by(restaurant_id=restaurant.id)
+        Review.query.filter(
+            Review.restaurant_id == restaurant.id,
+            Review.status != "hidden",
+        )
         .order_by(Review.created_at.desc())
         .all()
     )
+
     current_user = None
 
     if session.get("user_id"):
@@ -607,94 +611,300 @@ def restaurant_menu(restaurant_id):
     return render_template("restaurant_menu.html", restaurant=restaurant)
 
 
+def get_admin_user_or_redirect():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        flash("Please log in to access the admin dashboard.", "info")
+        return None, redirect(url_for("login"))
+
+    current_user = User.query.get_or_404(user_id)
+
+    if current_user.role != "admin":
+        flash("You do not have permission to access the admin dashboard.", "danger")
+        return None, redirect(url_for("home"))
+
+    return current_user, None
+
+
+def redirect_back_to_admin():
+    return redirect(request.referrer or url_for("admin_dashboard"))
+
+
 @app.route("/admin")
 def admin_dashboard():
-    admin_stats = [
-        {"label": "Total Users", "value": "1,248"},
-        {"label": "Total Restaurants", "value": "86"},
-        {"label": "Pending Approval", "value": "7"},
-        {"label": "Reported Listings", "value": "3"},
-    ]
+    current_user, response = get_admin_user_or_redirect()
 
-    restaurants = [
+    if response:
+        return response
+
+    restaurant_status = request.args.get("restaurant_status", "").strip()
+    restaurant_q = request.args.get("restaurant_q", "").strip()
+    restaurant_sort = request.args.get("restaurant_sort", "recent").strip()
+
+    user_status = request.args.get("user_status", "").strip()
+    user_q = request.args.get("user_q", "").strip()
+    user_sort = request.args.get("user_sort", "recent").strip()
+
+    review_status = request.args.get("review_status", "").strip()
+    review_q = request.args.get("review_q", "").strip()
+    review_sort = request.args.get("review_sort", "recent").strip()
+
+    overview_cards = [
+        {"label": "Total Users", "value": User.query.count()},
+        {"label": "Total Restaurants", "value": Restaurant.query.count()},
         {
-            "name": "Laneway Pizza Co.",
-            "category": "Italian",
-            "owner": "Mia Chen",
-            "status": "Approved",
-            "status_class": "admin-status--approved",
-            "rating": "4.7",
-            "action": "View",
+            "label": "Pending Restaurants",
+            "value": Restaurant.query.filter_by(status="pending").count(),
         },
         {
-            "name": "Ocean View Cafe",
-            "category": "Modern Australian",
-            "owner": "David Lee",
-            "status": "Pending",
-            "status_class": "admin-status--pending",
-            "rating": "4.3",
-            "action": "Review",
-        },
-        {
-            "name": "Green Garden Bistro",
-            "category": "Vegetarian",
-            "owner": "Sarah Green",
-            "status": "Reported",
-            "status_class": "admin-status--reported",
-            "rating": "3.9",
-            "action": "Check",
+            "label": "Suspended Users",
+            "value": User.query.filter_by(status="suspended").count(),
         },
     ]
 
-    users = [
-        {
-            "name": "Alex Wong",
-            "email": "alex@example.com",
-            "role": "Customer",
-            "status": "Active",
-            "status_class": "admin-status--approved",
-            "action": "View",
-        },
-        {
-            "name": "Mia Chen",
-            "email": "mia@example.com",
-            "role": "Owner",
-            "status": "Active",
-            "status_class": "admin-status--approved",
-            "action": "View",
-        },
-        {
-            "name": "Jordan Smith",
-            "email": "jordan@example.com",
-            "role": "Customer",
-            "status": "Under Review",
-            "status_class": "admin-status--pending",
-            "action": "Check",
-        },
-    ]
+    restaurant_query = Restaurant.query.outerjoin(User, Restaurant.owner_id == User.id)
 
-    admin_tasks = [
-        {
-            "title": "Approve restaurants",
-            "description": "Review new restaurant submissions and approve listings that meet the platform requirements.",
-        },
-        {
-            "title": "Manage reports",
-            "description": "Check reported restaurants, reviews, or users and decide whether action is needed.",
-        },
-        {
-            "title": "Monitor users",
-            "description": "View user roles, account status, and activity before connecting full admin controls.",
-        },
-    ]
+    if restaurant_status:
+        restaurant_query = restaurant_query.filter(
+            Restaurant.status == restaurant_status
+        )
+
+    if restaurant_q:
+        search_text = f"%{restaurant_q}%"
+        restaurant_query = restaurant_query.filter(
+            db.or_(
+                Restaurant.name.ilike(search_text),
+                Restaurant.category.ilike(search_text),
+                Restaurant.suburb.ilike(search_text),
+                Restaurant.address.ilike(search_text),
+                User.username.ilike(search_text),
+                User.email.ilike(search_text),
+            )
+        )
+
+    if restaurant_sort == "oldest":
+        restaurant_query = restaurant_query.order_by(Restaurant.created_at.asc())
+    else:
+        restaurant_query = restaurant_query.order_by(Restaurant.created_at.desc())
+
+    restaurants = restaurant_query.limit(5).all()
+
+    user_query = User.query
+
+    if user_status:
+        user_query = user_query.filter(User.status == user_status)
+
+    if user_q:
+        search_text = f"%{user_q}%"
+        user_query = user_query.filter(
+            db.or_(
+                User.username.ilike(search_text),
+                User.email.ilike(search_text),
+                User.role.ilike(search_text),
+            )
+        )
+
+    if user_sort == "oldest":
+        user_query = user_query.order_by(User.created_at.asc())
+    else:
+        user_query = user_query.order_by(User.created_at.desc())
+
+    users = user_query.limit(5).all()
+
+    review_query = Review.query.join(
+        Restaurant, Review.restaurant_id == Restaurant.id
+    ).join(User, Review.user_id == User.id)
+
+    if review_status:
+        review_query = review_query.filter(Review.status == review_status)
+
+    if review_q:
+        search_text = f"%{review_q}%"
+        review_query = review_query.filter(
+            db.or_(
+                Review.content.ilike(search_text),
+                Restaurant.name.ilike(search_text),
+                User.username.ilike(search_text),
+                User.email.ilike(search_text),
+            )
+        )
+
+    if review_sort == "oldest":
+        review_query = review_query.order_by(Review.created_at.asc())
+    elif review_sort == "highest_rating":
+        review_query = review_query.order_by(
+            Review.rating.desc(), Review.created_at.desc()
+        )
+    elif review_sort == "lowest_rating":
+        review_query = review_query.order_by(
+            Review.rating.asc(), Review.created_at.desc()
+        )
+    else:
+        review_query = review_query.order_by(Review.created_at.desc())
+
+    reviews = review_query.limit(5).all()
 
     return render_template(
         "admin_dashboard.html",
-        admin_stats=admin_stats,
+        overview_cards=overview_cards,
         restaurants=restaurants,
         users=users,
-        admin_tasks=admin_tasks,
+        reviews=reviews,
+        restaurant_status=restaurant_status,
+        restaurant_q=restaurant_q,
+        restaurant_sort=restaurant_sort,
+        user_status=user_status,
+        user_q=user_q,
+        user_sort=user_sort,
+        review_status=review_status,
+        review_q=review_q,
+        review_sort=review_sort,
     )
+
+
+@app.route("/admin/restaurants/update", methods=["POST"])
+def update_restaurant_records():
+    current_user, response = get_admin_user_or_redirect()
+
+    if response:
+        return response
+
+    allowed_statuses = ["approved", "pending", "reported"]
+
+    for key, value in request.form.items():
+        if not key.startswith("restaurant_status_"):
+            continue
+
+        restaurant_id = key.replace("restaurant_status_", "")
+
+        if not restaurant_id.isdigit():
+            continue
+
+        if value not in allowed_statuses:
+            continue
+
+        restaurant = Restaurant.query.get(int(restaurant_id))
+
+        if restaurant:
+            restaurant.status = value
+            restaurant.updated_at = datetime.utcnow()
+
+    db.session.commit()
+    flash("Restaurant records updated.", "success")
+
+    return redirect_back_to_admin()
+
+
+@app.route("/admin/users/update", methods=["POST"])
+def update_user_records():
+    current_user, response = get_admin_user_or_redirect()
+
+    if response:
+        return response
+
+    allowed_roles = ["customer", "owner", "admin"]
+    allowed_statuses = ["active", "suspended"]
+
+    user_ids = set()
+
+    for key in request.form:
+        if key.startswith("user_role_"):
+            user_ids.add(key.replace("user_role_", ""))
+        elif key.startswith("user_status_"):
+            user_ids.add(key.replace("user_status_", ""))
+
+    for user_id in user_ids:
+        if not user_id.isdigit():
+            continue
+
+        user = User.query.get(int(user_id))
+
+        if not user:
+            continue
+
+        role = request.form.get(f"user_role_{user.id}")
+        status = request.form.get(f"user_status_{user.id}")
+
+        if role in allowed_roles:
+            user.role = role
+
+        if status in allowed_statuses:
+            if user.id == current_user.id and status == "suspended":
+                flash("You cannot suspend your own admin account.", "danger")
+                continue
+
+            user.status = status
+
+        user.updated_at = datetime.utcnow()
+
+    db.session.commit()
+    flash("User records updated.", "success")
+
+    return redirect_back_to_admin()
+
+
+@app.route("/admin/reviews/update", methods=["POST"])
+def update_review_records():
+    current_user, response = get_admin_user_or_redirect()
+
+    if response:
+        return response
+
+    allowed_statuses = ["active", "reported", "hidden"]
+
+    for key, value in request.form.items():
+        if not key.startswith("review_status_"):
+            continue
+
+        review_id = key.replace("review_status_", "")
+
+        if not review_id.isdigit():
+            continue
+
+        if value not in allowed_statuses:
+            continue
+
+        review = Review.query.get(int(review_id))
+
+        if review:
+            review.status = value
+            review.updated_at = datetime.utcnow()
+
+    db.session.commit()
+    flash("Review records updated.", "success")
+
+    return redirect_back_to_admin()
+
+
+@app.route("/admin/reviews/<int:review_id>/delete", methods=["POST"])
+def delete_review_record(review_id):
+    current_user, response = get_admin_user_or_redirect()
+
+    if response:
+        return response
+
+    review = Review.query.get_or_404(review_id)
+    restaurant = review.restaurant
+
+    db.session.delete(review)
+    db.session.commit()
+
+    remaining_reviews = Review.query.filter_by(restaurant_id=restaurant.id).all()
+    total_reviews = len(remaining_reviews)
+
+    restaurant.review_count = total_reviews
+    restaurant.average_rating = (
+        round(sum(item.rating for item in remaining_reviews) / total_reviews, 1)
+        if total_reviews
+        else 0.0
+    )
+    restaurant.updated_at = datetime.utcnow()
+
+    db.session.commit()
+
+    flash("Review deleted successfully.", "success")
+    return redirect_back_to_admin()
 
 
 @app.route("/owner")
