@@ -74,7 +74,8 @@
             <div class="collections-grid">
                 {% for collection in bookmark_collections %}
                 <article class="collection-card" data-collection-card data-collection-id="{{ collection.id }}">
-                    <button class="collection-card__main" type="button" aria-label="Open {{ collection.name }}">
+                    <button class="collection-card__main" type="button" data-open-collection="{{ collection.id }}"
+                        aria-label="Open {{ collection.name }}">
                         <div class="collection-card__media">
                             <img class="collection-card__image" src="{{ collection.cover_image }}"
                                 alt="{{ collection.name }} cover image">
@@ -94,6 +95,51 @@
             </div>
         </section>
     </section>
+
+    {% for collection in bookmark_collections %}
+    <div class="bookmark-modal" id="collectionModal-{{ collection.id }}" data-collection-modal aria-hidden="true">
+        <div class="bookmark-modal__overlay" data-close-modal></div>
+        <section class="bookmark-modal__panel" role="dialog" aria-modal="true"
+            aria-labelledby="collectionTitle-{{ collection.id }}">
+            <button class="bookmark-modal__close" type="button" data-close-modal aria-label="Close collection">
+                ×
+            </button>
+
+            <div class="collection-modal-header">
+                <div>
+                    <p class="collection-modal-header__meta mb-2">
+                        {{ collection.visibility }} · {{ collection.restaurant_count }} places
+                    </p>
+                    <h2 class="h4 fw-bold mb-2" id="collectionTitle-{{ collection.id }}">
+                        {{ collection.name }}
+                    </h2>
+                    <p class="text-secondary mb-0">{{ collection.description }}</p>
+                </div>
+                <span class="collection-modal-header__code">
+                    {{ collection.share_code }}
+                </span>
+            </div>
+
+            <div class="collection-restaurant-grid">
+                {% for restaurant in collection.restaurants %}
+                <article class="collection-restaurant-card">
+                    <img class="collection-restaurant-card__image" src="{{ restaurant.image }}"
+                        alt="{{ restaurant.name }}">
+                    <div class="collection-restaurant-card__body">
+                        <span class="collection-restaurant-card__category">{{ restaurant.category }}</span>
+                        <h3>{{ restaurant.name }}</h3>
+                        <p>{{ restaurant.location }} · {{ restaurant.price }}</p>
+                        <p class="collection-restaurant-card__rating">
+                            {{ restaurant.star_text }}
+                            <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>
+                        </p>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+    {% endfor %}
 </main>
 {% endblock %}
 

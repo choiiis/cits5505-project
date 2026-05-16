@@ -208,6 +208,137 @@
   text-transform: uppercase;
 }
 
+.bookmark-modal {
+  display: none;
+  inset: 0;
+  padding: 1.5rem;
+  position: fixed;
+  z-index: 1050;
+}
+
+.bookmark-modal.is-open {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.bookmark-modal__overlay {
+  background: rgba(17, 24, 39, 0.55);
+  inset: 0;
+  position: absolute;
+}
+
+.bookmark-modal__panel {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1.25rem 3rem rgba(17, 24, 39, 0.24);
+  max-height: min(720px, 90vh);
+  max-width: 760px;
+  overflow: auto;
+  padding: 1.5rem;
+  position: relative;
+  width: min(100%, 760px);
+  z-index: 1;
+}
+
+.bookmark-modal__close {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  color: var(--brand-ink);
+  display: inline-flex;
+  font-size: 1.25rem;
+  height: 2.5rem;
+  justify-content: center;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  width: 2.5rem;
+}
+
+.collection-modal-header {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--brand-line);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0 3.25rem 1rem 0;
+}
+
+.collection-modal-header__meta {
+  color: var(--brand-green);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.collection-modal-header__code {
+  background: #f8fafc;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  color: #4d5b68;
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.45rem 0.65rem;
+}
+
+.collection-restaurant-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.collection-restaurant-card {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 105px minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.collection-restaurant-card__image {
+  height: 100%;
+  min-height: 130px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.collection-restaurant-card__body {
+  padding: 0.85rem;
+}
+
+.collection-restaurant-card__category {
+  color: var(--brand-green);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.collection-restaurant-card h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  margin: 0.25rem 0;
+}
+
+.collection-restaurant-card p {
+  color: #5f6c7b;
+  font-size: 0.86rem;
+  margin-bottom: 0.35rem;
+}
+
+.collection-restaurant-card__rating {
+  color: var(--brand-coral) !important;
+  font-weight: 700;
+}
+
+.collection-restaurant-card__rating span {
+  color: #4d5b68;
+  font-weight: 400;
+}
+
 @media (max-width: 767.98px) {
   .bookmarks-page {
     padding-bottom: 2rem;
@@ -231,6 +362,23 @@
   }
 
   .collections-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bookmark-modal {
+    padding: 0.75rem;
+  }
+
+  .bookmark-modal__panel {
+    padding: 1rem;
+  }
+
+  .collection-modal-header {
+    flex-direction: column;
+    padding-right: 3rem;
+  }
+
+  .collection-restaurant-grid {
     grid-template-columns: 1fr;
   }
 }

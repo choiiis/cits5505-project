@@ -26,5 +26,48 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    function openModal(modal) {
+        if (!modal) {
+            return;
+        }
+
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+    }
+
+    function closeModal(modal) {
+        if (!modal) {
+            return;
+        }
+
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+    }
+
+    document.querySelectorAll("[data-open-collection]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const collectionId = button.dataset.openCollection;
+            const modal = document.getElementById(`collectionModal-${collectionId}`);
+
+            openModal(modal);
+        });
+    });
+
+    document.querySelectorAll("[data-close-modal]").forEach((button) => {
+        button.addEventListener("click", () => {
+            closeModal(button.closest("[data-collection-modal]"));
+        });
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") {
+            return;
+        }
+
+        document.querySelectorAll("[data-collection-modal].is-open").forEach(closeModal);
+    });
+
     updateEmptyState();
 });
