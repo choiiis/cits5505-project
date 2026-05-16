@@ -96,47 +96,6 @@
             </div>
         </div>
     </section>
-
-    <section class="security-section py-5" aria-labelledby="securityTitle">
-        <div class="container">
-            <div class="security-panel">
-                <div class="security-panel__intro">
-                    <span class="security-panel__eyebrow">Security</span>
-                    <h2 class="h3 fw-bold mb-2" id="securityTitle">Account and form protection</h2>
-                    <p class="text-secondary mb-0">
-                        TableTrail uses standard Flask security practices to protect user accounts and form submissions.
-                    </p>
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <article class="security-item">
-                            <h3 class="security-item__title">Salted password hashes</h3>
-                            <p class="security-item__copy">
-                                Passwords are stored as Werkzeug-generated salted hashes instead of plain text.
-                            </p>
-                        </article>
-                    </div>
-                    <div class="col-md-4">
-                        <article class="security-item">
-                            <h3 class="security-item__title">CSRF form tokens</h3>
-                            <p class="security-item__copy">
-                                POST forms include server-validated CSRF tokens to prevent forged form submissions.
-                            </p>
-                        </article>
-                    </div>
-                    <div class="col-md-4">
-                        <article class="security-item">
-                            <h3 class="security-item__title">Environment config</h3>
-                            <p class="security-item__copy">
-                                Secrets and database URLs are read from environment variables instead of hard-coded values.
-                            </p>
-                        </article>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 </main>
 {% endblock %}
 
