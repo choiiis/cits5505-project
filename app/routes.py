@@ -175,6 +175,20 @@ def build_review_summary(reviews):
         "distribution": distribution,
     }
 
+def refresh_restaurant_rating_summary(restaurant):
+    visible_reviews = Review.query.filter(
+        Review.restaurant_id == restaurant.id,
+        Review.status != "hidden",
+    ).all()
+
+    review_count = len(visible_reviews)
+    restaurant.review_count = review_count
+    restaurant.average_rating = (
+        round(sum(review.rating for review in visible_reviews) / review_count, 1)
+        if review_count
+        else 0.0
+    )
+    restaurant.updated_at = datetime.utcnow()
 
 def make_initials(username):
     parts = username.split()
