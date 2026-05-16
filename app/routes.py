@@ -1075,3 +1075,47 @@ def owner_dashboard():
         reviews=reviews,
         review_summary=review_summary,
     )
+
+@app.route("/owner/restaurant/update", methods=["POST"])
+def update_owner_restaurant():
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant = get_owner_restaurant(current_user.id)
+
+    if not restaurant:
+        flash("No restaurant record is linked to this owner account.", "warning")
+        return redirect(url_for("owner_dashboard"))
+
+    name = request.form.get("name", "").strip()
+    category = request.form.get("category", "").strip()
+    address = request.form.get("address", "").strip()
+    phone = request.form.get("phone", "").strip()
+    website = request.form.get("website", "").strip()
+    description = request.form.get("description", "").strip()
+
+    if not name or not category or not address:
+        flash("Restaurant name, category, and address are required.", "danger")
+        return redirect_back_to_owner()
+
+    restaurant.name = name
+    restaurant.category = category
+    restaurant.address = address
+
+    if hasattr(restaurant, "phone"):
+        restaurant.phone = phone
+
+    if hasattr(restaurant, "website"):
+        restaurant.website = website
+
+    if hasattr(restaurant, "description"):
+        restaurant.description = description
+
+    restaurant.updated_at = datetime.utcnow()
+
+    db.session.commit()
+
+    flash("Restaurant information updated successfully.", "success")
+    return redirect(url_for("owner_dashboard"))
