@@ -599,10 +599,55 @@ def bookmarks():
     )
 
 
-@app.route("/restaurants/<int:restaurant_id>")
+@app.route("/restaurants/<int:restaurant_id>", methods=["GET", "POST"])
 def restaurant_detail(restaurant_id):
     # restaurant summary
     restaurant = Restaurant.query.get_or_404(restaurant_id)
+
+    if request.method == "POST":
+        user_id = session.get("user_id")
+
+        if not user_id:
+            flash("Please log in to write a review.", "info")
+            return redirect(url_for("login"))
+
+        rating_text = request.form.get("rating", "").strip()
+        review_text = request.form.get("review_text", "").strip()
+
+        try:
+            rating = int(rating_text)
+        except ValueError:
+            rating = 0
+
+        if rating < 1 or rating > 5 or not review_text:
+            flash("Please choose a rating and write your review.", "danger")
+            return redirect(url_for("restaurant_detail", restaurant_id=restaurant.id))
+
+        review = Review(
+            restaurant_id=restaurant.id,
+            user_id=user_id,
+            rating=rating,
+            content=review_text,
+        )
+
+        db.session.add(review)
+        db.session.flush()
+
+        visible_reviews = Review.query.filter(
+            Review.restaurant_id == restaurant.id,
+            Review.status != "hidden",
+        ).all()
+
+        restaurant.review_count = len(visible_reviews)
+        restaurant.average_rating = round(
+            sum(item.rating for item in visible_reviews) / restaurant.review_count,
+            1,
+        )
+        restaurant.updated_at = datetime.utcnow()
+
+        db.session.commit()
+        flash("Review submitted successfully.", "success")
+        return redirect(url_for("restaurant_detail", restaurant_id=restaurant.id))
 
     # restaurant opening hours
     opening_hours = (
