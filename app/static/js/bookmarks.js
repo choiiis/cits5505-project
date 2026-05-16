@@ -17,6 +17,22 @@ document.addEventListener("DOMContentLoaded", () => {
         emptyState.classList.toggle("d-none", visibleCards.length > 0);
     }
 
+    function applyBookmarkSearch() {
+        const searchInput = document.querySelector("[data-bookmark-search]");
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+        document.querySelectorAll("[data-bookmark-card], [data-collection-card]").forEach((card) => {
+            const searchText = (card.dataset.searchText || card.textContent).toLowerCase();
+            const matches = !query || searchText.includes(query);
+
+            card.classList.toggle("d-none", !matches);
+        });
+
+        updateEmptyState();
+    }
+
+    document.querySelector("[data-bookmark-search]")?.addEventListener("input", applyBookmarkSearch);
+
     document.querySelectorAll("[data-remove-bookmark]").forEach((button) => {
         button.addEventListener("click", () => {
             const card = button.closest("[data-bookmark-card]");
@@ -154,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     card.querySelector("[data-collection-visibility-label]"),
                     visibilityInput.value
                 );
+                card.dataset.searchText = `${nextName} ${visibilityInput.value} ${card.textContent}`;
             }
 
             modal.querySelector("h2").textContent = nextName || modal.querySelector("h2").textContent;
@@ -162,6 +179,8 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 button.textContent = "Save settings";
             }, 1400);
+
+            applyBookmarkSearch();
         });
     });
 
@@ -186,6 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
         card.className = "collection-card";
         card.dataset.collectionCard = "";
         card.dataset.collectionId = collectionId;
+        card.dataset.searchText = `${name} ${visibility} new collection`;
         card.innerHTML = `
             <button class="collection-card__settings" type="button" aria-label="Open ${safeName} settings">
                 ⚙
@@ -211,6 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
         nameInput.value = "";
         visibilityInput.value = "Public";
         closeModal(modal);
+        applyBookmarkSearch();
     });
 
     document.querySelectorAll("[data-open-share-import]").forEach((button) => {
@@ -272,4 +293,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     updateEmptyState();
+    applyBookmarkSearch();
 });

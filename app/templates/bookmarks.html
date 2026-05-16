@@ -21,10 +21,20 @@
             </a>
         </div>
 
+        <section class="bookmark-search-panel mb-4" aria-label="Search saved restaurants and collections">
+            <label class="visually-hidden" for="bookmarkSearchInput">Search saved restaurants and collections</label>
+            <div class="bookmark-search-panel__field">
+                <span aria-hidden="true">⌕</span>
+                <input class="form-control form-control-lg" id="bookmarkSearchInput" type="search"
+                    placeholder="Search saved restaurants or collections" data-bookmark-search>
+            </div>
+        </section>
+
         <section class="bookmark-stage-shell" aria-label="Saved restaurants section">
             <div class="row g-3" id="bookmarkMount">
                 {% for restaurant in saved_restaurants %}
-                <div class="col-md-6 col-xl-4" data-bookmark-card>
+                <div class="col-md-6 col-xl-4" data-bookmark-card
+                    data-search-text="{{ restaurant.name }} {{ restaurant.category }} {{ restaurant.location }} {{ restaurant.price }} {{ restaurant.description }}">
                     <article class="bookmark-card">
                         <img src="{{ restaurant.image }}" class="bookmark-card__image" alt="{{ restaurant.name }}">
                         <div class="bookmark-card__body">
@@ -78,7 +88,8 @@
 
             <div class="collections-grid" data-collections-grid>
                 {% for collection in bookmark_collections %}
-                <article class="collection-card" data-collection-card data-collection-id="{{ collection.id }}">
+                <article class="collection-card" data-collection-card data-collection-id="{{ collection.id }}"
+                    data-search-text="{{ collection.name }} {{ collection.visibility }} {{ collection.share_code }} {{ collection.description }}">
                     <button class="collection-card__settings" type="button"
                         data-open-collection-settings="{{ collection.id }}"
                         aria-label="Open {{ collection.name }} settings">
