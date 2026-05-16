@@ -913,6 +913,25 @@ def edit_restaurant_record(restaurant_id):
     flash("Restaurant record updated successfully.", "success")
     return redirect_back_to_admin()
 
+@app.route("/admin/restaurants/<int:restaurant_id>/delete", methods=["POST"])
+def delete_restaurant_record(restaurant_id):
+    current_user, response = get_admin_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+
+    Review.query.filter_by(restaurant_id=restaurant.id).delete()
+    MenuItem.query.filter_by(restaurant_id=restaurant.id).delete()
+    OpeningHour.query.filter_by(restaurant_id=restaurant.id).delete()
+
+    db.session.delete(restaurant)
+    db.session.commit()
+
+    flash("Restaurant record deleted successfully.", "success")
+    return redirect_back_to_admin()
+
 @app.route("/admin/restaurants/update", methods=["POST"])
 def update_restaurant_records():
     current_user, response = get_admin_user_or_redirect()
