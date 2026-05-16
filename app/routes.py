@@ -477,6 +477,35 @@ def profile():
         reviews=reviews,
     )
 
+@app.route("/profile/reviews/<int:review_id>/edit", methods=["POST"])
+def edit_profile_review(review_id):
+    review, response = get_profile_review_or_redirect(review_id)
+
+    if response:
+        return response
+
+    rating_text = request.form.get("rating", "").strip()
+    content = request.form.get("content", "").strip()
+
+    try:
+        rating = int(rating_text)
+    except ValueError:
+        rating = 0
+
+    if rating < 1 or rating > 5 or not content:
+        flash("Please choose a rating and write your review.", "danger")
+        return redirect(url_for("profile"))
+
+    review.rating = rating
+    review.content = content
+    review.updated_at = datetime.utcnow()
+
+    refresh_restaurant_rating_summary(review.restaurant)
+
+    db.session.commit()
+
+    flash("Review updated successfully.", "success")
+    return redirect(url_for("profile"))
 
 @app.route("/search")
 def search():
