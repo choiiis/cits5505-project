@@ -175,6 +175,21 @@ def build_review_summary(reviews):
         "distribution": distribution,
     }
 
+def refresh_restaurant_rating_summary(restaurant):
+    visible_reviews = Review.query.filter(
+        Review.restaurant_id == restaurant.id,
+        Review.status != "hidden",
+    ).all()
+
+    total_reviews = len(visible_reviews)
+
+    restaurant.review_count = total_reviews
+    restaurant.average_rating = (
+        round(sum(review.rating for review in visible_reviews) / total_reviews, 1)
+        if total_reviews
+        else 0.0
+    )
+    restaurant.updated_at = datetime.utcnow()
 
 def make_initials(username):
     parts = username.split()
@@ -1033,16 +1048,7 @@ def delete_review_record(review_id):
     db.session.delete(review)
     db.session.commit()
 
-    remaining_reviews = Review.query.filter_by(restaurant_id=restaurant.id).all()
-    total_reviews = len(remaining_reviews)
-
-    restaurant.review_count = total_reviews
-    restaurant.average_rating = (
-        round(sum(item.rating for item in remaining_reviews) / total_reviews, 1)
-        if total_reviews
-        else 0.0
-    )
-    restaurant.updated_at = datetime.utcnow()
+    refresh_restaurant_rating_summary(restaurant)
 
     db.session.commit()
 
