@@ -9,13 +9,14 @@ from app.models import (
     BookmarkCollection,
     Bookmark,
 )
+from werkzeug.security import generate_password_hash
 
 import random
 from datetime import datetime, timedelta
 
 random.seed(42)
 
-DEFAULT_PASSWORD_HASH = "dev-password-hash"
+DEFAULT_PASSWORD_HASH = generate_password_hash("password")
 
 PROFILE_IMAGES = [
     "https://randomuser.me/api/portraits/women/44.jpg",
