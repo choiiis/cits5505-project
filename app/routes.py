@@ -608,10 +608,57 @@ def bookmarks():
         },
     ]
 
+    public_collections = sorted(
+        [
+            {
+                "id": "public-perth-brunch",
+                "name": "Perth brunch trail",
+                "creator": "Mia Chen",
+                "subscriber_count": 128,
+                "cover_image": saved_restaurants[2]["image"],
+                "restaurant_count": 3,
+                "description": "Popular cafe and brunch picks around Perth and Northbridge.",
+                "restaurants": [
+                    collection_restaurants[2],
+                    collection_restaurants[0],
+                ],
+            },
+            {
+                "id": "public-weeknight-dinners",
+                "name": "Weeknight dinner spots",
+                "creator": "Alex Wong",
+                "subscriber_count": 94,
+                "cover_image": saved_restaurants[1]["image"],
+                "restaurant_count": 4,
+                "description": "Reliable dinner places for casual evenings with friends.",
+                "restaurants": [
+                    collection_restaurants[1],
+                    collection_restaurants[0],
+                ],
+            },
+            {
+                "id": "public-healthy-lunch",
+                "name": "Healthy lunch list",
+                "creator": "Jordan Smith",
+                "subscriber_count": 67,
+                "cover_image": saved_restaurants[0]["image"],
+                "restaurant_count": 3,
+                "description": "Fresh bowls, cafes, and lighter lunch options.",
+                "restaurants": [
+                    collection_restaurants[0],
+                    collection_restaurants[2],
+                ],
+            },
+        ],
+        key=lambda collection: collection["subscriber_count"],
+        reverse=True,
+    )
+
     return render_template(
         "bookmarks.html",
         saved_restaurants=saved_restaurants,
         bookmark_collections=bookmark_collections,
+        public_collections=public_collections,
     )
 
 

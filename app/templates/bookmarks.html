@@ -118,6 +118,45 @@
                 {% endfor %}
             </div>
         </section>
+
+        <section class="public-collections-section" aria-labelledby="publicCollectionsTitle">
+            <div class="collections-heading-row">
+                <div>
+                    <h2 class="h4 fw-bold mb-1" id="publicCollectionsTitle">Public Collections</h2>
+                    <p class="text-secondary mb-0">
+                        Discover public lists from other TableTrail users.
+                    </p>
+                </div>
+            </div>
+
+            <div class="public-collections-grid">
+                {% for collection in public_collections %}
+                <article class="public-collection-card">
+                    <button class="public-collection-card__main" type="button"
+                        data-open-public-collection="{{ collection.id }}"
+                        aria-label="Preview {{ collection.name }}">
+                        <img class="public-collection-card__image" src="{{ collection.cover_image }}"
+                            alt="{{ collection.name }} cover image">
+                        <div class="public-collection-card__body">
+                            <div class="public-collection-card__meta">
+                                <span>{{ collection.restaurant_count }} places</span>
+                                <span>{{ collection.subscriber_count }} subscribers</span>
+                            </div>
+                            <h3>{{ collection.name }}</h3>
+                            <p>{{ collection.description }}</p>
+                            <span class="public-collection-card__creator">
+                                by {{ collection.creator }}
+                            </span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-success public-collection-card__subscribe" type="button"
+                        data-subscribe-public-collection>
+                        Subscribe
+                    </button>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
     </section>
 
     {% for collection in bookmark_collections %}
@@ -173,6 +212,54 @@
                                 Remove
                             </button>
                         </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+    {% endfor %}
+
+    {% for collection in public_collections %}
+    <div class="bookmark-modal" id="publicCollectionModal-{{ collection.id }}" data-public-collection-modal
+        aria-hidden="true">
+        <div class="bookmark-modal__overlay" data-close-modal></div>
+        <section class="bookmark-modal__panel" role="dialog" aria-modal="true"
+            aria-labelledby="publicCollectionTitle-{{ collection.id }}">
+            <button class="bookmark-modal__close" type="button" data-close-modal aria-label="Close public collection">
+                ×
+            </button>
+
+            <div class="collection-modal-header">
+                <div>
+                    <p class="collection-modal-header__meta mb-2">
+                        {{ collection.restaurant_count }} places · {{ collection.subscriber_count }} subscribers
+                    </p>
+                    <h2 class="h4 fw-bold mb-2" id="publicCollectionTitle-{{ collection.id }}">
+                        {{ collection.name }}
+                    </h2>
+                    <p class="text-secondary mb-0">
+                        by {{ collection.creator }} · {{ collection.description }}
+                    </p>
+                </div>
+                <button class="btn btn-success" type="button" data-subscribe-public-collection>
+                    Subscribe
+                </button>
+            </div>
+
+            <div class="collection-restaurant-grid">
+                {% for restaurant in collection.restaurants %}
+                <article class="collection-restaurant-card" data-collection-restaurant>
+                    <img class="collection-restaurant-card__image" src="{{ restaurant.image }}"
+                        alt="{{ restaurant.name }}">
+                    <div class="collection-restaurant-card__body">
+                        <span class="collection-restaurant-card__category">{{ restaurant.category }}</span>
+                        <h3>{{ restaurant.name }}</h3>
+                        <p>{{ restaurant.location }} · {{ restaurant.price }}</p>
+                        <p class="collection-restaurant-card__rating">
+                            {{ restaurant.star_text }}
+                            <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>
+                        </p>
                     </div>
                 </article>
                 {% endfor %}
