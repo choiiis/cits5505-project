@@ -117,13 +117,13 @@
   flex-shrink: 0;
 }
 
-.collections-placeholder {
+.collections-grid {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.collection-summary {
+.collection-card {
   background: #ffffff;
   border: 1px solid var(--brand-line);
   border-radius: 8px;
@@ -131,35 +131,81 @@
   overflow: hidden;
 }
 
-.collection-summary__image {
+.collection-card__main {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.collection-card__main:focus-visible {
+  outline: 3px solid rgba(21, 128, 61, 0.25);
+  outline-offset: -3px;
+}
+
+.collection-card__media {
+  position: relative;
+}
+
+.collection-card__image {
   display: block;
-  height: 150px;
+  height: 170px;
   object-fit: cover;
   width: 100%;
 }
 
-.collection-summary__body {
+.collection-card__badges {
+  bottom: 0.8rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  left: 0.8rem;
+  position: absolute;
+  right: 0.8rem;
+}
+
+.collection-card__badges span {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  color: var(--brand-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+}
+
+.collection-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   padding: 1rem;
 }
 
-.collection-summary__meta {
-  color: #5f6c7b;
-  display: flex;
-  font-size: 0.82rem;
-  justify-content: space-between;
-  margin-bottom: 0.7rem;
-}
-
-.collection-summary h3 {
+.collection-card h3 {
   font-size: 1.05rem;
   font-weight: 700;
   margin-bottom: 0.45rem;
 }
 
-.collection-summary p {
+.collection-card p {
   color: #5f6c7b;
   font-size: 0.93rem;
-  margin-bottom: 0;
+  margin-bottom: 0.85rem;
+}
+
+.collection-card__code {
+  color: #6b7280;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-top: auto;
+  text-transform: uppercase;
 }
 
 @media (max-width: 767.98px) {
@@ -184,13 +230,13 @@
     flex-direction: column;
   }
 
-  .collections-placeholder {
+  .collections-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (min-width: 768px) and (max-width: 1199.98px) {
-  .collections-placeholder {
+  .collections-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
