@@ -917,7 +917,6 @@ def update_restaurant_records():
     if response:
         return response
 
-    allowed_statuses = ["approved", "pending", "reported"]
 
     for key, value in request.form.items():
         if not key.startswith("restaurant_status_"):
@@ -928,7 +927,7 @@ def update_restaurant_records():
         if not restaurant_id.isdigit():
             continue
 
-        if value not in allowed_statuses:
+        if not is_valid_admin_option(value, ADMIN_RESTAURANT_STATUSES):
             continue
 
         restaurant = Restaurant.query.get(int(restaurant_id))
