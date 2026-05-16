@@ -68,7 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            editForm.classList.toggle("d-none");
+        const isHidden = editForm.classList.toggle("d-none");
+        button.setAttribute("aria-expanded", String(!isHidden));
         });
     });
 
@@ -82,6 +83,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             editForm.classList.add("d-none");
+            const toggleButton = document.querySelector(`.js-review-edit-toggle[data-review-id="${reviewId}"]`);
+
+if (toggleButton) {
+    toggleButton.setAttribute("aria-expanded", "false");
+}
         });
     });
 

@@ -133,6 +133,7 @@
 
 <form
     class="review-edit-form d-none mt-3"
+    id="reviewEditForm{{ review.id }}"
     method="post"
     action="{{ url_for('edit_profile_review', review_id=review.id) }}"
     data-review-edit-form="{{ review.id }}">
@@ -160,11 +161,13 @@
     <div class="d-flex gap-2">
         <button class="btn btn-success btn-sm" type="submit">Save changes</button>
         <button
-            class="btn btn-outline-secondary btn-sm js-review-edit-cancel"
-            type="button"
-            data-review-id="{{ review.id }}">
-            Cancel
-        </button>
+    class="btn btn-outline-success btn-sm js-review-edit-toggle"
+    type="button"
+    data-review-id="{{ review.id }}"
+    aria-expanded="false"
+    aria-controls="reviewEditForm{{ review.id }}">
+    Edit
+</button>
     </div>
 </form>
                         </article>
