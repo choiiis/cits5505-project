@@ -892,6 +892,27 @@ def create_restaurant_record():
     flash("Restaurant record created successfully.", "success")
     return redirect_back_to_admin()
 
+@app.route("/admin/restaurants/<int:restaurant_id>/edit", methods=["POST"])
+def edit_restaurant_record(restaurant_id):
+    current_user, response = get_admin_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    form_data = get_admin_restaurant_form_data()
+
+    if not form_data["name"] or not form_data["category"] or not form_data["address"]:
+        flash("Restaurant name, category, and address are required.", "danger")
+        return redirect_back_to_admin()
+
+    apply_admin_restaurant_form_data(restaurant, form_data)
+
+    db.session.commit()
+
+    flash("Restaurant record updated successfully.", "success")
+    return redirect_back_to_admin()
+
 @app.route("/admin/restaurants/update", methods=["POST"])
 def update_restaurant_records():
     current_user, response = get_admin_user_or_redirect()
