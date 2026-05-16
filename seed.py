@@ -1115,6 +1115,7 @@ def create_bookmarks(customers, restaurants):
         collection for collection in collections if collection.is_public
     ]
     subscriptions = []
+    seen_subscription_pairs = set()
 
     for index in range(50):
         user = customers[index % len(customers)]
@@ -1122,6 +1123,13 @@ def create_bookmarks(customers, restaurants):
 
         if user.id == collection.user_id:
             collection = public_collections[(index + 1) % len(public_collections)]
+
+        pair = (collection.id, user.id)
+
+        if pair in seen_subscription_pairs:
+            continue
+
+        seen_subscription_pairs.add(pair)
 
         subscriptions.append(
             CollectionSubscription(

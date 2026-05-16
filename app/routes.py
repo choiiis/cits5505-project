@@ -9,7 +9,15 @@ from email.utils import formatdate, make_msgid
 from urllib.parse import quote_plus
 from uuid import uuid4
 
-from flask import current_app, flash, redirect, render_template, request, session, url_for
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from app import app, db
 from app.utils import make_star_text
 from app.models import (
@@ -30,7 +38,10 @@ DEFAULT_MENU_IMAGE = "images/menu-default.png"
 PROFILE_IMAGE_UPLOAD_FOLDER = os.path.join(
     app.static_folder, "uploads", "profile_images"
 )
+OWNER_MENU_UPLOAD_FOLDER = os.path.join(app.static_folder, "uploads", "menu_items")
 ALLOWED_PROFILE_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+ALLOWED_MENU_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
 SEARCH_MAP_COORDINATES = {
     "Perth CBD": {"lat": -31.9523, "lng": 115.8613},
     "Northbridge": {"lat": -31.9466, "lng": 115.8552},
@@ -166,7 +177,9 @@ def send_email(to_email, subject, body):
         or smtp_password.startswith("your-")
         or email_from.startswith("your-")
     ):
-        current_app.logger.warning("SMTP credentials are not configured; email not sent.")
+        current_app.logger.warning(
+            "SMTP credentials are not configured; email not sent."
+        )
         return False
 
     message = EmailMessage()
@@ -400,6 +413,32 @@ def get_restaurant_image(restaurant):
     )
 
 
+def is_allowed_menu_image(filename):
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED_MENU_IMAGE_EXTENSIONS
+    )
+
+
+def save_menu_image(file_storage):
+    if not file_storage or not file_storage.filename:
+        return ""
+
+    original_filename = secure_filename(file_storage.filename)
+
+    if not is_allowed_menu_image(original_filename):
+        flash("Please choose a PNG, JPG, JPEG, GIF, or WebP menu image.", "danger")
+        return None
+
+    os.makedirs(OWNER_MENU_UPLOAD_FOLDER, exist_ok=True)
+
+    extension = original_filename.rsplit(".", 1)[1].lower()
+    filename = f"{uuid4().hex}.{extension}"
+    file_storage.save(os.path.join(OWNER_MENU_UPLOAD_FOLDER, filename))
+
+    return f"uploads/menu_items/{filename}"
+
+
 def format_restaurant_card(restaurant, is_saved=True):
     rating = round(restaurant.average_rating or 0, 1)
 
@@ -463,8 +502,7 @@ def get_demo_user():
 def get_public_collection_cards(limit=None):
     collections = BookmarkCollection.query.filter_by(is_public=True).all()
     formatted_collections = [
-        format_bookmark_collection(collection)
-        for collection in collections
+        format_bookmark_collection(collection) for collection in collections
     ]
 
     formatted_collections.sort(
@@ -519,7 +557,10 @@ def index():
 def login():
     if request.method == "POST":
         if not check_rate_limit("login"):
-            flash("Too many login attempts. Please wait a few minutes and try again.", "danger")
+            flash(
+                "Too many login attempts. Please wait a few minutes and try again.",
+                "danger",
+            )
             return render_template("login.html")
 
         email = request.form.get("email", "").strip().lower()
@@ -550,7 +591,10 @@ def login():
 def forgot_password():
     if request.method == "POST":
         if not check_rate_limit("forgot_password"):
-            flash("Too many password reset requests. Please wait a few minutes and try again.", "danger")
+            flash(
+                "Too many password reset requests. Please wait a few minutes and try again.",
+                "danger",
+            )
             return render_template("forgot_password.html")
 
         email = request.form.get("email", "").strip().lower()
@@ -576,7 +620,10 @@ def forgot_password():
 @app.route("/resend-verification", methods=["POST"])
 def resend_verification():
     if not check_rate_limit("resend_verification"):
-        flash("Too many verification email requests. Please wait a few minutes and try again.", "danger")
+        flash(
+            "Too many verification email requests. Please wait a few minutes and try again.",
+            "danger",
+        )
         return redirect(url_for("login"))
 
     email = request.form.get("email", "").strip().lower()
@@ -698,7 +745,10 @@ def reset_password():
 def signup():
     if request.method == "POST":
         if not check_rate_limit("signup"):
-            flash("Too many signup attempts. Please wait a few minutes and try again.", "danger")
+            flash(
+                "Too many signup attempts. Please wait a few minutes and try again.",
+                "danger",
+            )
             return render_template("signup.html")
 
         username = request.form.get("username", "").strip()
@@ -749,9 +799,15 @@ def signup():
         db.session.commit()
 
         if email_sent:
-            flash("Account created. Please check your email to verify your account before logging in.", "success")
+            flash(
+                "Account created. Please check your email to verify your account before logging in.",
+                "success",
+            )
         else:
-            flash("Account created, but the verification email could not be sent. Please check SMTP settings and resend verification from login.", "warning")
+            flash(
+                "Account created, but the verification email could not be sent. Please check SMTP settings and resend verification from login.",
+                "warning",
+            )
         return redirect(url_for("login"))
 
     return render_template("signup.html")
@@ -792,9 +848,7 @@ def profile():
             os.makedirs(PROFILE_IMAGE_UPLOAD_FOLDER, exist_ok=True)
             extension = original_filename.rsplit(".", 1)[1].lower()
             filename = f"{uuid4().hex}.{extension}"
-            profile_image_file.save(
-                os.path.join(PROFILE_IMAGE_UPLOAD_FOLDER, filename)
-            )
+            profile_image_file.save(os.path.join(PROFILE_IMAGE_UPLOAD_FOLDER, filename))
             user.profile_image = url_for(
                 "static", filename=f"uploads/profile_images/{filename}"
             )
@@ -809,11 +863,15 @@ def profile():
     reviews = (
         Review.query.filter_by(user_id=user.id).order_by(Review.created_at.desc()).all()
     )
-    pending_email_token = AuthToken.query.filter_by(
-        user_id=user.id,
-        purpose="change_email",
-        used_at=None,
-    ).order_by(AuthToken.created_at.desc()).first()
+    pending_email_token = (
+        AuthToken.query.filter_by(
+            user_id=user.id,
+            purpose="change_email",
+            used_at=None,
+        )
+        .order_by(AuthToken.created_at.desc())
+        .first()
+    )
     pending_new_email = (
         pending_email_token.new_email
         if pending_email_token and not pending_email_token.is_expired
@@ -842,7 +900,10 @@ def change_email():
 
     if request.method == "POST":
         if not check_rate_limit("change_email"):
-            flash("Too many email change requests. Please wait a few minutes and try again.", "danger")
+            flash(
+                "Too many email change requests. Please wait a few minutes and try again.",
+                "danger",
+            )
             return render_template("change_email.html", user=user)
 
         new_email = request.form.get("new_email", "").strip().lower()
@@ -868,9 +929,15 @@ def change_email():
         db.session.commit()
 
         if email_sent:
-            flash("Please verify the new email address. Your current email remains active until then.", "success")
+            flash(
+                "Please verify the new email address. Your current email remains active until then.",
+                "success",
+            )
         else:
-            flash("The email change is pending, but the verification email could not be sent. Please check SMTP settings and try again.", "warning")
+            flash(
+                "The email change is pending, but the verification email could not be sent. Please check SMTP settings and try again.",
+                "warning",
+            )
         return redirect(url_for("profile"))
 
     return render_template("change_email.html", user=user)
@@ -893,11 +960,16 @@ def verify_email_change():
             token.used_at = datetime.utcnow()
             db.session.commit()
             title = "Email change link expired"
-            message = "This email change link has expired. Please request a new email change."
-        elif not token.new_email or User.query.filter(
-            User.email == token.new_email,
-            User.id != token.user_id,
-        ).first():
+            message = (
+                "This email change link has expired. Please request a new email change."
+            )
+        elif (
+            not token.new_email
+            or User.query.filter(
+                User.email == token.new_email,
+                User.id != token.user_id,
+            ).first()
+        ):
             token.used_at = datetime.utcnow()
             db.session.commit()
             title = "Email no longer available"
@@ -1077,8 +1149,7 @@ def bookmarks():
         ]
 
     bookmark_collections = [
-        format_bookmark_collection(collection)
-        for collection in user_collections
+        format_bookmark_collection(collection) for collection in user_collections
     ]
     public_collections = get_public_collection_cards()
 
@@ -1491,120 +1562,387 @@ def delete_review_record(review_id):
     return redirect_back_to_admin()
 
 
+def get_owner_user_or_redirect():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        flash("Please log in to access the owner dashboard.", "info")
+        return None, redirect(url_for("login"))
+
+    current_user = User.query.get_or_404(user_id)
+
+    if current_user.role != "owner":
+        flash("You do not have permission to access the owner dashboard.", "danger")
+        return None, redirect(url_for("home"))
+
+    return current_user, None
+
+
+def get_owner_restaurants(current_user):
+    return sorted(
+        current_user.owned_restaurants,
+        key=lambda restaurant: (restaurant.name or "").lower(),
+    )
+
+
+def get_owner_restaurant_or_redirect(current_user, restaurant_id=None):
+    owner_restaurants = get_owner_restaurants(current_user)
+
+    if not owner_restaurants:
+        flash("No restaurant is linked to your owner account yet.", "info")
+        return None, redirect(url_for("home"))
+
+    if restaurant_id:
+        restaurant = next(
+            (item for item in owner_restaurants if item.id == restaurant_id),
+            None,
+        )
+
+        if restaurant:
+            return restaurant, None
+
+        flash("You do not have permission to manage that restaurant.", "danger")
+        return None, redirect(url_for("owner_dashboard"))
+
+    return owner_restaurants[0], None
+
+
+def get_selected_owner_restaurant(current_user):
+    restaurant_id_text = (
+        request.form.get("restaurant_id") or request.args.get("restaurant_id") or ""
+    ).strip()
+
+    restaurant_id = int(restaurant_id_text) if restaurant_id_text.isdigit() else None
+    return get_owner_restaurant_or_redirect(current_user, restaurant_id)
+
+
+def redirect_back_to_owner(restaurant_id=None):
+    if restaurant_id:
+        return redirect(url_for("owner_dashboard", restaurant_id=restaurant_id))
+
+    return redirect(url_for("owner_dashboard"))
+
+
+def format_time_for_input(value):
+    if not value:
+        return ""
+
+    value = str(value).strip()
+
+    for date_format in ("%H:%M", "%H:%M:%S", "%I:%M %p"):
+        try:
+            return datetime.strptime(value, date_format).strftime("%H:%M")
+        except ValueError:
+            pass
+
+    return value[:5] if len(value) >= 5 else value
+
+
+def build_owner_opening_hours(restaurant):
+    return [
+        {
+            "id": hour.id,
+            "day_label": hour.day_label,
+            "open_time": format_time_for_input(hour.open_time),
+            "close_time": format_time_for_input(hour.close_time),
+            "is_closed": hour.is_closed,
+        }
+        for hour in sorted(restaurant.opening_hours, key=lambda item: item.day_of_week)
+    ]
+
+
+def build_owner_restaurant_info(restaurant):
+    return [
+        {"label": "Restaurant Name", "value": restaurant.name or ""},
+        {"label": "Category", "value": restaurant.category or ""},
+        {"label": "Address", "value": restaurant.address or ""},
+        {"label": "Suburb", "value": restaurant.suburb or ""},
+        {"label": "Phone", "value": restaurant.phone or ""},
+        {"label": "Website", "value": restaurant.website or ""},
+    ]
+
+
 @app.route("/owner")
 def owner_dashboard():
-    restaurant = {
-        "id": 1,
-        "name": "Laneway Pizza Co.",
-        "category": "Italian",
-        "address": "Barrack St, Perth, WA 6000",
-        "phone": "+61 8 1234 5678",
-        "website": "https://example.com",
-        "status": "Approved",
-        "rating": "4.7",
-        "review_count": "512",
-    }
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    owner_restaurants = get_owner_restaurants(current_user)
+    menu_items = sorted(
+        restaurant.menu_items,
+        key=lambda item: item.created_at or datetime.min,
+        reverse=True,
+    )
+
+    reviews = sorted(
+        restaurant.reviews,
+        key=lambda item: item.created_at or datetime.min,
+        reverse=True,
+    )
 
     owner_stats = [
-        {"label": "Restaurant", "value": restaurant["name"]},
-        {"label": "Listing Status", "value": restaurant["status"]},
-        {"label": "Rating", "value": restaurant["rating"]},
-        {"label": "Reviews", "value": restaurant["review_count"]},
-    ]
-
-    restaurant_info = [
-        {"label": "Restaurant Name", "field": "name", "value": restaurant["name"]},
-        {"label": "Category", "field": "category", "value": restaurant["category"]},
-        {"label": "Address", "field": "address", "value": restaurant["address"]},
-        {"label": "Phone", "field": "phone", "value": restaurant["phone"]},
-        {"label": "Website", "field": "website", "value": restaurant["website"]},
-    ]
-
-    opening_hours = [
-        {
-            "day": "Monday",
-            "open_time": "07:00",
-            "close_time": "23:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Tuesday",
-            "open_time": "07:00",
-            "close_time": "23:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Wednesday",
-            "open_time": "07:00",
-            "close_time": "23:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Thursday",
-            "open_time": "07:00",
-            "close_time": "23:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Friday",
-            "open_time": "07:00",
-            "close_time": "00:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Saturday",
-            "open_time": "08:00",
-            "close_time": "00:00",
-            "is_closed": False,
-        },
-        {"day": "Sunday", "open_time": "", "close_time": "", "is_closed": True},
-    ]
-
-    menu_items = [
-        {
-            "name": "Margherita Pizza",
-            "category": "Pizza",
-            "price": "$22",
-            "status": "Available",
-            "status_class": "owner-status--available",
-        },
-        {
-            "name": "Truffle Mushroom Pizza",
-            "category": "Pizza",
-            "price": "$27",
-            "status": "Available",
-            "status_class": "owner-status--available",
-        },
-        {
-            "name": "Tiramisu",
-            "category": "Dessert",
-            "price": "$14",
-            "status": "Hidden",
-            "status_class": "owner-status--hidden",
-        },
-    ]
-
-    owner_tasks = [
-        {
-            "title": "Edit restaurant profile",
-            "description": "Update restaurant name, category, contact details, website, images, and description.",
-        },
-        {
-            "title": "Manage opening hours",
-            "description": "Change daily opening times and mark specific days as closed.",
-        },
-        {
-            "title": "Review listing status",
-            "description": "Check whether the restaurant listing is approved, pending, hidden, or reported.",
-        },
+        {"label": "Restaurant", "value": restaurant.name},
+        {"label": "Listing Status", "value": restaurant.status.title()},
+        {"label": "Rating", "value": f"{restaurant.average_rating:.1f}"},
+        {"label": "Reviews", "value": restaurant.review_count},
     ]
 
     return render_template(
         "owner_dashboard.html",
         restaurant=restaurant,
+        owner_restaurants=owner_restaurants,
         owner_stats=owner_stats,
-        restaurant_info=restaurant_info,
-        opening_hours=opening_hours,
+        reviews=reviews,
+        restaurant_info=build_owner_restaurant_info(restaurant),
+        opening_hours=build_owner_opening_hours(restaurant),
         menu_items=menu_items,
-        owner_tasks=owner_tasks,
+        default_menu_image=DEFAULT_MENU_IMAGE,
     )
+
+
+@app.route("/owner/restaurant/update", methods=["POST"])
+def update_owner_restaurant_info():
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    name = request.form.get("name", "").strip()
+    category = request.form.get("category", "").strip()
+    address = request.form.get("address", "").strip()
+
+    if not name or not category or not address:
+        flash("Please complete restaurant name, category, and address.", "danger")
+        return redirect_back_to_owner(restaurant.id)
+
+    restaurant.name = name
+    restaurant.category = category
+    restaurant.address = address
+    restaurant.suburb = request.form.get("suburb", "").strip() or None
+    restaurant.phone = request.form.get("phone", "").strip() or None
+    restaurant.website = request.form.get("website", "").strip() or None
+    restaurant.description = request.form.get("description", "").strip() or None
+    restaurant.updated_at = datetime.utcnow()
+
+    db.session.commit()
+    flash("Restaurant information updated.", "success")
+
+    return redirect_back_to_owner(restaurant.id)
+
+
+@app.route("/owner/opening-hours/update", methods=["POST"])
+def update_owner_opening_hours():
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    for hour in restaurant.opening_hours:
+        is_closed = request.form.get(f"is_closed_{hour.id}") == "on"
+        hour.is_closed = is_closed
+
+        if is_closed:
+            hour.open_time = None
+            hour.close_time = None
+        else:
+            hour.open_time = (
+                request.form.get(f"open_time_{hour.id}", "").strip() or None
+            )
+            hour.close_time = (
+                request.form.get(f"close_time_{hour.id}", "").strip() or None
+            )
+
+    restaurant.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    flash("Opening hours updated.", "success")
+    return redirect_back_to_owner(restaurant.id)
+
+
+@app.route("/owner/menu-items/add", methods=["POST"])
+def add_owner_menu_item():
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    name = request.form.get("name", "").strip()
+    description = request.form.get("description", "").strip()
+    price_text = request.form.get("price", "").strip()
+    uploaded_image_url = save_menu_image(request.files.get("image_file"))
+
+    if uploaded_image_url is None:
+        return redirect_back_to_owner(restaurant.id)
+
+    if not name:
+        flash("Please enter a menu item name.", "danger")
+        return redirect_back_to_owner(restaurant.id)
+
+    try:
+        price = float(price_text) if price_text else None
+    except ValueError:
+        flash("Please enter a valid menu item price.", "danger")
+        return redirect_back_to_owner(restaurant.id)
+
+    menu_item = MenuItem(
+        restaurant_id=restaurant.id,
+        name=name,
+        description=description or None,
+        price=price,
+        image_url=uploaded_image_url or None,
+    )
+
+    db.session.add(menu_item)
+    restaurant.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    flash("Menu item added.", "success")
+    return redirect_back_to_owner(restaurant.id)
+
+
+@app.route("/owner/menu-items/<int:menu_item_id>/update", methods=["POST"])
+def update_owner_menu_item(menu_item_id):
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    menu_item = MenuItem.query.filter_by(
+        id=menu_item_id,
+        restaurant_id=restaurant.id,
+    ).first_or_404()
+
+    name = request.form.get("name", "").strip()
+    description = request.form.get("description", "").strip()
+    price_text = request.form.get("price", "").strip()
+    uploaded_image_url = save_menu_image(request.files.get("image_file"))
+
+    if uploaded_image_url is None:
+        return redirect_back_to_owner(restaurant.id)
+
+    if not name:
+        flash("Please enter a menu item name.", "danger")
+        return redirect_back_to_owner(restaurant.id)
+
+    try:
+        price = float(price_text) if price_text else None
+    except ValueError:
+        flash("Please enter a valid menu item price.", "danger")
+        return redirect_back_to_owner(restaurant.id)
+
+    menu_item.name = name
+    menu_item.description = description or None
+    menu_item.price = price
+
+    # update only if new file
+    if uploaded_image_url:
+        menu_item.image_url = uploaded_image_url
+
+    restaurant.updated_at = datetime.utcnow()
+
+    db.session.commit()
+
+    flash("Menu item updated.", "success")
+    return redirect_back_to_owner(restaurant.id)
+
+
+@app.route("/owner/menu-items/<int:menu_item_id>/delete", methods=["POST"])
+def delete_owner_menu_item(menu_item_id):
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    menu_item = MenuItem.query.filter_by(
+        id=menu_item_id,
+        restaurant_id=restaurant.id,
+    ).first_or_404()
+
+    db.session.delete(menu_item)
+    restaurant.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    flash("Menu item deleted.", "success")
+    return redirect_back_to_owner(restaurant.id)
+
+
+@app.route("/owner/reviews/<int:review_id>/report", methods=["POST"])
+def report_owner_review(review_id):
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    review = Review.query.filter_by(
+        id=review_id,
+        restaurant_id=restaurant.id,
+    ).first_or_404()
+
+    review.status = "reported"
+    review.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    flash("Review reported to admin.", "success")
+    return redirect_back_to_owner(restaurant.id)
+
+
+@app.route("/owner/reviews/<int:review_id>/cancel-report", methods=["POST"])
+def cancel_owner_review_report(review_id):
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    review = Review.query.filter_by(
+        id=review_id,
+        restaurant_id=restaurant.id,
+    ).first_or_404()
+
+    review.status = "active"
+    review.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    flash("Review report cancelled.", "success")
+    return redirect_back_to_owner(restaurant.id)
