@@ -228,10 +228,37 @@ def build_home_context():
             "image": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1200&q=80",
         },
     ]
+    public_collections = [
+        {
+            "name": "Perth brunch trail",
+            "creator": "Mia Chen",
+            "restaurant_count": 3,
+            "subscriber_count": 128,
+            "description": "Popular cafe and brunch picks around Perth and Northbridge.",
+            "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Weeknight dinner spots",
+            "creator": "Alex Wong",
+            "restaurant_count": 4,
+            "subscriber_count": 94,
+            "description": "Reliable dinner places for casual evenings with friends.",
+            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Healthy lunch list",
+            "creator": "Jordan Smith",
+            "restaurant_count": 3,
+            "subscriber_count": 67,
+            "description": "Fresh bowls, cafes, and lighter lunch options.",
+            "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+        },
+    ]
 
     return {
         "home_categories": home_categories,
         "featured_restaurants": featured_restaurants,
+        "public_collections": public_collections,
     }
 
 

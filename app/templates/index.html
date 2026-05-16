@@ -96,6 +96,43 @@
             </div>
         </div>
     </section>
+
+    <section class="public-preview-section py-5">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+                <div>
+                    <h2 class="h3 fw-bold mb-2">Popular Collections</h2>
+                    <p class="text-secondary mb-0">
+                        Browse public restaurant lists curated by TableTrail users.
+                    </p>
+                </div>
+                <a class="btn btn-outline-success align-self-md-center" href="{{ url_for('bookmarks') }}">
+                    View public collections
+                </a>
+            </div>
+
+            <div class="row g-3">
+                {% for collection in public_collections %}
+                <div class="col-md-6 col-xl-4">
+                    <a class="home-public-card" href="{{ url_for('bookmarks') }}"
+                        aria-label="View {{ collection.name }} public collection">
+                        <img class="home-public-card__image" src="{{ collection.image }}"
+                            alt="{{ collection.name }} cover image">
+                        <div class="home-public-card__body">
+                            <div class="home-public-card__meta">
+                                <span>{{ collection.restaurant_count }} places</span>
+                                <span>{{ collection.subscriber_count }} subscribers</span>
+                            </div>
+                            <h3>{{ collection.name }}</h3>
+                            <p>{{ collection.description }}</p>
+                            <span class="home-public-card__creator">by {{ collection.creator }}</span>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
 </main>
 {% endblock %}
 

@@ -138,6 +138,72 @@ main {
   margin-top: auto;
 }
 
+.public-preview-section {
+  background: #ffffff;
+  border-top: 1px solid var(--brand-line);
+}
+
+.home-public-card {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1.25rem rgba(31, 41, 51, 0.05);
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.home-public-card:hover {
+  color: inherit;
+  transform: translateY(-2px);
+}
+
+.home-public-card__image {
+  display: block;
+  height: 180px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.home-public-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.home-public-card__meta {
+  color: #5f6c7b;
+  display: flex;
+  font-size: 0.8rem;
+  font-weight: 700;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.home-public-card h3 {
+  font-size: 1.12rem;
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+}
+
+.home-public-card p {
+  color: #5f6c7b;
+  font-size: 0.95rem;
+  margin-bottom: 0.85rem;
+}
+
+.home-public-card__creator {
+  color: var(--brand-green);
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: auto;
+}
+
 @media (max-width: 991.98px) {
   .hero-search {
     margin-bottom: 0;
@@ -153,5 +219,9 @@ main {
 
   .featured-card__image {
     height: 180px;
+  }
+
+  .home-public-card__image {
+    height: 170px;
   }
 }
