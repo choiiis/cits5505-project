@@ -38,7 +38,10 @@ DEFAULT_MENU_IMAGE = "images/menu-default.png"
 PROFILE_IMAGE_UPLOAD_FOLDER = os.path.join(
     app.static_folder, "uploads", "profile_images"
 )
+OWNER_MENU_UPLOAD_FOLDER = os.path.join(app.static_folder, "uploads", "menu_items")
 ALLOWED_PROFILE_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+ALLOWED_MENU_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
 SEARCH_MAP_COORDINATES = {
     "Perth CBD": {"lat": -31.9523, "lng": 115.8613},
     "Northbridge": {"lat": -31.9466, "lng": 115.8552},
@@ -408,6 +411,32 @@ def get_restaurant_image(restaurant):
         or restaurant.hero_image
         or url_for("static", filename=DEFAULT_RESTAURANT_IMAGE)
     )
+
+
+def is_allowed_menu_image(filename):
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED_MENU_IMAGE_EXTENSIONS
+    )
+
+
+def save_menu_image(file_storage):
+    if not file_storage or not file_storage.filename:
+        return ""
+
+    original_filename = secure_filename(file_storage.filename)
+
+    if not is_allowed_menu_image(original_filename):
+        flash("Please choose a PNG, JPG, JPEG, GIF, or WebP menu image.", "danger")
+        return None
+
+    os.makedirs(OWNER_MENU_UPLOAD_FOLDER, exist_ok=True)
+
+    extension = original_filename.rsplit(".", 1)[1].lower()
+    filename = f"{uuid4().hex}.{extension}"
+    file_storage.save(os.path.join(OWNER_MENU_UPLOAD_FOLDER, filename))
+
+    return f"uploads/menu_items/{filename}"
 
 
 def format_restaurant_card(restaurant, is_saved=True):
@@ -1762,7 +1791,10 @@ def add_owner_menu_item():
     name = request.form.get("name", "").strip()
     description = request.form.get("description", "").strip()
     price_text = request.form.get("price", "").strip()
-    image_url = request.form.get("image_url", "").strip()
+    uploaded_image_url = save_menu_image(request.files.get("image_file"))
+
+    if uploaded_image_url is None:
+        return redirect_back_to_owner(restaurant.id)
 
     if not name:
         flash("Please enter a menu item name.", "danger")
@@ -1779,7 +1811,7 @@ def add_owner_menu_item():
         name=name,
         description=description or None,
         price=price,
-        image_url=image_url or None,
+        image_url=uploaded_image_url or None,
     )
 
     db.session.add(menu_item)
@@ -1810,7 +1842,10 @@ def update_owner_menu_item(menu_item_id):
     name = request.form.get("name", "").strip()
     description = request.form.get("description", "").strip()
     price_text = request.form.get("price", "").strip()
-    image_url = request.form.get("image_url", "").strip()
+    uploaded_image_url = save_menu_image(request.files.get("image_file"))
+
+    if uploaded_image_url is None:
+        return redirect_back_to_owner(restaurant.id)
 
     if not name:
         flash("Please enter a menu item name.", "danger")
@@ -1825,7 +1860,11 @@ def update_owner_menu_item(menu_item_id):
     menu_item.name = name
     menu_item.description = description or None
     menu_item.price = price
-    menu_item.image_url = image_url or None
+
+    # update only if new file
+    if uploaded_image_url:
+        menu_item.image_url = uploaded_image_url
+
     restaurant.updated_at = datetime.utcnow()
 
     db.session.commit()

@@ -5,4 +5,4 @@ __pycache__/
 .env
 app.db
 email_outbox.log
-app/static/uploads/profile_images/
+app/static/uploads/
