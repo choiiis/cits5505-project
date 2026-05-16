@@ -6,6 +6,30 @@
   min-height: 320px;
 }
 
+.bookmark-search-panel {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1.25rem rgba(31, 41, 51, 0.05);
+  padding: 1rem;
+}
+
+.bookmark-search-panel__field {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.bookmark-search-panel__field span {
+  color: var(--brand-green);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.bookmark-search-panel__field .form-control {
+  border-radius: 8px;
+}
+
 .bookmark-card {
   background: #ffffff;
   border: 1px solid var(--brand-line);
@@ -98,6 +122,388 @@
   text-align: center;
 }
 
+.bookmark-collections-section {
+  border-top: 1px solid var(--brand-line);
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+}
+
+.collections-heading-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.collections-heading-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.6rem;
+}
+
+.collections-heading-actions .btn {
+  border-radius: 8px;
+}
+
+.collection-share-open {
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.collections-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.collection-card {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1.25rem rgba(31, 41, 51, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+
+.collection-card__settings {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  color: var(--brand-ink);
+  display: inline-flex;
+  font-size: 0.95rem;
+  height: 2.35rem;
+  justify-content: center;
+  position: absolute;
+  right: 0.8rem;
+  top: 0.8rem;
+  width: 2.35rem;
+  z-index: 2;
+}
+
+.collection-card__main {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.collection-card__main:focus-visible {
+  outline: 3px solid rgba(21, 128, 61, 0.25);
+  outline-offset: -3px;
+}
+
+.collection-card__media {
+  position: relative;
+}
+
+.collection-card__image {
+  display: block;
+  height: 170px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.collection-card__badges {
+  bottom: 0.8rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  left: 0.8rem;
+  position: absolute;
+  right: 0.8rem;
+}
+
+.collection-card__badges span {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  color: var(--brand-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+}
+
+.collection-card__badges span.is-public {
+  visibility: hidden;
+}
+
+.collection-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.collection-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+}
+
+.collection-card p {
+  color: #5f6c7b;
+  font-size: 0.93rem;
+  margin-bottom: 0.85rem;
+}
+
+.collection-card__code {
+  color: #6b7280;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-top: auto;
+  text-transform: uppercase;
+}
+
+.bookmark-modal {
+  display: none;
+  inset: 0;
+  padding: 1.5rem;
+  position: fixed;
+  z-index: 1050;
+}
+
+.bookmark-modal.is-open {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.bookmark-modal__overlay {
+  background: rgba(17, 24, 39, 0.55);
+  inset: 0;
+  position: absolute;
+}
+
+.bookmark-modal__panel {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1.25rem 3rem rgba(17, 24, 39, 0.24);
+  max-height: min(720px, 90vh);
+  max-width: 760px;
+  overflow: auto;
+  padding: 1.5rem;
+  position: relative;
+  width: min(100%, 760px);
+  z-index: 1;
+}
+
+.bookmark-modal__close {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  color: var(--brand-ink);
+  display: inline-flex;
+  font-size: 1.25rem;
+  height: 2.5rem;
+  justify-content: center;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  width: 2.5rem;
+}
+
+.collection-modal-header {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--brand-line);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0 3.25rem 1rem 0;
+}
+
+.collection-modal-header__meta {
+  color: var(--brand-green);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.collection-modal-header__code {
+  background: #f8fafc;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  color: #4d5b68;
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.45rem 0.65rem;
+}
+
+.collection-restaurant-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.collection-restaurant-card {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 105px minmax(0, 1fr);
+  overflow: hidden;
+  position: relative;
+}
+
+.collection-restaurant-card__image {
+  height: 100%;
+  min-height: 130px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.collection-restaurant-card__heart {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--brand-line);
+  border-radius: 999px;
+  color: #6b7280;
+  display: inline-flex;
+  font-size: 1rem;
+  font-weight: 700;
+  height: 2rem;
+  justify-content: center;
+  left: 0.55rem;
+  position: absolute;
+  top: 0.55rem;
+  width: 2rem;
+}
+
+.collection-restaurant-card__heart.is-saved {
+  color: var(--brand-coral);
+}
+
+.collection-restaurant-card__body {
+  padding: 0.85rem;
+}
+
+.collection-restaurant-card__category {
+  color: var(--brand-green);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.collection-restaurant-card h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  margin: 0.25rem 0;
+}
+
+.collection-restaurant-card p {
+  color: #5f6c7b;
+  font-size: 0.86rem;
+  margin-bottom: 0.35rem;
+}
+
+.collection-restaurant-card__rating {
+  color: var(--brand-coral) !important;
+  font-weight: 700;
+}
+
+.collection-restaurant-card__rating span {
+  color: #4d5b68;
+  font-weight: 400;
+}
+
+.collection-restaurant-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.collection-restaurant-card__actions .btn {
+  border-radius: 8px;
+}
+
+.collection-restaurant-card__actions .btn:first-child {
+  flex: 1;
+}
+
+.collection-settings-panel,
+.collection-share-panel {
+  max-width: 560px;
+}
+
+.collection-settings-header {
+  border-bottom: 1px solid var(--brand-line);
+  margin-bottom: 1rem;
+  padding: 0 3rem 1rem 0;
+}
+
+.collection-settings-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.collection-settings-form .form-label {
+  color: var(--brand-ink);
+  font-weight: 700;
+  margin-bottom: -0.25rem;
+}
+
+.collection-copy-row,
+.collection-share-search {
+  display: flex;
+  gap: 0.55rem;
+}
+
+.collection-copy-row .btn,
+.collection-share-search .btn,
+.collection-settings-actions .btn {
+  border-radius: 8px;
+}
+
+.collection-settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+
+.collection-share-preview {
+  background: #f8fafc;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  color: #5f6c7b;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.collection-share-preview__eyebrow {
+  color: #6b7280;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+}
+
+.collection-share-preview h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.collection-share-preview__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.collection-share-preview__actions .btn {
+  border-radius: 8px;
+}
+
 @media (max-width: 767.98px) {
   .bookmarks-page {
     padding-bottom: 2rem;
@@ -113,5 +519,51 @@
 
   .bookmark-card__actions {
     flex-direction: column;
+  }
+
+  .collections-heading-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .collections-heading-actions {
+    flex-direction: column;
+  }
+
+  .collections-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bookmark-modal {
+    padding: 0.75rem;
+  }
+
+  .bookmark-modal__panel {
+    padding: 1rem;
+  }
+
+  .collection-modal-header {
+    flex-direction: column;
+    padding-right: 3rem;
+  }
+
+  .collection-restaurant-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-restaurant-card__actions {
+    flex-direction: column;
+  }
+
+  .collection-copy-row,
+  .collection-share-search,
+  .collection-share-preview__actions {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .collections-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

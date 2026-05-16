@@ -548,7 +548,58 @@ def bookmarks():
         },
     ]
 
-    return render_template("bookmarks.html", saved_restaurants=saved_restaurants)
+    collection_restaurants = [
+        {**restaurant, "is_saved": True}
+        for restaurant in saved_restaurants
+    ]
+
+    bookmark_collections = [
+        {
+            "id": "weekend-brunch",
+            "name": "Weekend brunch",
+            "visibility": "Public",
+            "share_code": "BRUNCH-4827",
+            "cover_image": saved_restaurants[0]["image"],
+            "restaurant_count": 2,
+            "description": "Easy cafes and light meals for slow weekend mornings.",
+            "restaurants": [
+                collection_restaurants[0],
+                {**collection_restaurants[2], "is_saved": False},
+            ],
+        },
+        {
+            "id": "dinner-shortlist",
+            "name": "Dinner shortlist",
+            "visibility": "Private",
+            "share_code": "DINNER-9135",
+            "cover_image": saved_restaurants[1]["image"],
+            "restaurant_count": 2,
+            "description": "Places worth trying for relaxed dinners with friends.",
+            "restaurants": [
+                collection_restaurants[1],
+                collection_restaurants[0],
+            ],
+        },
+        {
+            "id": "city-lunch",
+            "name": "City lunch ideas",
+            "visibility": "Public",
+            "share_code": "LUNCH-2058",
+            "cover_image": saved_restaurants[2]["image"],
+            "restaurant_count": 2,
+            "description": "Fast, reliable restaurants around Perth CBD.",
+            "restaurants": [
+                collection_restaurants[2],
+                {**collection_restaurants[1], "is_saved": False},
+            ],
+        },
+    ]
+
+    return render_template(
+        "bookmarks.html",
+        saved_restaurants=saved_restaurants,
+        bookmark_collections=bookmark_collections,
+    )
 
 
 @app.route("/restaurants/<int:restaurant_id>")

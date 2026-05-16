@@ -21,10 +21,20 @@
             </a>
         </div>
 
+        <section class="bookmark-search-panel mb-4" aria-label="Search saved restaurants and collections">
+            <label class="visually-hidden" for="bookmarkSearchInput">Search saved restaurants and collections</label>
+            <div class="bookmark-search-panel__field">
+                <span aria-hidden="true">⌕</span>
+                <input class="form-control form-control-lg" id="bookmarkSearchInput" type="search"
+                    placeholder="Search saved restaurants or collections" data-bookmark-search>
+            </div>
+        </section>
+
         <section class="bookmark-stage-shell" aria-label="Saved restaurants section">
             <div class="row g-3" id="bookmarkMount">
                 {% for restaurant in saved_restaurants %}
-                <div class="col-md-6 col-xl-4" data-bookmark-card>
+                <div class="col-md-6 col-xl-4" data-bookmark-card
+                    data-search-text="{{ restaurant.name }} {{ restaurant.category }} {{ restaurant.location }} {{ restaurant.price }} {{ restaurant.description }}">
                     <article class="bookmark-card">
                         <img src="{{ restaurant.image }}" class="bookmark-card__image" alt="{{ restaurant.name }}">
                         <div class="bookmark-card__body">
@@ -57,7 +67,233 @@
                 </div>
             </div>
         </section>
+
+        <section class="bookmark-collections-section" aria-labelledby="collectionsTitle">
+            <div class="collections-heading-row">
+                <div>
+                    <h2 class="h4 fw-bold mb-1" id="collectionsTitle">Collections</h2>
+                    <p class="text-secondary mb-0">
+                        Group saved restaurants into shareable lists.
+                    </p>
+                </div>
+                <div class="collections-heading-actions">
+                    <button class="btn btn-success" type="button" data-open-create-collection>
+                        Create collection
+                    </button>
+                    <button class="btn btn-outline-success collection-share-open" type="button" data-open-share-import>
+                        Share code
+                    </button>
+                </div>
+            </div>
+
+            <div class="collections-grid" data-collections-grid>
+                {% for collection in bookmark_collections %}
+                <article class="collection-card" data-collection-card data-collection-id="{{ collection.id }}"
+                    data-search-text="{{ collection.name }} {{ collection.visibility }} {{ collection.share_code }} {{ collection.description }}">
+                    <button class="collection-card__settings" type="button"
+                        data-open-collection-settings="{{ collection.id }}"
+                        aria-label="Open {{ collection.name }} settings">
+                        ⚙
+                    </button>
+                    <button class="collection-card__main" type="button" data-open-collection="{{ collection.id }}"
+                        aria-label="Open {{ collection.name }}">
+                        <div class="collection-card__media">
+                            <img class="collection-card__image" src="{{ collection.cover_image }}"
+                                alt="{{ collection.name }} cover image">
+                            <div class="collection-card__badges">
+                                <span class="{% if collection.visibility == 'Public' %}is-public{% endif %}"
+                                    data-collection-visibility-label>
+                                    {{ collection.visibility }}
+                                </span>
+                                <span>{{ collection.restaurant_count }} places</span>
+                            </div>
+                        </div>
+                        <div class="collection-card__body">
+                            <h3 data-collection-name-label>{{ collection.name }}</h3>
+                            <p>{{ collection.description }}</p>
+                            <span class="collection-card__code">Code: {{ collection.share_code }}</span>
+                        </div>
+                    </button>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
     </section>
+
+    {% for collection in bookmark_collections %}
+    <div class="bookmark-modal" id="collectionModal-{{ collection.id }}" data-collection-modal aria-hidden="true">
+        <div class="bookmark-modal__overlay" data-close-modal></div>
+        <section class="bookmark-modal__panel" role="dialog" aria-modal="true"
+            aria-labelledby="collectionTitle-{{ collection.id }}">
+            <button class="bookmark-modal__close" type="button" data-close-modal aria-label="Close collection">
+                ×
+            </button>
+
+            <div class="collection-modal-header">
+                <div>
+                    <p class="collection-modal-header__meta mb-2">
+                        {% if collection.visibility == "Private" %}Private · {% endif %}{{ collection.restaurant_count }} places
+                    </p>
+                    <h2 class="h4 fw-bold mb-2" id="collectionTitle-{{ collection.id }}">
+                        {{ collection.name }}
+                    </h2>
+                    <p class="text-secondary mb-0">{{ collection.description }}</p>
+                </div>
+                <span class="collection-modal-header__code">
+                    {{ collection.share_code }}
+                </span>
+            </div>
+
+            <div class="collection-restaurant-grid">
+                {% for restaurant in collection.restaurants %}
+                <article class="collection-restaurant-card" data-collection-restaurant>
+                    <button class="collection-restaurant-card__heart{% if restaurant.is_saved %} is-saved{% endif %}"
+                        type="button" data-toggle-collection-heart
+                        aria-label="{% if restaurant.is_saved %}Remove saved status{% else %}Save restaurant{% endif %}"
+                        aria-pressed="{% if restaurant.is_saved %}true{% else %}false{% endif %}">
+                        {% if restaurant.is_saved %}♥{% else %}♡{% endif %}
+                    </button>
+                    <img class="collection-restaurant-card__image" src="{{ restaurant.image }}"
+                        alt="{{ restaurant.name }}">
+                    <div class="collection-restaurant-card__body">
+                        <span class="collection-restaurant-card__category">{{ restaurant.category }}</span>
+                        <h3>{{ restaurant.name }}</h3>
+                        <p>{{ restaurant.location }} · {{ restaurant.price }}</p>
+                        <p class="collection-restaurant-card__rating">
+                            {{ restaurant.star_text }}
+                            <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>
+                        </p>
+                        <div class="collection-restaurant-card__actions">
+                            <a class="btn btn-sm btn-dark"
+                                href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
+                                View details
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" type="button"
+                                data-remove-collection-restaurant>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+    {% endfor %}
+
+    {% for collection in bookmark_collections %}
+    <div class="bookmark-modal" id="collectionSettings-{{ collection.id }}" data-collection-settings-modal
+        aria-hidden="true">
+        <div class="bookmark-modal__overlay" data-close-modal></div>
+        <section class="bookmark-modal__panel collection-settings-panel" role="dialog" aria-modal="true"
+            aria-labelledby="collectionSettingsTitle-{{ collection.id }}">
+            <button class="bookmark-modal__close" type="button" data-close-modal aria-label="Close settings">
+                ×
+            </button>
+
+            <div class="collection-settings-header">
+                <p class="collection-modal-header__meta mb-2">Collection settings</p>
+                <h2 class="h4 fw-bold mb-0" id="collectionSettingsTitle-{{ collection.id }}">
+                    {{ collection.name }}
+                </h2>
+            </div>
+
+            <div class="collection-settings-form">
+                <label class="form-label" for="collectionName-{{ collection.id }}">Collection name</label>
+                <input class="form-control" id="collectionName-{{ collection.id }}" type="text"
+                    value="{{ collection.name }}" data-collection-name-input>
+
+                <label class="form-label" for="collectionVisibility-{{ collection.id }}">Visibility</label>
+                <select class="form-select" id="collectionVisibility-{{ collection.id }}"
+                    data-collection-visibility-input>
+                    <option value="Public" {% if collection.visibility == "Public" %}selected{% endif %}>Public</option>
+                    <option value="Private" {% if collection.visibility == "Private" %}selected{% endif %}>Private</option>
+                </select>
+
+                <label class="form-label" for="collectionShareCode-{{ collection.id }}">Share code</label>
+                <div class="collection-copy-row">
+                    <input class="form-control" id="collectionShareCode-{{ collection.id }}" type="text"
+                        value="{{ collection.share_code }}" readonly data-share-code-input>
+                    <button class="btn btn-outline-success" type="button" data-copy-share-code>
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="collection-settings-actions">
+                <button class="btn btn-success" type="button" data-save-collection-settings>
+                    Save settings
+                </button>
+            </div>
+        </section>
+    </div>
+    {% endfor %}
+
+    <div class="bookmark-modal" id="createCollectionModal" data-create-collection-modal aria-hidden="true">
+        <div class="bookmark-modal__overlay" data-close-modal></div>
+        <section class="bookmark-modal__panel collection-settings-panel" role="dialog" aria-modal="true"
+            aria-labelledby="createCollectionTitle">
+            <button class="bookmark-modal__close" type="button" data-close-modal aria-label="Close create collection">
+                ×
+            </button>
+
+            <div class="collection-settings-header">
+                <p class="collection-modal-header__meta mb-2">New collection</p>
+                <h2 class="h4 fw-bold mb-0" id="createCollectionTitle">
+                    Create collection
+                </h2>
+            </div>
+
+            <div class="collection-settings-form">
+                <label class="form-label" for="newCollectionName">Collection name</label>
+                <input class="form-control" id="newCollectionName" type="text" placeholder="Weekend ideas"
+                    data-create-collection-name>
+
+                <label class="form-label" for="newCollectionVisibility">Visibility</label>
+                <select class="form-select" id="newCollectionVisibility" data-create-collection-visibility>
+                    <option value="Public" selected>Public</option>
+                    <option value="Private">Private</option>
+                </select>
+            </div>
+
+            <div class="collection-settings-actions">
+                <button class="btn btn-success" type="button" data-create-collection-submit>
+                    Create collection
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <div class="bookmark-modal" id="shareImportModal" data-share-import-modal aria-hidden="true">
+        <div class="bookmark-modal__overlay" data-close-modal></div>
+        <section class="bookmark-modal__panel collection-share-panel" role="dialog" aria-modal="true"
+            aria-labelledby="shareImportTitle">
+            <button class="bookmark-modal__close" type="button" data-close-modal aria-label="Close share code">
+                ×
+            </button>
+
+            <div class="collection-settings-header">
+                <h2 class="h4 fw-bold mb-2" id="shareImportTitle">Open shared collection</h2>
+                <p class="text-secondary mb-0">
+                    Paste a collection share code to preview it before subscribing or copying it.
+                </p>
+            </div>
+
+            <div class="collection-share-search">
+                <label class="visually-hidden" for="shareCodeInput">Share code</label>
+                <input class="form-control" id="shareCodeInput" type="text" placeholder="BRUNCH-4827">
+                <button class="btn btn-success" type="button" data-preview-share-code>
+                    Preview
+                </button>
+            </div>
+
+            <div class="collection-share-preview" id="sharePreview">
+                Enter a share code to preview a collection.
+            </div>
+        </section>
+    </div>
+
+    <script id="bookmarkCollectionsData" type="application/json">{{ bookmark_collections|tojson }}</script>
 </main>
 {% endblock %}
 
