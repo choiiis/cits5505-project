@@ -6,7 +6,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}?v=leaflet-map-2">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}?v=collection-picker-1">
 {% endblock %}
 
 {% block content %}
@@ -224,7 +224,10 @@
                                     </a>
 
                                     <button class="search-bookmark-btn bookmark-toggle"
-                                        data-bookmark="{{ restaurant.id }}" type="button" aria-label="Save restaurant">
+                                        data-bookmark="{{ restaurant.id }}"
+                                        data-restaurant-name="{{ restaurant.name }}"
+                                        data-restaurant-category="{{ restaurant.category }}"
+                                        type="button" aria-label="Save {{ restaurant.name }} to collection">
                                         ♡
                                     </button>
                                 </div>
@@ -260,11 +263,54 @@
             </div>
         </div>
     </section>
+
+    <div class="search-save-modal" id="collectionPickerModal" aria-hidden="true">
+        <div class="search-save-modal__overlay" data-close-collection-picker></div>
+        <section class="search-save-modal__panel" role="dialog" aria-modal="true"
+            aria-labelledby="collectionPickerTitle">
+            <button class="search-save-modal__close" type="button" data-close-collection-picker
+                aria-label="Close collection picker">
+                ×
+            </button>
+
+            <div class="search-save-modal__header">
+                <p class="search-save-modal__eyebrow">Save restaurant</p>
+                <h2 id="collectionPickerTitle">Choose collections</h2>
+                <p class="text-secondary mb-0" id="collectionPickerRestaurant">
+                    Select where this restaurant should be saved.
+                </p>
+            </div>
+
+            <div class="collection-picker-list" id="collectionPickerList">
+                {% for collection in collection_choices %}
+                <button class="collection-picker-option" type="button"
+                    data-picker-collection="{{ collection.id }}">
+                    <span>
+                        <strong>{{ collection.name }}</strong>
+                        {% if collection.visibility == "Private" %}
+                        <small>Private</small>
+                        {% endif %}
+                    </span>
+                    <span class="collection-picker-option__check">✓</span>
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="search-save-modal__actions">
+                <button class="btn btn-outline-dark" type="button" data-close-collection-picker>
+                    Cancel
+                </button>
+                <button class="btn btn-success" type="button" data-save-to-collections>
+                    Save
+                </button>
+            </div>
+        </section>
+    </div>
 </main>
 
 {% endblock %}
 
 {% block scripts %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{{ url_for('static', filename='js/search.js') }}?v=leaflet-map-2"></script>
+<script src="{{ url_for('static', filename='js/search.js') }}?v=collection-picker-1"></script>
 {% endblock %}
