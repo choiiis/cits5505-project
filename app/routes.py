@@ -12,7 +12,15 @@ from uuid import uuid4
 from flask import current_app, flash, redirect, render_template, request, session, url_for
 from app import app, db
 from app.utils import make_star_text
-from app.models import AuthToken, Restaurant, MenuItem, OpeningHour, Review, User
+from app.models import (
+    AuthToken,
+    BookmarkCollection,
+    Restaurant,
+    MenuItem,
+    OpeningHour,
+    Review,
+    User,
+)
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
@@ -384,84 +392,111 @@ def is_allowed_profile_image(filename):
     )
 
 
+def get_restaurant_image(restaurant):
+    return (
+        restaurant.thumbnail_image
+        or restaurant.hero_image
+        or url_for("static", filename=DEFAULT_RESTAURANT_IMAGE)
+    )
+
+
+def format_restaurant_card(restaurant, is_saved=True):
+    rating = round(restaurant.average_rating or 0, 1)
+
+    return {
+        "id": restaurant.id,
+        "name": restaurant.name,
+        "restaurant_id": restaurant.id,
+        "category": restaurant.category,
+        "location": restaurant.suburb or restaurant.address,
+        "rating": rating,
+        "star_text": make_star_text(rating),
+        "review_count": restaurant.review_count,
+        "description": restaurant.description,
+        "image": get_restaurant_image(restaurant),
+        "is_saved": is_saved,
+    }
+
+
+def get_collection_cover_image(collection):
+    for bookmark in collection.bookmarks:
+        if bookmark.restaurant:
+            return get_restaurant_image(bookmark.restaurant)
+
+    return url_for("static", filename=DEFAULT_RESTAURANT_IMAGE)
+
+
+def format_bookmark_collection(collection, is_saved=True):
+    restaurants = [
+        format_restaurant_card(bookmark.restaurant, is_saved=is_saved)
+        for bookmark in collection.bookmarks
+        if bookmark.restaurant and bookmark.restaurant.status == "approved"
+    ]
+    cover_image = get_collection_cover_image(collection)
+
+    return {
+        "id": collection.id,
+        "name": collection.name,
+        "visibility": "Public" if collection.is_public else "Private",
+        "share_code": f"COL-{collection.id:04d}",
+        "cover_image": cover_image,
+        "image": cover_image,
+        "restaurant_count": len(restaurants),
+        "description": collection.description,
+        "restaurants": restaurants,
+        "creator": collection.user.username if collection.user else "TableTrail user",
+        "subscriber_count": len(collection.subscriptions),
+    }
+
+
+def get_demo_user():
+    user_id = session.get("user_id")
+
+    if user_id:
+        user = User.query.get(user_id)
+        if user:
+            return user
+
+    return User.query.filter_by(role="customer").order_by(User.id).first()
+
+
+def get_public_collection_cards(limit=None):
+    collections = BookmarkCollection.query.filter_by(is_public=True).all()
+    formatted_collections = [
+        format_bookmark_collection(collection)
+        for collection in collections
+    ]
+
+    formatted_collections.sort(
+        key=lambda collection: (
+            collection["subscriber_count"],
+            collection["restaurant_count"],
+        ),
+        reverse=True,
+    )
+
+    return formatted_collections[:limit] if limit else formatted_collections
+
+
 def build_home_context():
-    home_categories = ["Italian", "Japanese", "Cafe", "Thai", "Dessert"]
+    home_categories = [
+        row[0]
+        for row in db.session.query(Restaurant.category)
+        .filter(Restaurant.status == "approved")
+        .distinct()
+        .order_by(Restaurant.category)
+        .limit(5)
+        .all()
+        if row[0]
+    ]
     featured_restaurants = [
-        {
-            "name": "Green Bowl Kitchen",
-            "restaurant_id": 5,
-            "category": "Healthy",
-            "location": "Subiaco",
-            "price": "$$",
-            "rating": 4.4,
-            "star_text": make_star_text(4.4),
-            "review_count": 3,
-            "description": "Fresh bowls, salads, smoothies, and vegan-friendly meals.",
-            "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-            "name": "Laneway Pizza Co.",
-            "restaurant_id": 1,
-            "category": "Italian",
-            "location": "Perth CBD",
-            "price": "$$",
-            "rating": 4.7,
-            "star_text": make_star_text(4.7),
-            "review_count": 3,
-            "description": "A casual pizza spot in Perth CBD.",
-            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-            "name": "Northbridge Coffee Lab",
-            "restaurant_id": 2,
-            "category": "Cafe",
-            "location": "Northbridge",
-            "price": "$$",
-            "rating": 4.5,
-            "star_text": make_star_text(4.5),
-            "review_count": 2,
-            "description": "Specialty coffee and brunch near Northbridge.",
-            "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-            "name": "Seoul Table",
-            "restaurant_id": 3,
-            "category": "Korean",
-            "location": "Victoria Park",
-            "price": "$$",
-            "rating": 4.8,
-            "star_text": make_star_text(4.8),
-            "review_count": 4,
-            "description": "Korean comfort food and BBQ in Victoria Park.",
-            "image": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1200&q=80",
-        },
+        format_restaurant_card(restaurant)
+        for restaurant in Restaurant.query.filter_by(status="approved")
+        .order_by(Restaurant.average_rating.desc(), Restaurant.review_count.desc())
+        .limit(4)
+        .all()
     ]
-    public_collections = [
-        {
-            "name": "Perth brunch trail",
-            "creator": "Mia Chen",
-            "restaurant_count": 3,
-            "subscriber_count": 128,
-            "description": "Popular cafe and brunch picks around Perth and Northbridge.",
-            "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-            "name": "Weeknight dinner spots",
-            "creator": "Alex Wong",
-            "restaurant_count": 4,
-            "subscriber_count": 94,
-            "description": "Reliable dinner places for casual evenings with friends.",
-            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-            "name": "Healthy lunch list",
-            "creator": "Jordan Smith",
-            "restaurant_count": 3,
-            "subscriber_count": 67,
-            "description": "Fresh bowls, cafes, and lighter lunch options.",
-            "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
-        },
-    ]
+    public_collections = get_public_collection_cards(limit=3)
 
     return {
         "home_categories": home_categories,
@@ -983,6 +1018,20 @@ def search():
         .all()
         if row[0]
     ]
+    user = get_demo_user()
+    collection_choices = []
+
+    if user:
+        collection_choices = [
+            {
+                "id": collection.id,
+                "name": collection.name,
+                "visibility": "Public" if collection.is_public else "Private",
+            }
+            for collection in BookmarkCollection.query.filter_by(user_id=user.id)
+            .order_by(BookmarkCollection.created_at, BookmarkCollection.id)
+            .all()
+        ]
 
     return render_template(
         "search.html",
@@ -994,158 +1043,44 @@ def search():
         search_map_search_url=search_map_search_url,
         search_map_label=search_map_label,
         search_summary_label=search_summary_label,
-        collection_choices=[
-            {"id": "favorite", "name": "Favorite", "visibility": "Private"},
-            {"id": "weekend-brunch", "name": "Weekend brunch", "visibility": "Public"},
-            {"id": "dinner-shortlist", "name": "Dinner shortlist", "visibility": "Private"},
-            {"id": "city-lunch", "name": "City lunch ideas", "visibility": "Public"},
-        ],
+        collection_choices=collection_choices,
     )
 
 
 @app.route("/bookmarks")
 def bookmarks():
-    saved_restaurants = [
-        {
-            "id": 5,
-            "name": "Green Bowl Kitchen",
-            "category": "Healthy",
-            "location": "Subiaco",
-            "price": "$$",
-            "rating": 4.4,
-            "star_text": make_star_text(4.4),
-            "review_count": 3,
-            "description": "Fresh bowls, salads, smoothies, and vegan-friendly meals.",
-            "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-            "id": 1,
-            "name": "Laneway Pizza Co.",
-            "category": "Italian",
-            "location": "Perth CBD",
-            "price": "$$",
-            "rating": 4.7,
-            "star_text": make_star_text(4.7),
-            "review_count": 3,
-            "description": "A casual pizza spot in Perth CBD.",
-            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-            "id": 2,
-            "name": "Northbridge Coffee Lab",
-            "category": "Cafe",
-            "location": "Northbridge",
-            "price": "$$",
-            "rating": 4.5,
-            "star_text": make_star_text(4.5),
-            "review_count": 2,
-            "description": "Specialty coffee and brunch near Northbridge.",
-            "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
-        },
-    ]
+    user = get_demo_user()
+    user_collections = []
 
-    collection_restaurants = [
-        {**restaurant, "is_saved": True}
-        for restaurant in saved_restaurants
-    ]
+    if user:
+        user_collections = (
+            BookmarkCollection.query.filter_by(user_id=user.id)
+            .order_by(BookmarkCollection.created_at, BookmarkCollection.id)
+            .all()
+        )
+
+    favorite_collection = next(
+        (
+            collection
+            for collection in user_collections
+            if collection.name.lower() == "favorite"
+        ),
+        user_collections[0] if user_collections else None,
+    )
+    saved_restaurants = []
+
+    if favorite_collection:
+        saved_restaurants = [
+            format_restaurant_card(bookmark.restaurant)
+            for bookmark in favorite_collection.bookmarks
+            if bookmark.restaurant and bookmark.restaurant.status == "approved"
+        ]
 
     bookmark_collections = [
-        {
-            "id": "favorite",
-            "name": "Favorite",
-            "visibility": "Private",
-            "share_code": "FAVORITE",
-            "cover_image": saved_restaurants[0]["image"],
-            "restaurant_count": len(saved_restaurants),
-            "description": "Your main saved restaurant list.",
-            "restaurants": collection_restaurants,
-        },
-        {
-            "id": "weekend-brunch",
-            "name": "Weekend brunch",
-            "visibility": "Public",
-            "share_code": "BRUNCH-4827",
-            "cover_image": saved_restaurants[0]["image"],
-            "restaurant_count": 2,
-            "description": "Easy cafes and light meals for slow weekend mornings.",
-            "restaurants": [
-                collection_restaurants[0],
-                {**collection_restaurants[2], "is_saved": False},
-            ],
-        },
-        {
-            "id": "dinner-shortlist",
-            "name": "Dinner shortlist",
-            "visibility": "Private",
-            "share_code": "DINNER-9135",
-            "cover_image": saved_restaurants[1]["image"],
-            "restaurant_count": 2,
-            "description": "Places worth trying for relaxed dinners with friends.",
-            "restaurants": [
-                collection_restaurants[1],
-                collection_restaurants[0],
-            ],
-        },
-        {
-            "id": "city-lunch",
-            "name": "City lunch ideas",
-            "visibility": "Public",
-            "share_code": "LUNCH-2058",
-            "cover_image": saved_restaurants[2]["image"],
-            "restaurant_count": 2,
-            "description": "Fast, reliable restaurants around Perth CBD.",
-            "restaurants": [
-                collection_restaurants[2],
-                {**collection_restaurants[1], "is_saved": False},
-            ],
-        },
+        format_bookmark_collection(collection)
+        for collection in user_collections
     ]
-
-    public_collections = sorted(
-        [
-            {
-                "id": "public-perth-brunch",
-                "name": "Perth brunch trail",
-                "creator": "Mia Chen",
-                "subscriber_count": 128,
-                "cover_image": saved_restaurants[2]["image"],
-                "restaurant_count": 3,
-                "description": "Popular cafe and brunch picks around Perth and Northbridge.",
-                "restaurants": [
-                    collection_restaurants[2],
-                    collection_restaurants[0],
-                ],
-            },
-            {
-                "id": "public-weeknight-dinners",
-                "name": "Weeknight dinner spots",
-                "creator": "Alex Wong",
-                "subscriber_count": 94,
-                "cover_image": saved_restaurants[1]["image"],
-                "restaurant_count": 4,
-                "description": "Reliable dinner places for casual evenings with friends.",
-                "restaurants": [
-                    collection_restaurants[1],
-                    collection_restaurants[0],
-                ],
-            },
-            {
-                "id": "public-healthy-lunch",
-                "name": "Healthy lunch list",
-                "creator": "Jordan Smith",
-                "subscriber_count": 67,
-                "cover_image": saved_restaurants[0]["image"],
-                "restaurant_count": 3,
-                "description": "Fresh bowls, cafes, and lighter lunch options.",
-                "restaurants": [
-                    collection_restaurants[0],
-                    collection_restaurants[2],
-                ],
-            },
-        ],
-        key=lambda collection: collection["subscriber_count"],
-        reverse=True,
-    )
+    public_collections = get_public_collection_cards()
 
     return render_template(
         "bookmarks.html",

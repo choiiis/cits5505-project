@@ -33,6 +33,10 @@ class User(db.Model):
         "BookmarkCollection", back_populates="user", cascade="all, delete-orphan"
     )
 
+    collection_subscriptions = db.relationship(
+        "CollectionSubscription", back_populates="user", cascade="all, delete-orphan"
+    )
+
     auth_tokens = db.relationship(
         "AuthToken", back_populates="user", cascade="all, delete-orphan"
     )
@@ -212,6 +216,12 @@ class BookmarkCollection(db.Model):
         "Bookmark", back_populates="collection", cascade="all, delete-orphan"
     )
 
+    subscriptions = db.relationship(
+        "CollectionSubscription",
+        back_populates="collection",
+        cascade="all, delete-orphan",
+    )
+
     __table_args__ = (
         db.UniqueConstraint("user_id", "name", name="unique_collection_name_per_user"),
     )
@@ -237,5 +247,31 @@ class Bookmark(db.Model):
     __table_args__ = (
         db.UniqueConstraint(
             "collection_id", "restaurant_id", name="unique_restaurant_per_collection"
+        ),
+    )
+
+
+class CollectionSubscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    collection_id = db.Column(
+        db.Integer, db.ForeignKey("bookmark_collection.id"), nullable=False
+    )
+
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    collection = db.relationship(
+        "BookmarkCollection", back_populates="subscriptions"
+    )
+
+    user = db.relationship("User", back_populates="collection_subscriptions")
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "collection_id",
+            "user_id",
+            name="unique_collection_subscription_per_user",
         ),
     )
