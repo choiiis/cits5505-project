@@ -297,32 +297,6 @@
   padding: 6px 12px;
 }
 
-.owner-task-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-.owner-task-card {
-  background: #ffffff;
-  border: 1px solid var(--brand-line);
-  border-radius: 14px;
-  padding: 18px;
-}
-
-.owner-task-card h3 {
-  color: var(--brand-ink);
-  font-size: 1.05rem;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.owner-task-card p {
-  color: #5f6c7b;
-  line-height: 1.5;
-  margin: 0;
-}
-
 @media (max-width: 991.98px) {
   .owner-page {
     padding-bottom: 2rem;
@@ -342,8 +316,7 @@
     margin-top: 1rem;
   }
 
-  .owner-info-grid,
-  .owner-task-grid {
+  .owner-info-grid {
     grid-template-columns: 1fr;
   }
 
@@ -409,5 +382,127 @@
 @media (max-width: 575.98px) {
   .owner-hours-table input[type="time"] {
     width: 120px;
+  }
+}
+
+.owner-restaurant-switcher-card {
+  margin-bottom: 24px;
+}
+
+.owner-restaurant-switcher {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.owner-restaurant-switcher label {
+  color: var(--brand-ink);
+  display: block;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.owner-restaurant-switcher p {
+  color: #5f6c7b;
+  margin: 0;
+}
+
+.owner-select {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 10px;
+  color: var(--brand-ink);
+  font-weight: 700;
+  min-height: 42px;
+  min-width: 260px;
+  padding: 0.55rem 0.75rem;
+}
+
+.owner-section-form {
+  margin: 0;
+}
+
+.owner-info-grid--editable,
+.owner-form-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.owner-form-field--wide,
+.owner-form-field--full {
+  grid-column: span 2;
+}
+
+.owner-form-field textarea,
+.owner-form-field input[type="url"],
+.owner-form-field input[type="number"] {
+  border: 1px solid var(--brand-line);
+  border-radius: 10px;
+  color: var(--brand-ink);
+  font: inherit;
+  min-height: 40px;
+  padding: 0.45rem 0.65rem;
+}
+
+.owner-form-field textarea {
+  resize: vertical;
+}
+
+.owner-delete-form,
+.owner-report-form {
+  display: inline-flex;
+  margin-left: 0.35rem;
+}
+
+.owner-table-button--danger {
+  color: #dc2626;
+}
+
+.owner-status--active,
+.owner-status--approved {
+  background: var(--brand-mint);
+  color: var(--brand-green);
+}
+
+.owner-status--reported,
+.owner-status--pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.owner-status--hidden {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+@media (max-width: 991.98px) {
+  .owner-restaurant-switcher {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .owner-select {
+    min-width: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+
+  .owner-info-grid--editable,
+  .owner-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-form-field--wide,
+  .owner-form-field--full {
+    grid-column: span 1;
+  }
+
+  .owner-delete-form,
+  .owner-report-form,
+  .owner-table-button {
+    margin-left: 0;
+    width: 100%;
   }
 }
