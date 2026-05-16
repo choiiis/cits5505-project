@@ -501,6 +501,12 @@ def search():
         search_map_search_url=search_map_search_url,
         search_map_label=search_map_label,
         search_summary_label=search_summary_label,
+        collection_choices=[
+            {"id": "favorite", "name": "Favorite", "visibility": "Private"},
+            {"id": "weekend-brunch", "name": "Weekend brunch", "visibility": "Public"},
+            {"id": "dinner-shortlist", "name": "Dinner shortlist", "visibility": "Private"},
+            {"id": "city-lunch", "name": "City lunch ideas", "visibility": "Public"},
+        ],
     )
 
 
@@ -551,6 +557,16 @@ def bookmarks():
     ]
 
     bookmark_collections = [
+        {
+            "id": "favorite",
+            "name": "Favorite",
+            "visibility": "Private",
+            "share_code": "FAVORITE",
+            "cover_image": saved_restaurants[0]["image"],
+            "restaurant_count": len(saved_restaurants),
+            "description": "Your main saved restaurant list.",
+            "restaurants": collection_restaurants,
+        },
         {
             "id": "weekend-brunch",
             "name": "Weekend brunch",

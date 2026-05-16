@@ -13,24 +13,24 @@
     <section class="container py-4 py-md-5">
         <div class="shared-page-header mb-4">
             <div class="shared-page-header__content">
-                <h1 class="h3 fw-bold mb-2">Saved Restaurants</h1>
-                <p class="text-secondary">Your bookmark list for places to try next.</p>
+                <h1 class="h3 fw-bold mb-2">Favorite</h1>
+                <p class="text-secondary">Your default collection for saved restaurants.</p>
             </div>
             <a class="btn btn-success align-self-start align-self-md-center" href="{{ url_for('search') }}">
                 Find more
             </a>
         </div>
 
-        <section class="bookmark-search-panel mb-4" aria-label="Search saved restaurants and collections">
-            <label class="visually-hidden" for="bookmarkSearchInput">Search saved restaurants and collections</label>
+        <section class="bookmark-search-panel mb-4" aria-label="Search favorite restaurants and collections">
+            <label class="visually-hidden" for="bookmarkSearchInput">Search favorite restaurants and collections</label>
             <div class="bookmark-search-panel__field">
                 <span aria-hidden="true">⌕</span>
                 <input class="form-control form-control-lg" id="bookmarkSearchInput" type="search"
-                    placeholder="Search saved restaurants or collections" data-bookmark-search>
+                    placeholder="Search favorite restaurants or collections" data-bookmark-search>
             </div>
         </section>
 
-        <section class="bookmark-stage-shell" aria-label="Saved restaurants section">
+        <section class="bookmark-stage-shell" aria-label="Favorite restaurants section">
             <div class="row g-3" id="bookmarkMount">
                 {% for restaurant in saved_restaurants %}
                 <div class="col-md-6 col-xl-4" data-bookmark-card
@@ -62,7 +62,7 @@
 
                 <div class="col-12 {% if saved_restaurants %}d-none{% endif %}" id="bookmarkEmptyState">
                     <div class="bookmark-empty-state">
-                        Your saved restaurant list is empty. Explore more places and save your favourites.
+                        Your favorite collection is empty. Explore more places and save your favourites.
                     </div>
                 </div>
             </div>
