@@ -68,7 +68,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
-  margin-top: -2.5rem;
+  margin-top: 24px;
   position: relative;
   z-index: 2;
 }

@@ -11,16 +11,14 @@
     <section class="owner-hero">
         <div class="container owner-hero__inner">
             <div>
-                <p class="owner-label">Owner Panel</p>
                 <h1>Owner Dashboard</h1>
                 <p class="owner-subtitle">
-                    Manage {{ restaurant.name }} information, menu items, opening hours, and listing status from one
-                    place.
+                    Manage restaurant information, menu items, opening hours, and listing status from one place.
                 </p>
             </div>
 
             <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}" class="owner-view-link">
-                View public page
+                View restaurant page
             </a>
         </div>
     </section>
@@ -125,8 +123,7 @@
                                 on that day.</p>
                         </div>
 
-                        <button type="submit" class="owner-action-button" id="saveOpeningHoursBtn">Save opening
-                            hours</button>
+                        <button type="submit" class="owner-action-button" id="saveOpeningHoursBtn">Save changes</button>
                     </div>
 
                     <div class="owner-table-wrap">
