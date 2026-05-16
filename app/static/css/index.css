@@ -138,6 +138,48 @@ main {
   margin-top: auto;
 }
 
+.security-section {
+  background: #f7f9fb;
+}
+
+.security-panel {
+  background: #ffffff;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.security-panel__intro {
+  margin-bottom: 1.25rem;
+  max-width: 46rem;
+}
+
+.security-panel__eyebrow {
+  color: var(--brand-green);
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+  text-transform: uppercase;
+}
+
+.security-item {
+  border-left: 3px solid var(--brand-green);
+  height: 100%;
+  padding: 0.25rem 0 0.25rem 1rem;
+}
+
+.security-item__title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.security-item__copy {
+  color: #5f6c7b;
+  margin-bottom: 0;
+}
+
 @media (max-width: 991.98px) {
   .hero-search {
     margin-bottom: 0;
@@ -153,5 +195,9 @@ main {
 
   .featured-card__image {
     height: 180px;
+  }
+
+  .security-panel {
+    padding: 1.1rem;
   }
 }
