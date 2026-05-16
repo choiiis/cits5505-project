@@ -190,6 +190,21 @@ def refresh_restaurant_rating_summary(restaurant):
     )
     restaurant.updated_at = datetime.utcnow()
 
+def get_profile_review_or_redirect(review_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        flash("Please log in to manage your reviews.", "info")
+        return None, redirect(url_for("login"))
+
+    review = Review.query.get_or_404(review_id)
+
+    if review.user_id != user_id:
+        flash("You can only manage your own reviews.", "danger")
+        return None, redirect(url_for("profile"))
+
+    return review, None
+
 def make_initials(username):
     parts = username.split()
     if not parts:
