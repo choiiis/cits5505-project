@@ -1,7 +1,7 @@
 from flask import flash, redirect, render_template, request, session, url_for
 from app import app, db
 from app.utils import make_star_text
-from app.models import Restaurant, MenuItem, OpeningHour, Review, User
+from app.models import Restaurant, MenuItem, OpeningHour, Review, ReviewPhoto, User
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from datetime import datetime
@@ -613,6 +613,7 @@ def restaurant_detail(restaurant_id):
 
         rating_text = request.form.get("rating", "").strip()
         review_text = request.form.get("review_text", "").strip()
+        review_photo_url = request.form.get("review_photo_url", "").strip()
 
         try:
             rating = int(rating_text)
@@ -632,6 +633,14 @@ def restaurant_detail(restaurant_id):
 
         db.session.add(review)
         db.session.flush()
+
+        if review_photo_url:
+            db.session.add(
+                ReviewPhoto(
+                    review_id=review.id,
+                    image_url=review_photo_url,
+                )
+            )
 
         visible_reviews = Review.query.filter(
             Review.restaurant_id == restaurant.id,

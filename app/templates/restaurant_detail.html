@@ -49,8 +49,13 @@
         <textarea id="reviewText" name="review_text" class="form-control" rows="5"
             placeholder="Share your experience"></textarea>
 
-        <label for="reviewPhotos">Photos</label>
-        <input type="file" id="reviewPhotos" name="review_photos" class="form-control" accept="image/*" multiple>
+        <label for="reviewPhotoUrl">Photo URL</label>
+        <input
+            type="url"
+            id="reviewPhotoUrl"
+            name="review_photo_url"
+            class="form-control"
+            placeholder="https://example.com/photo.jpg">
         <button type="submit" class="btn btn-success rounded-pill fw-bold py-2 mt-3">
             Submit review
         </button>
