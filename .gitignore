@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 .env
 app.db
+app/static/uploads/profile_images/

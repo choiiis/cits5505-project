@@ -1,8 +1,12 @@
+import os
+from uuid import uuid4
+
 from flask import flash, redirect, render_template, request, session, url_for
 from app import app, db
 from app.utils import make_star_text
 from app.models import Restaurant, MenuItem, OpeningHour, Review, User
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from datetime import datetime
 from urllib.parse import quote_plus
@@ -10,6 +14,10 @@ from urllib.parse import quote_plus
 DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
 DEFAULT_RESTAURANT_IMAGE = "images/restaurant-default.png"
 DEFAULT_MENU_IMAGE = "images/menu-default.png"
+PROFILE_IMAGE_UPLOAD_FOLDER = os.path.join(
+    app.static_folder, "uploads", "profile_images"
+)
+ALLOWED_PROFILE_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 SEARCH_MAP_COORDINATES = {
     "Perth CBD": {"lat": -31.9523, "lng": 115.8613},
     "Northbridge": {"lat": -31.9466, "lng": 115.8552},
@@ -174,6 +182,13 @@ def make_initials(username):
         return "TT"
 
     return "".join(part[0] for part in parts[:2]).upper()
+
+
+def is_allowed_profile_image(filename):
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED_PROFILE_IMAGE_EXTENSIONS
+    )
 
 
 def build_home_context():
@@ -355,7 +370,7 @@ def profile():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip().lower()
-        profile_image = request.form.get("profile_image", "").strip()
+        profile_image_file = request.files.get("profile_image")
 
         if not username or not email:
             flash("Please enter your username and email.", "danger")
@@ -369,9 +384,25 @@ def profile():
             flash("That email is already used by another account.", "danger")
             return redirect(url_for("profile"))
 
+        if profile_image_file and profile_image_file.filename:
+            original_filename = secure_filename(profile_image_file.filename)
+
+            if not is_allowed_profile_image(original_filename):
+                flash("Please choose a PNG, JPG, GIF, or WebP profile image.", "danger")
+                return redirect(url_for("profile"))
+
+            os.makedirs(PROFILE_IMAGE_UPLOAD_FOLDER, exist_ok=True)
+            extension = original_filename.rsplit(".", 1)[1].lower()
+            filename = f"{uuid4().hex}.{extension}"
+            profile_image_file.save(
+                os.path.join(PROFILE_IMAGE_UPLOAD_FOLDER, filename)
+            )
+            user.profile_image = url_for(
+                "static", filename=f"uploads/profile_images/{filename}"
+            )
+
         user.username = username
         user.email = email
-        user.profile_image = profile_image or None
         db.session.commit()
 
         session["username"] = user.username
@@ -615,10 +646,55 @@ def bookmarks():
     )
 
 
-@app.route("/restaurants/<int:restaurant_id>")
+@app.route("/restaurants/<int:restaurant_id>", methods=["GET", "POST"])
 def restaurant_detail(restaurant_id):
     # restaurant summary
     restaurant = Restaurant.query.get_or_404(restaurant_id)
+
+    if request.method == "POST":
+        user_id = session.get("user_id")
+
+        if not user_id:
+            flash("Please log in to write a review.", "info")
+            return redirect(url_for("login"))
+
+        rating_text = request.form.get("rating", "").strip()
+        review_text = request.form.get("review_text", "").strip()
+
+        try:
+            rating = int(rating_text)
+        except ValueError:
+            rating = 0
+
+        if rating < 1 or rating > 5 or not review_text:
+            flash("Please choose a rating and write your review.", "danger")
+            return redirect(url_for("restaurant_detail", restaurant_id=restaurant.id))
+
+        review = Review(
+            restaurant_id=restaurant.id,
+            user_id=user_id,
+            rating=rating,
+            content=review_text,
+        )
+
+        db.session.add(review)
+        db.session.flush()
+
+        visible_reviews = Review.query.filter(
+            Review.restaurant_id == restaurant.id,
+            Review.status != "hidden",
+        ).all()
+
+        restaurant.review_count = len(visible_reviews)
+        restaurant.average_rating = round(
+            sum(item.rating for item in visible_reviews) / restaurant.review_count,
+            1,
+        )
+        restaurant.updated_at = datetime.utcnow()
+
+        db.session.commit()
+        flash("Review submitted successfully.", "success")
+        return redirect(url_for("restaurant_detail", restaurant_id=restaurant.id))
 
     # restaurant opening hours
     opening_hours = (
