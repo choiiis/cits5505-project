@@ -678,6 +678,25 @@ def get_admin_user_or_redirect():
 def redirect_back_to_admin():
     return redirect(request.referrer or url_for("admin_dashboard"))
 
+def get_owner_user_or_redirect():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        flash("Please log in to access the owner dashboard.", "info")
+        return None, redirect(url_for("login"))
+
+    current_user = User.query.get_or_404(user_id)
+
+    if current_user.role != "owner":
+        flash("You do not have permission to access the owner dashboard.", "danger")
+        return None, redirect(url_for("home"))
+
+    return current_user, None
+
+
+def redirect_back_to_owner():
+    return redirect(request.referrer or url_for("owner_dashboard"))
+
 
 @app.route("/admin")
 def admin_dashboard():
