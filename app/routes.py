@@ -769,7 +769,14 @@ def get_admin_user_or_redirect():
 
 def redirect_back_to_admin():
     return redirect(request.referrer or url_for("admin_dashboard"))
+ADMIN_RESTAURANT_STATUSES = ["approved", "pending", "reported"]
+ADMIN_USER_ROLES = ["customer", "owner", "admin"]
+ADMIN_USER_STATUSES = ["active", "suspended"]
+ADMIN_REVIEW_STATUSES = ["active", "reported", "hidden"]
 
+
+def is_valid_admin_option(value, allowed_values):
+    return value in allowed_values
 
 @app.route("/admin")
 def admin_dashboard():
