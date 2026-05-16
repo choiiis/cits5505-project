@@ -1,21 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("profileForm");
     const usernameInput = document.getElementById("usernameInput");
-    const emailInput = document.getElementById("emailInput");
     const profileImageInput = document.getElementById("profileImageInput");
     const message = document.getElementById("profileMessage");
 
-    if (!form || !usernameInput || !emailInput || !profileImageInput || !message) {
+    if (!form || !usernameInput || !profileImageInput || !message) {
         return;
     }
 
     function setFieldState(input, isValid) {
         input.classList.toggle("is-invalid", !isValid);
         input.classList.toggle("is-valid", isValid && input.value.trim() !== "");
-    }
-
-    function isValidEmail(value) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     }
 
     function isOptionalImageFile(input) {
@@ -28,17 +23,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function validateForm() {
         const usernameIsValid = usernameInput.value.trim().length > 0;
-        const emailIsValid = isValidEmail(emailInput.value.trim());
         const profileImageIsValid = isOptionalImageFile(profileImageInput);
 
         setFieldState(usernameInput, usernameIsValid);
-        setFieldState(emailInput, emailIsValid);
         setFieldState(profileImageInput, profileImageIsValid);
 
-        return usernameIsValid && emailIsValid && profileImageIsValid;
+        return usernameIsValid && profileImageIsValid;
     }
 
-    [usernameInput, emailInput].forEach((input) => {
+    [usernameInput, profileImageInput].forEach((input) => {
         input.addEventListener("input", () => {
             message.textContent = "";
             message.classList.remove("is-error");

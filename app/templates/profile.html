@@ -40,7 +40,12 @@
                         {% endif %}
                     </div>
                     <h2 class="h5 fw-bold mb-1" id="profileInfoTitle">{{ user.username }}</h2>
-                    <p class="text-secondary mb-4">{{ user.email }}</p>
+                    <p class="text-secondary mb-2">{{ user.email }}</p>
+                    {% if pending_new_email %}
+                    <div class="alert alert-warning py-2 text-start" role="status">
+                        Pending change to {{ pending_new_email }}. Please verify the new email to complete the update.
+                    </div>
+                    {% endif %}
 
                     <form id="profileForm" method="post" action="{{ url_for('profile') }}" enctype="multipart/form-data" novalidate>
                         <div class="mb-3">
@@ -54,19 +59,6 @@
                                 autocomplete="name"
                                 required>
                             <div class="invalid-feedback">Please enter your username.</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label" for="emailInput">Email</label>
-                            <input
-                                class="form-control"
-                                id="emailInput"
-                                name="email"
-                                type="email"
-                                value="{{ user.email }}"
-                                autocomplete="email"
-                                required>
-                            <div class="invalid-feedback">Please enter a valid email address.</div>
                         </div>
 
                         <div class="mb-3">
@@ -88,6 +80,7 @@
                 <section class="profile-panel mt-4" aria-labelledby="accountActionsTitle">
                     <h2 class="h5 fw-bold mb-3" id="accountActionsTitle">Account Actions</h2>
                     <div class="d-grid gap-2">
+                        <a class="btn btn-outline-success" href="{{ url_for('change_email') }}">Change email</a>
                         <a class="btn btn-outline-success" href="{{ url_for('logout') }}">Logout</a>
                         <button class="btn btn-outline-danger" type="button" disabled>Delete account</button>
                     </div>

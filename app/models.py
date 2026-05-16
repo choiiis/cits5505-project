@@ -8,6 +8,7 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True, index=True)
     username = db.Column(db.String(80), nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
+    email_verified_at = db.Column(db.DateTime)
 
     profile_image = db.Column(db.String(255))
     role = db.Column(db.String(20), nullable=False, default="customer")
@@ -31,6 +32,36 @@ class User(db.Model):
     bookmark_collections = db.relationship(
         "BookmarkCollection", back_populates="user", cascade="all, delete-orphan"
     )
+
+    auth_tokens = db.relationship(
+        "AuthToken", back_populates="user", cascade="all, delete-orphan"
+    )
+
+    @property
+    def is_email_verified(self):
+        return self.email_verified_at is not None
+
+
+class AuthToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    token_hash = db.Column(db.String(64), nullable=False, unique=True, index=True)
+    purpose = db.Column(db.String(40), nullable=False, index=True)
+    new_email = db.Column(db.String(120))
+    expires_at = db.Column(db.DateTime, nullable=False, index=True)
+    used_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship("User", back_populates="auth_tokens")
+
+    @property
+    def is_used(self):
+        return self.used_at is not None
+
+    @property
+    def is_expired(self):
+        return datetime.utcnow() > self.expires_at
 
 
 class Restaurant(db.Model):

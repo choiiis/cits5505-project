@@ -683,6 +683,7 @@ def create_users():
         profile_image=None,
         role="admin",
         status="active",
+        email_verified_at=datetime.utcnow() - timedelta(days=70),
         created_at=datetime.utcnow() - timedelta(days=70),
         updated_at=datetime.utcnow() - timedelta(days=1),
     )
@@ -708,6 +709,7 @@ def create_users():
                 ),
                 role="owner",
                 status=USER_STATUS_PATTERN[index % len(USER_STATUS_PATTERN)],
+                email_verified_at=datetime.utcnow() - timedelta(days=65 - index),
                 abn_number=abn_number,
                 contact_number=contact_number,
                 created_at=datetime.utcnow() - timedelta(days=65 - index),
@@ -776,6 +778,7 @@ def create_users():
                 ),
                 role="customer",
                 status=USER_STATUS_PATTERN[index % len(USER_STATUS_PATTERN)],
+                email_verified_at=datetime.utcnow() - timedelta(days=60 - (index % 40)),
                 created_at=datetime.utcnow() - timedelta(days=60 - (index % 40)),
                 updated_at=datetime.utcnow() - timedelta(days=index % 12),
             )

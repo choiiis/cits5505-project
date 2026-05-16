@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Change Email | TableTrail{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block body_attrs %}data-page="profile"{% endblock %}
+
+{% block content %}
+<main class="profile-page">
+    <section class="container py-4 py-md-5">
+        <div class="shared-page-header mb-4">
+            <div class="shared-page-header__content">
+                <h1 class="h3 fw-bold mb-2">Change email</h1>
+                <p class="text-secondary">Your current email stays active until the new address is verified.</p>
+            </div>
+            <a class="btn btn-outline-success align-self-start align-self-md-center" href="{{ url_for('profile') }}">Back to profile</a>
+        </div>
+
+        <section class="profile-panel profile-panel--narrow mx-auto" aria-labelledby="changeEmailTitle">
+            <h2 class="h5 fw-bold mb-1" id="changeEmailTitle">Request email change</h2>
+            <p class="text-secondary">Current email: {{ user.email }}</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="auth-alerts" aria-live="polite">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} py-2" role="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form id="changeEmailForm" method="post" action="{{ url_for('change_email') }}" novalidate>
+                <div class="mb-3">
+                    <label class="form-label" for="newEmailInput">New email</label>
+                    <input
+                        class="form-control"
+                        id="newEmailInput"
+                        name="new_email"
+                        type="email"
+                        placeholder="new@example.com"
+                        autocomplete="email"
+                        required>
+                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="currentPasswordInput">Current password</label>
+                    <input
+                        class="form-control"
+                        id="currentPasswordInput"
+                        name="current_password"
+                        type="password"
+                        autocomplete="current-password"
+                        required>
+                    <div class="invalid-feedback">Please enter your current password.</div>
+                </div>
+
+                <button class="btn btn-success w-100" type="submit">Send verification link</button>
+                <p class="account-action-message mb-0 mt-3" id="changeEmailMessage" role="status" aria-live="polite"></p>
+            </form>
+        </section>
+    </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/change_email.js') }}"></script>
+{% endblock %}
