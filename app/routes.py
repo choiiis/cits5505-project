@@ -993,17 +993,38 @@ def delete_review_record(review_id):
 
 @app.route("/owner")
 def owner_dashboard():
-    restaurant = {
-        "id": 1,
-        "name": "Laneway Pizza Co.",
-        "category": "Italian",
-        "address": "Barrack St, Perth, WA 6000",
-        "phone": "+61 8 1234 5678",
-        "website": "https://example.com",
-        "status": "Approved",
-        "rating": "4.7",
-        "review_count": "512",
-    }
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant_model = get_owner_restaurant(current_user.id)
+
+    if not restaurant_model:
+        flash("No restaurant record is linked to this owner account.", "warning")
+        return render_template(
+            "owner_dashboard.html",
+            restaurant=None,
+            owner_stats=[],
+            restaurant_info=[],
+            opening_hours=[],
+            menu_items=[],
+            owner_tasks=[],
+            reviews=[],
+            review_summary=build_review_summary([]),
+        )
+
+    reviews = (
+        Review.query.filter(
+            Review.restaurant_id == restaurant_model.id,
+            Review.status != "hidden",
+        )
+        .order_by(Review.created_at.desc())
+        .all()
+    )
+
+    review_summary = build_review_summary(reviews)
+    restaurant = build_owner_restaurant_data(restaurant_model, review_summary)
 
     owner_stats = [
         {"label": "Restaurant", "value": restaurant["name"]},
@@ -1020,69 +1041,13 @@ def owner_dashboard():
         {"label": "Website", "field": "website", "value": restaurant["website"]},
     ]
 
-    opening_hours = [
-        {
-            "day": "Monday",
-            "open_time": "07:00",
-            "close_time": "23:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Tuesday",
-            "open_time": "07:00",
-            "close_time": "23:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Wednesday",
-            "open_time": "07:00",
-            "close_time": "23:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Thursday",
-            "open_time": "07:00",
-            "close_time": "23:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Friday",
-            "open_time": "07:00",
-            "close_time": "00:00",
-            "is_closed": False,
-        },
-        {
-            "day": "Saturday",
-            "open_time": "08:00",
-            "close_time": "00:00",
-            "is_closed": False,
-        },
-        {"day": "Sunday", "open_time": "", "close_time": "", "is_closed": True},
-    ]
+    opening_hours = (
+        OpeningHour.query.filter_by(restaurant_id=restaurant_model.id)
+        .order_by(OpeningHour.day_of_week)
+        .all()
+    )
 
-    menu_items = [
-        {
-            "name": "Margherita Pizza",
-            "category": "Pizza",
-            "price": "$22",
-            "status": "Available",
-            "status_class": "owner-status--available",
-        },
-        {
-            "name": "Truffle Mushroom Pizza",
-            "category": "Pizza",
-            "price": "$27",
-            "status": "Available",
-            "status_class": "owner-status--available",
-        },
-        {
-            "name": "Tiramisu",
-            "category": "Dessert",
-            "price": "$14",
-            "status": "Hidden",
-            "status_class": "owner-status--hidden",
-        },
-    ]
+    menu_items = MenuItem.query.filter_by(restaurant_id=restaurant_model.id).all()
 
     owner_tasks = [
         {
@@ -1107,4 +1072,6 @@ def owner_dashboard():
         opening_hours=opening_hours,
         menu_items=menu_items,
         owner_tasks=owner_tasks,
+        reviews=reviews,
+        review_summary=review_summary,
     )
