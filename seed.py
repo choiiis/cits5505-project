@@ -1111,23 +1111,24 @@ def create_bookmarks(customers, restaurants):
     db.session.add_all(bookmarks)
     db.session.commit()
 
+    public_collections = [
+        collection for collection in collections if collection.is_public
+    ]
     subscriptions = []
 
-    for collection in collections:
-        if not collection.is_public:
-            continue
+    for index in range(50):
+        user = customers[index % len(customers)]
+        collection = public_collections[index % len(public_collections)]
 
-        for user in customers:
-            if user.id == collection.user_id:
-                continue
+        if user.id == collection.user_id:
+            collection = public_collections[(index + 1) % len(public_collections)]
 
-            if (user.id + collection.id) % 3 != 0:
-                subscriptions.append(
-                    CollectionSubscription(
-                        collection_id=collection.id,
-                        user_id=user.id,
-                    )
-                )
+        subscriptions.append(
+            CollectionSubscription(
+                collection_id=collection.id,
+                user_id=user.id,
+            )
+        )
 
     db.session.add_all(subscriptions)
     db.session.commit()
