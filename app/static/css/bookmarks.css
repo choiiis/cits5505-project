@@ -129,6 +129,24 @@
   border-radius: 8px;
   box-shadow: 0 0.5rem 1.25rem rgba(31, 41, 51, 0.05);
   overflow: hidden;
+  position: relative;
+}
+
+.collection-card__settings {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  color: var(--brand-ink);
+  display: inline-flex;
+  font-size: 0.95rem;
+  height: 2.35rem;
+  justify-content: center;
+  position: absolute;
+  right: 0.8rem;
+  top: 0.8rem;
+  width: 2.35rem;
+  z-index: 2;
 }
 
 .collection-card__main {
@@ -375,6 +393,79 @@
   flex: 1;
 }
 
+.collection-settings-panel,
+.collection-share-panel {
+  max-width: 560px;
+}
+
+.collection-settings-header {
+  border-bottom: 1px solid var(--brand-line);
+  margin-bottom: 1rem;
+  padding: 0 3rem 1rem 0;
+}
+
+.collection-settings-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.collection-settings-form .form-label {
+  color: var(--brand-ink);
+  font-weight: 700;
+  margin-bottom: -0.25rem;
+}
+
+.collection-copy-row,
+.collection-share-search {
+  display: flex;
+  gap: 0.55rem;
+}
+
+.collection-copy-row .btn,
+.collection-share-search .btn,
+.collection-settings-actions .btn {
+  border-radius: 8px;
+}
+
+.collection-settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+
+.collection-share-preview {
+  background: #f8fafc;
+  border: 1px solid var(--brand-line);
+  border-radius: 8px;
+  color: #5f6c7b;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.collection-share-preview__eyebrow {
+  color: #6b7280;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+}
+
+.collection-share-preview h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.collection-share-preview__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.collection-share-preview__actions .btn {
+  border-radius: 8px;
+}
+
 @media (max-width: 767.98px) {
   .bookmarks-page {
     padding-bottom: 2rem;
@@ -419,6 +510,12 @@
   }
 
   .collection-restaurant-card__actions {
+    flex-direction: column;
+  }
+
+  .collection-copy-row,
+  .collection-share-search,
+  .collection-share-preview__actions {
     flex-direction: column;
   }
 }
