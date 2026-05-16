@@ -106,7 +106,7 @@
                         Browse public restaurant lists curated by TableTrail users.
                     </p>
                 </div>
-                <a class="btn btn-outline-success align-self-md-center" href="{{ url_for('bookmarks') }}">
+                <a class="btn btn-outline-success align-self-md-center" href="{{ url_for('bookmarks') }}#publicCollections">
                     View public collections
                 </a>
             </div>
@@ -114,7 +114,7 @@
             <div class="row g-3">
                 {% for collection in public_collections %}
                 <div class="col-md-6 col-xl-4">
-                    <a class="home-public-card" href="{{ url_for('bookmarks') }}"
+                    <a class="home-public-card" href="{{ url_for('bookmarks') }}#publicCollections"
                         aria-label="View {{ collection.name }} public collection">
                         <img class="home-public-card__image" src="{{ collection.image }}"
                             alt="{{ collection.name }} cover image">
