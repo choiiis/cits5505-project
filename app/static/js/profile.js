@@ -18,23 +18,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     }
 
-    function isOptionalUrl(value) {
-        if (!value.trim()) {
+    function isOptionalImageFile(input) {
+        if (!input.files || input.files.length === 0) {
             return true;
         }
 
-        try {
-            new URL(value);
-            return true;
-        } catch {
-            return false;
-        }
+        return ["image/png", "image/jpeg", "image/gif", "image/webp"].includes(input.files[0].type);
     }
 
     function validateForm() {
         const usernameIsValid = usernameInput.value.trim().length > 0;
         const emailIsValid = isValidEmail(emailInput.value.trim());
-        const profileImageIsValid = isOptionalUrl(profileImageInput.value);
+        const profileImageIsValid = isOptionalImageFile(profileImageInput);
 
         setFieldState(usernameInput, usernameIsValid);
         setFieldState(emailInput, emailIsValid);
@@ -43,12 +38,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return usernameIsValid && emailIsValid && profileImageIsValid;
     }
 
-    [usernameInput, emailInput, profileImageInput].forEach((input) => {
+    [usernameInput, emailInput].forEach((input) => {
         input.addEventListener("input", () => {
             message.textContent = "";
             message.classList.remove("is-error");
             validateForm();
         });
+    });
+
+    profileImageInput.addEventListener("change", () => {
+        message.textContent = "";
+        message.classList.remove("is-error");
+        validateForm();
     });
 
     form.addEventListener("submit", (event) => {

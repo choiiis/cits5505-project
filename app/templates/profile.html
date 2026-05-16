@@ -42,7 +42,7 @@
                     <h2 class="h5 fw-bold mb-1" id="profileInfoTitle">{{ user.username }}</h2>
                     <p class="text-secondary mb-4">{{ user.email }}</p>
 
-                    <form id="profileForm" method="post" action="{{ url_for('profile') }}" novalidate>
+                    <form id="profileForm" method="post" action="{{ url_for('profile') }}" enctype="multipart/form-data" novalidate>
                         <div class="mb-3">
                             <label class="form-label" for="usernameInput">Username</label>
                             <input
@@ -70,15 +70,14 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label" for="profileImageInput">Profile image URL</label>
+                            <label class="form-label" for="profileImageInput">Profile image</label>
                             <input
                                 class="form-control"
                                 id="profileImageInput"
                                 name="profile_image"
-                                type="url"
-                                value="{{ user.profile_image or '' }}"
-                                autocomplete="url">
-                            <div class="invalid-feedback">Please enter a valid image URL.</div>
+                                type="file"
+                                accept="image/png,image/jpeg,image/gif,image/webp">
+                            <div class="invalid-feedback">Please choose a PNG, JPG, GIF, or WebP image.</div>
                         </div>
 
                         <button class="btn btn-success w-100" type="submit">Save profile</button>
