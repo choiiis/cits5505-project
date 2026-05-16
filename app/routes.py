@@ -697,6 +697,23 @@ def get_owner_user_or_redirect():
 def redirect_back_to_owner():
     return redirect(request.referrer or url_for("owner_dashboard"))
 
+def get_owner_restaurant(owner_id):
+    return Restaurant.query.filter_by(owner_id=owner_id).first()
+
+
+def build_owner_restaurant_data(restaurant, review_summary):
+    return {
+        "id": restaurant.id,
+        "name": restaurant.name,
+        "category": restaurant.category,
+        "address": restaurant.address,
+        "phone": getattr(restaurant, "phone", "") or "",
+        "website": getattr(restaurant, "website", "") or "",
+        "description": getattr(restaurant, "description", "") or "",
+        "status": (restaurant.status or "pending").title(),
+        "rating": review_summary["average_rating"],
+        "review_count": review_summary["total_reviews"],
+    }
 
 @app.route("/admin")
 def admin_dashboard():
