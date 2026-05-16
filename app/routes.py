@@ -949,8 +949,6 @@ def update_user_records():
     if response:
         return response
 
-    allowed_roles = ["customer", "owner", "admin"]
-    allowed_statuses = ["active", "suspended"]
 
     user_ids = set()
 
@@ -972,10 +970,10 @@ def update_user_records():
         role = request.form.get(f"user_role_{user.id}")
         status = request.form.get(f"user_status_{user.id}")
 
-        if role in allowed_roles:
+        if is_valid_admin_option(role, ADMIN_USER_ROLES):
             user.role = role
 
-        if status in allowed_statuses:
+        if is_valid_admin_option(status, ADMIN_USER_STATUSES):
             if user.id == current_user.id and status == "suspended":
                 flash("You cannot suspend your own admin account.", "danger")
                 continue
