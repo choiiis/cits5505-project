@@ -12,6 +12,7 @@ from uuid import uuid4
 from flask import (
     current_app,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -23,6 +24,7 @@ from app.utils import make_star_text
 from app.models import (
     AuthToken,
     BookmarkCollection,
+    CollectionSubscription,
     Restaurant,
     MenuItem,
     OpeningHour,
@@ -465,7 +467,12 @@ def get_collection_cover_image(collection):
     return url_for("static", filename=DEFAULT_RESTAURANT_IMAGE)
 
 
-def format_bookmark_collection(collection, is_saved=True):
+def format_bookmark_collection(
+    collection,
+    is_saved=True,
+    is_subscribed=False,
+    current_user_id=None,
+):
     restaurants = [
         format_restaurant_card(bookmark.restaurant, is_saved=is_saved)
         for bookmark in collection.bookmarks
@@ -485,6 +492,8 @@ def format_bookmark_collection(collection, is_saved=True):
         "restaurants": restaurants,
         "creator": collection.user.username if collection.user else "TableTrail user",
         "subscriber_count": len(collection.subscriptions),
+        "is_subscribed": is_subscribed,
+        "is_owner": current_user_id == collection.user_id if current_user_id else False,
     }
 
 
@@ -499,10 +508,21 @@ def get_demo_user():
     return User.query.filter_by(role="customer").order_by(User.id).first()
 
 
-def get_public_collection_cards(limit=None):
+def get_public_collection_cards(limit=None, current_user=None):
     collections = BookmarkCollection.query.filter_by(is_public=True).all()
     formatted_collections = [
-        format_bookmark_collection(collection) for collection in collections
+        format_bookmark_collection(
+            collection,
+            is_subscribed=bool(
+                current_user
+                and any(
+                    subscription.user_id == current_user.id
+                    for subscription in collection.subscriptions
+                )
+            ),
+            current_user_id=current_user.id if current_user else None,
+        )
+        for collection in collections
     ]
 
     formatted_collections.sort(
@@ -1123,6 +1143,7 @@ def search():
 def bookmarks():
     user = get_demo_user()
     user_collections = []
+    subscribed_collections = []
 
     if user:
         user_collections = (
@@ -1130,6 +1151,13 @@ def bookmarks():
             .order_by(BookmarkCollection.created_at, BookmarkCollection.id)
             .all()
         )
+        subscribed_collections = [
+            subscription.collection
+            for subscription in user.collection_subscriptions
+            if subscription.collection
+            and subscription.collection.is_public
+            and subscription.collection.user_id != user.id
+        ]
 
     favorite_collection = next(
         (
@@ -1149,15 +1177,84 @@ def bookmarks():
         ]
 
     bookmark_collections = [
-        format_bookmark_collection(collection) for collection in user_collections
+        format_bookmark_collection(collection, current_user_id=user.id if user else None)
+        for collection in user_collections
     ]
-    public_collections = get_public_collection_cards()
+    bookmark_collections.extend(
+        format_bookmark_collection(
+            collection,
+            is_subscribed=True,
+            current_user_id=user.id if user else None,
+        )
+        for collection in subscribed_collections
+    )
+    public_collections = get_public_collection_cards(current_user=user)
 
     return render_template(
         "bookmarks.html",
         saved_restaurants=saved_restaurants,
         bookmark_collections=bookmark_collections,
         public_collections=public_collections,
+    )
+
+
+@app.route("/collections/<int:collection_id>/subscribe", methods=["POST"])
+def subscribe_collection(collection_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify(
+            {
+                "success": False,
+                "message": "Please log in to subscribe to a collection.",
+                "redirect_url": url_for("login"),
+            }
+        ), 401
+
+    collection = BookmarkCollection.query.get_or_404(collection_id)
+
+    if not collection.is_public:
+        return jsonify(
+            {
+                "success": False,
+                "message": "Only public collections can be subscribed to.",
+            }
+        ), 403
+
+    if collection.user_id == user_id:
+        return jsonify(
+            {
+                "success": True,
+                "message": "This is your own collection.",
+                "subscriber_count": len(collection.subscriptions),
+                "redirect_url": url_for("bookmarks") + "#collectionsTitle",
+            }
+        )
+
+    subscription = CollectionSubscription.query.filter_by(
+        collection_id=collection.id,
+        user_id=user_id,
+    ).first()
+
+    if not subscription:
+        db.session.add(
+            CollectionSubscription(
+                collection_id=collection.id,
+                user_id=user_id,
+            )
+        )
+        db.session.commit()
+
+    return jsonify(
+        {
+            "success": True,
+            "message": "Collection subscribed.",
+            "subscriber_count": len(collection.subscriptions),
+            "redirect_url": url_for(
+                "bookmarks", subscribed_collection=collection.id
+            )
+            + "#collectionsTitle",
+        }
     )
 
 
