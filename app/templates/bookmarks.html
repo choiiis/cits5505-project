@@ -216,10 +216,12 @@
                                 href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
                                 View details
                             </a>
+                            {% if not collection.is_subscribed %}
                             <button class="btn btn-sm btn-outline-danger" type="button"
                                 data-remove-collection-restaurant>
                                 Remove
                             </button>
+                            {% endif %}
                         </div>
                     </div>
                 </article>
