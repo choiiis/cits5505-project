@@ -25,6 +25,7 @@
         {% endwith %}
 
         <form id="signupForm" method="post" action="{{ url_for('signup') }}" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="signup-grid signup-grid--two">
                 <div class="mb-3">
                     <label class="form-label" for="usernameInput">Full name</label>

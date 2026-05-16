@@ -25,7 +25,7 @@
             </div>
 
             <div class="search-bar hero-search mt-4">
-                <form class="row g-2 align-items-center" action="search.html" method="get">
+                <form class="row g-2 align-items-center" action="{{ url_for('search') }}" method="get">
                     <div class="col-lg-5">
                         <label class="visually-hidden" for="keywordSearch">Search restaurants</label>
                         <input class="form-control form-control-lg" id="keywordSearch" name="q"
@@ -38,7 +38,7 @@
                     </div>
                     <div class="col-lg-3 d-flex gap-2">
                         <button class="btn btn-success btn-lg flex-fill" type="submit">Search</button>
-                        <a class="btn btn-outline-success btn-lg map-btn" id="mapLink" href="search.html?map=true">
+                        <a class="btn btn-outline-success btn-lg map-btn" id="mapLink" href="{{ url_for('search') }}?map=true">
                             Map
                         </a>
                     </div>
@@ -65,7 +65,7 @@
                     <p class="text-secondary mb-0">Explore highlighted dining spots from different cuisines and
                         locations.</p>
                 </div>
-                <a class="btn btn-success align-self-md-center" href="search.html">Explore More</a>
+                <a class="btn btn-success align-self-md-center" href="{{ url_for('search') }}">Explore More</a>
             </div>
 
             <div class="row g-3" id="featuredMount">
@@ -93,6 +93,47 @@
                     </article>
                 </div>
                 {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="security-section py-5" aria-labelledby="securityTitle">
+        <div class="container">
+            <div class="security-panel">
+                <div class="security-panel__intro">
+                    <span class="security-panel__eyebrow">Security</span>
+                    <h2 class="h3 fw-bold mb-2" id="securityTitle">Account and form protection</h2>
+                    <p class="text-secondary mb-0">
+                        TableTrail uses standard Flask security practices to protect user accounts and form submissions.
+                    </p>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <article class="security-item">
+                            <h3 class="security-item__title">Salted password hashes</h3>
+                            <p class="security-item__copy">
+                                Passwords are stored as Werkzeug-generated salted hashes instead of plain text.
+                            </p>
+                        </article>
+                    </div>
+                    <div class="col-md-4">
+                        <article class="security-item">
+                            <h3 class="security-item__title">CSRF form tokens</h3>
+                            <p class="security-item__copy">
+                                POST forms include server-validated CSRF tokens to prevent forged form submissions.
+                            </p>
+                        </article>
+                    </div>
+                    <div class="col-md-4">
+                        <article class="security-item">
+                            <h3 class="security-item__title">Environment config</h3>
+                            <p class="security-item__copy">
+                                Secrets and database URLs are read from environment variables instead of hard-coded values.
+                            </p>
+                        </article>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
