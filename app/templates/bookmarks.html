@@ -57,6 +57,37 @@
                 </div>
             </div>
         </section>
+
+        <section class="bookmark-collections-section" aria-labelledby="collectionsTitle">
+            <div class="collections-heading-row">
+                <div>
+                    <h2 class="h4 fw-bold mb-1" id="collectionsTitle">Collections</h2>
+                    <p class="text-secondary mb-0">
+                        Group saved restaurants into shareable lists.
+                    </p>
+                </div>
+                <button class="btn btn-outline-success collection-share-open" type="button">
+                    Use share code
+                </button>
+            </div>
+
+            <div class="collections-placeholder">
+                {% for collection in bookmark_collections %}
+                <article class="collection-summary">
+                    <img class="collection-summary__image" src="{{ collection.cover_image }}"
+                        alt="{{ collection.name }} cover image">
+                    <div class="collection-summary__body">
+                        <div class="collection-summary__meta">
+                            <span>{{ collection.visibility }}</span>
+                            <span>{{ collection.restaurant_count }} places</span>
+                        </div>
+                        <h3>{{ collection.name }}</h3>
+                        <p>{{ collection.description }}</p>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
     </section>
 </main>
 {% endblock %}
