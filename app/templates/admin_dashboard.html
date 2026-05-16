@@ -9,10 +9,10 @@
 {% block content %}
 <main class="admin-page">
     <section class="admin-hero">
-        <div class="container admin-hero__inner">
-            <div>
-                <p class="admin-label">Admin Panel</p>
+        <div class="container-fluid px-5 admin-hero__inner">
+            <div class="admin-hero__content">
                 <h1>Admin Dashboard</h1>
+
                 <p class="admin-subtitle">
                     Manage restaurant listings, user accounts, approval status, and reported content from one place.
                 </p>
@@ -21,13 +21,27 @@
     </section>
 
     <section class="admin-dashboard-section">
-        <div class="container">
+        <div class="container-fluid px-5">
 
             <section class="admin-stats">
                 {% for stat in overview_cards %}
-                <div class="admin-stat-card">
-                    <span>{{ stat.label }}</span>
-                    <strong>{{ stat.value }}</strong>
+                <div class="admin-stat-card admin-stat-card--{{ loop.index }}">
+                    <div class="admin-stat-card__icon">
+                        {% if loop.index == 1 %}
+                        👥
+                        {% elif loop.index == 2 %}
+                        🏪
+                        {% elif loop.index == 3 %}
+                        ⏳
+                        {% else %}
+                        ⚠
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <span>{{ stat.label }}</span>
+                        <strong>{{ stat.value }}</strong>
+                    </div>
                 </div>
                 {% endfor %}
             </section>
@@ -35,11 +49,15 @@
             <section class="admin-card">
                 <form method="post" action="{{ url_for('update_restaurant_records') }}">
                     <div class="admin-card__heading admin-card__heading--with-action">
-                        <div>
-                            <h2>Restaurant Management</h2>
-                            <p>
-                                Search restaurant records, filter by listing status, and update approval status.
-                            </p>
+                        <div class="admin-card__title-row">
+                            <div class="admin-section-icon">🏪</div>
+
+                            <div>
+                                <h2>Restaurant Management</h2>
+                                <p>
+                                    Search restaurant records, filter by listing status, and update approval status.
+                                </p>
+                            </div>
                         </div>
 
                         <button type="submit" class="admin-save-button">
@@ -104,7 +122,9 @@
                                 {% for restaurant in restaurants %}
                                 <tr class="admin-clickable-row"
                                     data-row-url="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
-                                    <td>{{ restaurant.name }}</td>
+                                    <td>
+                                        <strong class="admin-primary-text">{{ restaurant.name }}</strong>
+                                    </td>
                                     <td>{{ restaurant.category }}</td>
                                     <td>{{ restaurant.owner.username if restaurant.owner else "Unassigned" }}</td>
                                     <td>
@@ -125,12 +145,15 @@
                                             </option>
                                         </select>
                                     </td>
-                                    <td>{{ "%.1f"|format(restaurant.average_rating) }}</td>
+                                    <td>
+                                        <span class="admin-rating">{{ "%.1f"|format(restaurant.average_rating) }}
+                                            ★</span>
+                                    </td>
                                     <td>{{ restaurant.created_at.strftime("%d %b %Y") }}</td>
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="6">No restaurant records found.</td>
+                                    <td colspan="6" class="admin-empty-cell">No restaurant records found.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -151,11 +174,15 @@
             <section class="admin-card">
                 <form method="post" action="{{ url_for('update_user_records') }}">
                     <div class="admin-card__heading admin-card__heading--with-action">
-                        <div>
-                            <h2>User Management</h2>
-                            <p>
-                                Search users, filter account status, and update roles or account status.
-                            </p>
+                        <div class="admin-card__title-row">
+                            <div class="admin-section-icon">👤</div>
+
+                            <div>
+                                <h2>User Management</h2>
+                                <p>
+                                    Search users, filter account status, and update roles or account status.
+                                </p>
+                            </div>
                         </div>
 
                         <button type="submit" class="admin-save-button">
@@ -216,7 +243,9 @@
                             <tbody>
                                 {% for user in users %}
                                 <tr>
-                                    <td>{{ user.username }}</td>
+                                    <td>
+                                        <strong class="admin-primary-text">{{ user.username }}</strong>
+                                    </td>
                                     <td>{{ user.email }}</td>
                                     <td>
                                         <select name="user_role_{{ user.id }}" class="admin-table-select">
@@ -249,7 +278,7 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="6">No user records found.</td>
+                                    <td colspan="6" class="admin-empty-cell">No user records found.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -270,11 +299,15 @@
             <section class="admin-card">
                 <form method="post" action="{{ url_for('update_review_records') }}">
                     <div class="admin-card__heading admin-card__heading--with-action">
-                        <div>
-                            <h2>Review Management</h2>
-                            <p>
-                                Search reviews, update moderation status, or delete inappropriate content.
-                            </p>
+                        <div class="admin-card__title-row">
+                            <div class="admin-section-icon">🛡</div>
+
+                            <div>
+                                <h2>Review Management</h2>
+                                <p>
+                                    Search reviews, update moderation status, or delete inappropriate content.
+                                </p>
+                            </div>
                         </div>
 
                         <button type="submit" class="admin-save-button">
@@ -347,9 +380,13 @@
                                 {% for review in reviews %}
                                 <tr class="admin-clickable-row"
                                     data-row-url="{{ url_for('restaurant_detail', restaurant_id=review.restaurant_id) }}">
-                                    <td>{{ review.restaurant.name }}</td>
+                                    <td>
+                                        <strong class="admin-primary-text">{{ review.restaurant.name }}</strong>
+                                    </td>
                                     <td>{{ review.user.username }}</td>
-                                    <td>{{ review.rating }}/5</td>
+                                    <td>
+                                        <span class="admin-rating">{{ review.rating }}/5 ★</span>
+                                    </td>
                                     <td class="admin-review-content">{{ review.content }}</td>
                                     <td>
                                         <select name="review_status_{{ review.id }}"
@@ -378,7 +415,7 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="7">No review records found.</td>
+                                    <td colspan="7" class="admin-empty-cell">No review records found.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -405,6 +442,7 @@
     </section>
 </main>
 {% endblock %}
+
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
 {% endblock %}
