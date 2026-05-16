@@ -1119,3 +1119,37 @@ def update_owner_restaurant():
 
     flash("Restaurant information updated successfully.", "success")
     return redirect(url_for("owner_dashboard"))
+
+    @app.route("/owner/reviews/<int:review_id>/status", methods=["POST"])
+def update_owner_review_status(review_id):
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant = get_owner_restaurant(current_user.id)
+
+    if not restaurant:
+        flash("No restaurant record is linked to this owner account.", "warning")
+        return redirect(url_for("owner_dashboard"))
+
+    review = Review.query.get_or_404(review_id)
+
+    if review.restaurant_id != restaurant.id:
+        flash("You can only manage reviews for your own restaurant.", "danger")
+        return redirect(url_for("owner_dashboard"))
+
+    allowed_statuses = ["active", "reported", "hidden"]
+    status = request.form.get("status", "").strip()
+
+    if status not in allowed_statuses:
+        flash("Invalid review status.", "danger")
+        return redirect_back_to_owner()
+
+    review.status = status
+    review.updated_at = datetime.utcnow()
+
+    db.session.commit()
+
+    flash("Review status updated successfully.", "success")
+    return redirect(url_for("owner_dashboard"))
