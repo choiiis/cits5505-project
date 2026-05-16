@@ -195,6 +195,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const saveSettingsButton = event.target.closest("[data-save-collection-settings]");
         const createCollectionButton = event.target.closest("[data-create-collection-submit]");
         const openShareButton = event.target.closest("[data-open-share-import]");
+        const openPublicCollectionButton = event.target.closest("[data-open-public-collection]");
+        const subscribePublicCollectionButton = event.target.closest("[data-subscribe-public-collection]");
 
         if (closeButton) {
             closeModal(closeButton.closest(".bookmark-modal"));
@@ -338,6 +340,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (openShareButton) {
             openModal(document.getElementById("shareImportModal"));
+            return;
+        }
+
+        if (openPublicCollectionButton) {
+            const collectionId = openPublicCollectionButton.dataset.openPublicCollection;
+            const modal = document.getElementById(`publicCollectionModal-${collectionId}`);
+
+            openModal(modal);
+            return;
+        }
+
+        if (subscribePublicCollectionButton) {
+            subscribePublicCollectionButton.textContent = "Subscribed";
+            subscribePublicCollectionButton.classList.remove("btn-outline-success");
+            subscribePublicCollectionButton.classList.add("btn-success");
         }
     });
 

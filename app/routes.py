@@ -243,10 +243,37 @@ def build_home_context():
             "image": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1200&q=80",
         },
     ]
+    public_collections = [
+        {
+            "name": "Perth brunch trail",
+            "creator": "Mia Chen",
+            "restaurant_count": 3,
+            "subscriber_count": 128,
+            "description": "Popular cafe and brunch picks around Perth and Northbridge.",
+            "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Weeknight dinner spots",
+            "creator": "Alex Wong",
+            "restaurant_count": 4,
+            "subscriber_count": 94,
+            "description": "Reliable dinner places for casual evenings with friends.",
+            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+        },
+        {
+            "name": "Healthy lunch list",
+            "creator": "Jordan Smith",
+            "restaurant_count": 3,
+            "subscriber_count": 67,
+            "description": "Fresh bowls, cafes, and lighter lunch options.",
+            "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+        },
+    ]
 
     return {
         "home_categories": home_categories,
         "featured_restaurants": featured_restaurants,
+        "public_collections": public_collections,
     }
 
 
@@ -639,10 +666,57 @@ def bookmarks():
         },
     ]
 
+    public_collections = sorted(
+        [
+            {
+                "id": "public-perth-brunch",
+                "name": "Perth brunch trail",
+                "creator": "Mia Chen",
+                "subscriber_count": 128,
+                "cover_image": saved_restaurants[2]["image"],
+                "restaurant_count": 3,
+                "description": "Popular cafe and brunch picks around Perth and Northbridge.",
+                "restaurants": [
+                    collection_restaurants[2],
+                    collection_restaurants[0],
+                ],
+            },
+            {
+                "id": "public-weeknight-dinners",
+                "name": "Weeknight dinner spots",
+                "creator": "Alex Wong",
+                "subscriber_count": 94,
+                "cover_image": saved_restaurants[1]["image"],
+                "restaurant_count": 4,
+                "description": "Reliable dinner places for casual evenings with friends.",
+                "restaurants": [
+                    collection_restaurants[1],
+                    collection_restaurants[0],
+                ],
+            },
+            {
+                "id": "public-healthy-lunch",
+                "name": "Healthy lunch list",
+                "creator": "Jordan Smith",
+                "subscriber_count": 67,
+                "cover_image": saved_restaurants[0]["image"],
+                "restaurant_count": 3,
+                "description": "Fresh bowls, cafes, and lighter lunch options.",
+                "restaurants": [
+                    collection_restaurants[0],
+                    collection_restaurants[2],
+                ],
+            },
+        ],
+        key=lambda collection: collection["subscriber_count"],
+        reverse=True,
+    )
+
     return render_template(
         "bookmarks.html",
         saved_restaurants=saved_restaurants,
         bookmark_collections=bookmark_collections,
+        public_collections=public_collections,
     )
 
 
