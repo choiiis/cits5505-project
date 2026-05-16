@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Email Verification | TableTrail{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
+{% block body_attrs %}data-page="login"{% endblock %}
+
+{% block content %}
+<main class="auth-shell container d-flex align-items-center justify-content-center py-5">
+    <section class="form-card bg-white shadow-sm p-4 w-100">
+        <div class="alert alert-{{ status }} py-2" role="alert">{{ message }}</div>
+        <h1 class="h3 fw-bold">{{ title }}</h1>
+        <p class="text-secondary">Account links can only be used once and expire automatically.</p>
+
+        <div class="d-grid gap-2">
+            <a class="btn btn-success" href="{{ url_for('login') }}">Go to login</a>
+            <a class="btn btn-outline-success" href="{{ url_for('home') }}">Back to home</a>
+        </div>
+    </section>
+</main>
+{% endblock %}
