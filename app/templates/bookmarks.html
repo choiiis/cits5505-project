@@ -34,13 +34,13 @@
             <div class="row g-3" id="bookmarkMount">
                 {% for restaurant in saved_restaurants %}
                 <div class="col-md-6 col-xl-4" data-bookmark-card
-                    data-search-text="{{ restaurant.name }} {{ restaurant.category }} {{ restaurant.location }} {{ restaurant.price }} {{ restaurant.description }}">
+                    data-search-text="{{ restaurant.name }} {{ restaurant.category }} {{ restaurant.location }} {{ restaurant.description }}">
                     <article class="bookmark-card">
                         <img src="{{ restaurant.image }}" class="bookmark-card__image" alt="{{ restaurant.name }}">
                         <div class="bookmark-card__body">
                             <span class="bookmark-card__category">{{ restaurant.category }}</span>
                             <h2 class="bookmark-card__title">{{ restaurant.name }}</h2>
-                            <p class="bookmark-card__meta">{{ restaurant.location }} · {{ restaurant.price }}</p>
+                            <p class="bookmark-card__meta">{{ restaurant.location }}</p>
                             <p class="bookmark-card__rating">
                                 {{ restaurant.star_text }}
                                 <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>
@@ -197,7 +197,7 @@
                     <div class="collection-restaurant-card__body">
                         <span class="collection-restaurant-card__category">{{ restaurant.category }}</span>
                         <h3>{{ restaurant.name }}</h3>
-                        <p>{{ restaurant.location }} · {{ restaurant.price }}</p>
+                        <p>{{ restaurant.location }}</p>
                         <p class="collection-restaurant-card__rating">
                             {{ restaurant.star_text }}
                             <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>
@@ -255,7 +255,7 @@
                     <div class="collection-restaurant-card__body">
                         <span class="collection-restaurant-card__category">{{ restaurant.category }}</span>
                         <h3>{{ restaurant.name }}</h3>
-                        <p>{{ restaurant.location }} · {{ restaurant.price }}</p>
+                        <p>{{ restaurant.location }}</p>
                         <p class="collection-restaurant-card__rating">
                             {{ restaurant.star_text }}
                             <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>

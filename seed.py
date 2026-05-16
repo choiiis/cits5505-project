@@ -8,6 +8,7 @@ from app.models import (
     ReviewPhoto,
     BookmarkCollection,
     Bookmark,
+    CollectionSubscription,
 )
 from werkzeug.security import generate_password_hash
 
@@ -632,6 +633,7 @@ RESTAURANT_DATA = [
 def clear_data():
     ReviewPhoto.query.delete()
     Review.query.delete()
+    CollectionSubscription.query.delete()
     Bookmark.query.delete()
     BookmarkCollection.query.delete()
     OpeningHour.query.delete()
@@ -1042,6 +1044,13 @@ def create_bookmarks(customers, restaurants):
     collection_specs = [
         (
             customers[0],
+            "Favorite",
+            "My default saved restaurant collection.",
+            False,
+            [0, 2, 5, 10],
+        ),
+        (
+            customers[0],
             "Perth best",
             "My favourite restaurants around Perth.",
             True,
@@ -1100,6 +1109,27 @@ def create_bookmarks(customers, restaurants):
             )
 
     db.session.add_all(bookmarks)
+    db.session.commit()
+
+    subscriptions = []
+
+    for collection in collections:
+        if not collection.is_public:
+            continue
+
+        for user in customers:
+            if user.id == collection.user_id:
+                continue
+
+            if (user.id + collection.id) % 3 != 0:
+                subscriptions.append(
+                    CollectionSubscription(
+                        collection_id=collection.id,
+                        user_id=user.id,
+                    )
+                )
+
+    db.session.add_all(subscriptions)
     db.session.commit()
 
 
