@@ -103,7 +103,7 @@
                             <img class="collection-card__image" src="{{ collection.cover_image }}"
                                 alt="{{ collection.name }} cover image">
                             <div class="collection-card__badges">
-                                <span class="{% if collection.visibility == 'Public' %}is-public{% endif %}"
+                                <span class="{% if collection.is_subscribed %}is-subscribed{% elif collection.visibility == 'Public' %}is-public{% endif %}"
                                     data-collection-visibility-label>
                                     {{ "Subscribed" if collection.is_subscribed else collection.visibility }}
                                 </span>
