@@ -548,6 +548,11 @@ def bookmarks():
         },
     ]
 
+    collection_restaurants = [
+        {**restaurant, "is_saved": True}
+        for restaurant in saved_restaurants
+    ]
+
     bookmark_collections = [
         {
             "id": "weekend-brunch",
@@ -557,7 +562,10 @@ def bookmarks():
             "cover_image": saved_restaurants[0]["image"],
             "restaurant_count": 2,
             "description": "Easy cafes and light meals for slow weekend mornings.",
-            "restaurants": [saved_restaurants[0], saved_restaurants[2]],
+            "restaurants": [
+                collection_restaurants[0],
+                {**collection_restaurants[2], "is_saved": False},
+            ],
         },
         {
             "id": "dinner-shortlist",
@@ -567,7 +575,10 @@ def bookmarks():
             "cover_image": saved_restaurants[1]["image"],
             "restaurant_count": 2,
             "description": "Places worth trying for relaxed dinners with friends.",
-            "restaurants": [saved_restaurants[1], saved_restaurants[0]],
+            "restaurants": [
+                collection_restaurants[1],
+                collection_restaurants[0],
+            ],
         },
         {
             "id": "city-lunch",
@@ -577,7 +588,10 @@ def bookmarks():
             "cover_image": saved_restaurants[2]["image"],
             "restaurant_count": 2,
             "description": "Fast, reliable restaurants around Perth CBD.",
-            "restaurants": [saved_restaurants[2], saved_restaurants[1]],
+            "restaurants": [
+                collection_restaurants[2],
+                {**collection_restaurants[1], "is_saved": False},
+            ],
         },
     ]
 

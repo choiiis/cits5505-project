@@ -298,6 +298,7 @@
   display: grid;
   grid-template-columns: 105px minmax(0, 1fr);
   overflow: hidden;
+  position: relative;
 }
 
 .collection-restaurant-card__image {
@@ -305,6 +306,27 @@
   min-height: 130px;
   object-fit: cover;
   width: 100%;
+}
+
+.collection-restaurant-card__heart {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--brand-line);
+  border-radius: 999px;
+  color: #6b7280;
+  display: inline-flex;
+  font-size: 1rem;
+  font-weight: 700;
+  height: 2rem;
+  justify-content: center;
+  left: 0.55rem;
+  position: absolute;
+  top: 0.55rem;
+  width: 2rem;
+}
+
+.collection-restaurant-card__heart.is-saved {
+  color: var(--brand-coral);
 }
 
 .collection-restaurant-card__body {
@@ -337,6 +359,20 @@
 .collection-restaurant-card__rating span {
   color: #4d5b68;
   font-weight: 400;
+}
+
+.collection-restaurant-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.collection-restaurant-card__actions .btn {
+  border-radius: 8px;
+}
+
+.collection-restaurant-card__actions .btn:first-child {
+  flex: 1;
 }
 
 @media (max-width: 767.98px) {
@@ -380,6 +416,10 @@
 
   .collection-restaurant-grid {
     grid-template-columns: 1fr;
+  }
+
+  .collection-restaurant-card__actions {
+    flex-direction: column;
   }
 }
 

@@ -122,7 +122,13 @@
 
             <div class="collection-restaurant-grid">
                 {% for restaurant in collection.restaurants %}
-                <article class="collection-restaurant-card">
+                <article class="collection-restaurant-card" data-collection-restaurant>
+                    <button class="collection-restaurant-card__heart{% if restaurant.is_saved %} is-saved{% endif %}"
+                        type="button" data-toggle-collection-heart
+                        aria-label="{% if restaurant.is_saved %}Remove saved status{% else %}Save restaurant{% endif %}"
+                        aria-pressed="{% if restaurant.is_saved %}true{% else %}false{% endif %}">
+                        {% if restaurant.is_saved %}♥{% else %}♡{% endif %}
+                    </button>
                     <img class="collection-restaurant-card__image" src="{{ restaurant.image }}"
                         alt="{{ restaurant.name }}">
                     <div class="collection-restaurant-card__body">
@@ -133,6 +139,16 @@
                             {{ restaurant.star_text }}
                             <span>{{ restaurant.rating }} ({{ restaurant.review_count }})</span>
                         </p>
+                        <div class="collection-restaurant-card__actions">
+                            <a class="btn btn-sm btn-dark"
+                                href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
+                                View details
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" type="button"
+                                data-remove-collection-restaurant>
+                                Remove
+                            </button>
+                        </div>
                     </div>
                 </article>
                 {% endfor %}

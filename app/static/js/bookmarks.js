@@ -61,6 +61,29 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    document.querySelectorAll("[data-toggle-collection-heart]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const isSaved = button.classList.toggle("is-saved");
+
+            button.textContent = isSaved ? "♥" : "♡";
+            button.setAttribute("aria-pressed", String(isSaved));
+            button.setAttribute(
+                "aria-label",
+                isSaved ? "Remove saved status" : "Save restaurant"
+            );
+        });
+    });
+
+    document.querySelectorAll("[data-remove-collection-restaurant]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const card = button.closest("[data-collection-restaurant]");
+
+            if (card) {
+                card.remove();
+            }
+        });
+    });
+
     document.addEventListener("keydown", (event) => {
         if (event.key !== "Escape") {
             return;
