@@ -1,11 +1,18 @@
-from flask import flash, redirect, render_template, request, session, url_for
+import hashlib
+import os
+import re
+import secrets
+import smtplib
+from datetime import datetime, timedelta
+from email.message import EmailMessage
+from email.utils import formatdate, make_msgid
+from urllib.parse import quote_plus
+
+from flask import current_app, flash, redirect, render_template, request, session, url_for
 from app import app, db
 from app.utils import make_star_text
-from app.models import Restaurant, MenuItem, OpeningHour, Review, User
+from app.models import AuthToken, Restaurant, MenuItem, OpeningHour, Review, User
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from datetime import datetime
-from urllib.parse import quote_plus
 
 DEFAULT_PROFILE_IMAGE = "https://ui-avatars.com/api/?name=TableTrail&background=dcfce7&color=15803d&bold=true"
 DEFAULT_RESTAURANT_IMAGE = "images/restaurant-default.png"
@@ -49,6 +56,191 @@ SEARCH_MAP_LOCATION_COLORS = [
     "#65a30d",
     "#c2410c",
 ]
+EMAIL_PATTERN = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+EMAIL_VERIFICATION_HOURS = 24
+PASSWORD_RESET_HOURS = 1
+EMAIL_CHANGE_HOURS = 24
+RATE_LIMIT_WINDOWS = {
+    "login": (8, 300),
+    "signup": (5, 300),
+    "forgot_password": (5, 300),
+    "resend_verification": (3, 300),
+    "change_email": (5, 300),
+}
+
+
+def is_valid_email(email):
+    return bool(email and EMAIL_PATTERN.match(email))
+
+
+def is_strong_enough_password(password):
+    return bool(password and len(password) >= 6)
+
+
+def check_rate_limit(key):
+    limit, window_seconds = RATE_LIMIT_WINDOWS[key]
+    now = datetime.utcnow().timestamp()
+    bucket_key = f"rate_limit:{key}"
+    attempts = [
+        timestamp
+        for timestamp in session.get(bucket_key, [])
+        if now - timestamp < window_seconds
+    ]
+
+    if len(attempts) >= limit:
+        session[bucket_key] = attempts
+        return False
+
+    attempts.append(now)
+    session[bucket_key] = attempts
+    return True
+
+
+def hash_token(token):
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def create_auth_token(user, purpose, expires_in, new_email=None):
+    token = secrets.token_urlsafe(32)
+    auth_token = AuthToken(
+        user=user,
+        token_hash=hash_token(token),
+        purpose=purpose,
+        new_email=new_email,
+        expires_at=datetime.utcnow() + expires_in,
+    )
+    db.session.add(auth_token)
+    return token
+
+
+def get_auth_token(raw_token, purpose):
+    if not raw_token:
+        return None
+
+    return AuthToken.query.filter_by(
+        token_hash=hash_token(raw_token),
+        purpose=purpose,
+    ).first()
+
+
+def retire_open_tokens(user, purpose):
+    now = datetime.utcnow()
+    AuthToken.query.filter_by(
+        user_id=user.id,
+        purpose=purpose,
+        used_at=None,
+    ).update({"used_at": now})
+
+
+def make_absolute_url(endpoint, **values):
+    frontend_url = current_app.config["FRONTEND_URL"].rstrip("/")
+    return f"{frontend_url}{url_for(endpoint, **values)}"
+
+
+def send_email(to_email, subject, body):
+    smtp_host = current_app.config["SMTP_HOST"]
+    smtp_port = current_app.config["SMTP_PORT"]
+    smtp_user = current_app.config["SMTP_USER"]
+    smtp_password = current_app.config["SMTP_APP_PASSWORD"]
+    email_from = current_app.config["EMAIL_FROM"] or smtp_user
+
+    if (
+        not smtp_user
+        or not smtp_password
+        or not email_from
+        or smtp_user.startswith("your-")
+        or smtp_password.startswith("your-")
+        or email_from.startswith("your-")
+    ):
+        current_app.logger.warning("SMTP credentials are not configured; email not sent.")
+        return False
+
+    message = EmailMessage()
+    message["Subject"] = subject
+    message["From"] = email_from
+    message["To"] = to_email
+    message["Date"] = formatdate(localtime=True)
+    message["Message-ID"] = make_msgid(domain="tabletrail.local")
+    message.set_content(body)
+    write_local_email_copy(to_email, subject, body)
+
+    try:
+        with smtplib.SMTP(smtp_host, smtp_port) as smtp:
+            smtp.starttls()
+            smtp.login(smtp_user, smtp_password)
+            smtp.send_message(message)
+    except Exception:
+        current_app.logger.exception("Unable to send email to %s", to_email)
+        return False
+
+    return True
+
+
+def write_local_email_copy(to_email, subject, body):
+    outbox_path = os.path.join(current_app.root_path, "..", "email_outbox.log")
+
+    with open(outbox_path, "a", encoding="utf-8") as outbox:
+        outbox.write("\n" + "=" * 72 + "\n")
+        outbox.write(f"To: {to_email}\n")
+        outbox.write(f"Subject: {subject}\n")
+        outbox.write(f"Date: {datetime.utcnow().isoformat()}Z\n\n")
+        outbox.write(body)
+        outbox.write("\n")
+
+
+def send_verification_email(user):
+    retire_open_tokens(user, "verify_email")
+    token = create_auth_token(
+        user,
+        "verify_email",
+        timedelta(hours=EMAIL_VERIFICATION_HOURS),
+    )
+    verification_url = make_absolute_url("verify_email", token=token)
+    body = (
+        f"Hi {user.username},\n\n"
+        "Please verify your TableTrail account by opening this link:\n"
+        f"{verification_url}\n\n"
+        f"This link expires in {EMAIL_VERIFICATION_HOURS} hours.\n\n"
+        "If you did not create this account, you can ignore this email."
+    )
+    return send_email(user.email, "Verify your TableTrail email", body)
+
+
+def send_password_reset_email(user):
+    retire_open_tokens(user, "reset_password")
+    token = create_auth_token(
+        user,
+        "reset_password",
+        timedelta(hours=PASSWORD_RESET_HOURS),
+    )
+    reset_url = make_absolute_url("reset_password", token=token)
+    body = (
+        f"Hi {user.username},\n\n"
+        "Use this link to reset your TableTrail password:\n"
+        f"{reset_url}\n\n"
+        f"This link expires in {PASSWORD_RESET_HOURS} hour.\n\n"
+        "If you did not request this, you can ignore this email."
+    )
+    return send_email(user.email, "Reset your TableTrail password", body)
+
+
+def send_change_email_verification(user, new_email):
+    retire_open_tokens(user, "change_email")
+    token = create_auth_token(
+        user,
+        "change_email",
+        timedelta(hours=EMAIL_CHANGE_HOURS),
+        new_email=new_email,
+    )
+    change_url = make_absolute_url("verify_email_change", token=token)
+    body = (
+        f"Hi {user.username},\n\n"
+        "Please confirm this new email address for your TableTrail account:\n"
+        f"{change_url}\n\n"
+        f"This link expires in {EMAIL_CHANGE_HOURS} hours.\n\n"
+        "Your current email will stay active until you verify this one."
+    )
+    return send_email(new_email, "Confirm your new TableTrail email", body)
 
 
 def build_openstreetmap_url(restaurants):
@@ -248,12 +440,24 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+        if not check_rate_limit("login"):
+            flash("Too many login attempts. Please wait a few minutes and try again.", "danger")
+            return render_template("login.html")
+
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
 
         user = User.query.filter_by(email=email).first()
 
         if is_valid_login(user, password):
+            if user.status == "suspended":
+                flash("This account is suspended. Please contact support.", "danger")
+                return render_template("login.html")
+
+            if not user.is_email_verified:
+                flash("Please verify your email before logging in.", "warning")
+                return render_template("login.html", unverified_email=email)
+
             session["user_id"] = user.id
             session["username"] = user.username
             flash(f"Welcome back, {user.username}.", "success")
@@ -267,24 +471,158 @@ def login():
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
+        if not check_rate_limit("forgot_password"):
+            flash("Too many password reset requests. Please wait a few minutes and try again.", "danger")
+            return render_template("forgot_password.html")
+
         email = request.form.get("email", "").strip().lower()
 
-        if not email:
+        if not is_valid_email(email):
             flash("Please enter your email address.", "danger")
             return render_template("forgot_password.html")
 
-        User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            send_password_reset_email(user)
+            db.session.commit()
+
         flash(
-            "If an account exists for that email, reset instructions will be sent.",
+            "If an account exists, a reset link has been sent.",
             "success",
         )
 
     return render_template("forgot_password.html")
 
 
+@app.route("/resend-verification", methods=["POST"])
+def resend_verification():
+    if not check_rate_limit("resend_verification"):
+        flash("Too many verification email requests. Please wait a few minutes and try again.", "danger")
+        return redirect(url_for("login"))
+
+    email = request.form.get("email", "").strip().lower()
+    user = User.query.filter_by(email=email).first() if is_valid_email(email) else None
+
+    if user and not user.is_email_verified:
+        send_verification_email(user)
+        db.session.commit()
+
+    flash("If the account needs verification, a new link has been sent.", "success")
+    return redirect(url_for("login"))
+
+
+@app.route("/verify-email")
+def verify_email():
+    token_value = request.args.get("token", "")
+    token = get_auth_token(token_value, "verify_email")
+    status = "danger"
+    title = "Verification link problem"
+    message = "This verification link is invalid."
+
+    if token:
+        if token.is_used:
+            status = "info"
+            title = "Email already verified"
+            message = "This verification link has already been used."
+        elif token.is_expired:
+            token.used_at = datetime.utcnow()
+            db.session.commit()
+            title = "Verification link expired"
+            message = "This verification link has expired. Please request a new verification email."
+        elif token.user.is_email_verified:
+            token.used_at = datetime.utcnow()
+            db.session.commit()
+            status = "info"
+            title = "Email already verified"
+            message = "Your email is already verified. You can log in."
+        else:
+            token.user.email_verified_at = datetime.utcnow()
+            token.used_at = datetime.utcnow()
+            db.session.commit()
+            status = "success"
+            title = "Email verified"
+            message = "Your email has been verified. You can now log in."
+
+    return render_template(
+        "email_verification_result.html",
+        status=status,
+        title=title,
+        message=message,
+    )
+
+
+@app.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    token_value = request.args.get("token", "") or request.form.get("token", "")
+    token = get_auth_token(token_value, "reset_password")
+
+    if not token:
+        return render_template(
+            "reset_password.html",
+            token="",
+            token_is_valid=False,
+            token_message="This password reset link is invalid.",
+        )
+
+    if token.is_used:
+        return render_template(
+            "reset_password.html",
+            token="",
+            token_is_valid=False,
+            token_message="This password reset link has already been used.",
+        )
+
+    if token.is_expired:
+        token.used_at = datetime.utcnow()
+        db.session.commit()
+        return render_template(
+            "reset_password.html",
+            token="",
+            token_is_valid=False,
+            token_message="This password reset link has expired.",
+        )
+
+    if request.method == "POST":
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not is_strong_enough_password(password):
+            flash("Password must be at least 6 characters.", "danger")
+            return render_template(
+                "reset_password.html",
+                token=token_value,
+                token_is_valid=True,
+            )
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return render_template(
+                "reset_password.html",
+                token=token_value,
+                token_is_valid=True,
+            )
+
+        token.user.password_hash = generate_password_hash(password)
+        token.used_at = datetime.utcnow()
+        db.session.commit()
+        flash("Your password has been reset. Please log in.", "success")
+        return redirect(url_for("login"))
+
+    return render_template(
+        "reset_password.html",
+        token=token_value,
+        token_is_valid=True,
+    )
+
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
+        if not check_rate_limit("signup"):
+            flash("Too many signup attempts. Please wait a few minutes and try again.", "danger")
+            return render_template("signup.html")
+
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
@@ -293,8 +631,12 @@ def signup():
         abn_number = request.form.get("abn_number", "").strip()
         contact_number = request.form.get("contact_number", "").strip()
 
-        if not username or not email or not password:
+        if not username or not is_valid_email(email) or not password:
             flash("Please complete all required fields.", "danger")
+            return render_template("signup.html")
+
+        if not is_strong_enough_password(password):
+            flash("Password must be at least 6 characters.", "danger")
             return render_template("signup.html")
 
         if role not in ["customer", "owner"]:
@@ -325,12 +667,14 @@ def signup():
         )
 
         db.session.add(user)
+        email_sent = send_verification_email(user)
         db.session.commit()
 
-        session["user_id"] = user.id
-        session["username"] = user.username
-        flash(f"Welcome to TableTrail, {user.username}.", "success")
-        return redirect(url_for("restaurant_detail", restaurant_id=1))
+        if email_sent:
+            flash("Account created. Please check your email to verify your account before logging in.", "success")
+        else:
+            flash("Account created, but the verification email could not be sent. Please check SMTP settings and resend verification from login.", "warning")
+        return redirect(url_for("login"))
 
     return render_template("signup.html")
 
@@ -354,23 +698,13 @@ def profile():
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
-        email = request.form.get("email", "").strip().lower()
         profile_image = request.form.get("profile_image", "").strip()
 
-        if not username or not email:
-            flash("Please enter your username and email.", "danger")
-            return redirect(url_for("profile"))
-
-        existing_user = User.query.filter(
-            User.email == email, User.id != user.id
-        ).first()
-
-        if existing_user:
-            flash("That email is already used by another account.", "danger")
+        if not username:
+            flash("Please enter your username.", "danger")
             return redirect(url_for("profile"))
 
         user.username = username
-        user.email = email
         user.profile_image = profile_image or None
         db.session.commit()
 
@@ -381,6 +715,16 @@ def profile():
     reviews = (
         Review.query.filter_by(user_id=user.id).order_by(Review.created_at.desc()).all()
     )
+    pending_email_token = AuthToken.query.filter_by(
+        user_id=user.id,
+        purpose="change_email",
+        used_at=None,
+    ).order_by(AuthToken.created_at.desc()).first()
+    pending_new_email = (
+        pending_email_token.new_email
+        if pending_email_token and not pending_email_token.is_expired
+        else None
+    )
 
     return render_template(
         "profile.html",
@@ -388,6 +732,96 @@ def profile():
         initials=make_initials(user.username),
         profile_image=user.profile_image,
         reviews=reviews,
+        pending_new_email=pending_new_email,
+    )
+
+
+@app.route("/change-email", methods=["GET", "POST"])
+def change_email():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        flash("Please log in to change your email.", "info")
+        return redirect(url_for("login"))
+
+    user = User.query.get_or_404(user_id)
+
+    if request.method == "POST":
+        if not check_rate_limit("change_email"):
+            flash("Too many email change requests. Please wait a few minutes and try again.", "danger")
+            return render_template("change_email.html", user=user)
+
+        new_email = request.form.get("new_email", "").strip().lower()
+        current_password = request.form.get("current_password", "")
+
+        if not is_valid_email(new_email):
+            flash("Please enter a valid new email address.", "danger")
+            return render_template("change_email.html", user=user)
+
+        if new_email == user.email:
+            flash("That is already your current email address.", "info")
+            return render_template("change_email.html", user=user)
+
+        if User.query.filter(User.email == new_email, User.id != user.id).first():
+            flash("That email is already used by another account.", "danger")
+            return render_template("change_email.html", user=user)
+
+        if not check_password_hash(user.password_hash, current_password):
+            flash("Current password is incorrect.", "danger")
+            return render_template("change_email.html", user=user)
+
+        email_sent = send_change_email_verification(user, new_email)
+        db.session.commit()
+
+        if email_sent:
+            flash("Please verify the new email address. Your current email remains active until then.", "success")
+        else:
+            flash("The email change is pending, but the verification email could not be sent. Please check SMTP settings and try again.", "warning")
+        return redirect(url_for("profile"))
+
+    return render_template("change_email.html", user=user)
+
+
+@app.route("/verify-email-change")
+def verify_email_change():
+    token_value = request.args.get("token", "")
+    token = get_auth_token(token_value, "change_email")
+    status = "danger"
+    title = "Email change link problem"
+    message = "This email change link is invalid."
+
+    if token:
+        if token.is_used:
+            status = "info"
+            title = "Email change already handled"
+            message = "This email change link has already been used."
+        elif token.is_expired:
+            token.used_at = datetime.utcnow()
+            db.session.commit()
+            title = "Email change link expired"
+            message = "This email change link has expired. Please request a new email change."
+        elif not token.new_email or User.query.filter(
+            User.email == token.new_email,
+            User.id != token.user_id,
+        ).first():
+            token.used_at = datetime.utcnow()
+            db.session.commit()
+            title = "Email no longer available"
+            message = "That email address is no longer available."
+        else:
+            token.user.email = token.new_email
+            token.user.email_verified_at = datetime.utcnow()
+            token.used_at = datetime.utcnow()
+            db.session.commit()
+            status = "success"
+            title = "Email changed"
+            message = "Your email address has been updated."
+
+    return render_template(
+        "email_verification_result.html",
+        status=status,
+        title=title,
+        message=message,
     )
 
 

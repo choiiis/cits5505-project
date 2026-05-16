@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 .env
 app.db
+email_outbox.log
