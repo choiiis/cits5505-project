@@ -694,6 +694,44 @@ def get_admin_user_or_redirect():
 def redirect_back_to_admin():
     return redirect(request.referrer or url_for("admin_dashboard"))
 
+def get_admin_restaurant_form_data():
+    return {
+        "name": request.form.get("name", "").strip(),
+        "category": request.form.get("category", "").strip(),
+        "address": request.form.get("address", "").strip(),
+        "suburb": request.form.get("suburb", "").strip(),
+        "phone": request.form.get("phone", "").strip(),
+        "website": request.form.get("website", "").strip(),
+        "description": request.form.get("description", "").strip(),
+        "status": request.form.get("status", "pending").strip(),
+        "owner_id": request.form.get("owner_id", "").strip(),
+    }
+
+
+def apply_admin_restaurant_form_data(restaurant, form_data):
+    restaurant.name = form_data["name"]
+    restaurant.category = form_data["category"]
+    restaurant.address = form_data["address"]
+
+    if hasattr(restaurant, "suburb"):
+        restaurant.suburb = form_data["suburb"]
+
+    if hasattr(restaurant, "phone"):
+        restaurant.phone = form_data["phone"]
+
+    if hasattr(restaurant, "website"):
+        restaurant.website = form_data["website"]
+
+    if hasattr(restaurant, "description"):
+        restaurant.description = form_data["description"]
+
+    if form_data["owner_id"].isdigit():
+        restaurant.owner_id = int(form_data["owner_id"])
+
+    if form_data["status"] in ["approved", "pending", "reported"]:
+        restaurant.status = form_data["status"]
+
+    restaurant.updated_at = datetime.utcnow()
 
 @app.route("/admin")
 def admin_dashboard():
