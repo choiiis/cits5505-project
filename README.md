@@ -26,6 +26,7 @@ SMTP_USER=your-gmail-address@gmail.com
 SMTP_APP_PASSWORD=your-google-app-password
 FRONTEND_URL=http://127.0.0.1:5000
 EMAIL_FROM=your-gmail-address@gmail.com
+EMAIL_OUTBOX_ENABLED=false
 ```
 
 ### Gmail App Password setup
@@ -40,6 +41,8 @@ The app sends email verification, password reset, and email-change links through
 6. Set `SMTP_USER` and `EMAIL_FROM` to the Gmail address used to create the app password.
 
 `FRONTEND_URL` must match the URL users open in the browser, for example `http://127.0.0.1:5000` locally.
+
+Set `EMAIL_OUTBOX_ENABLED=true` only for local development when you want outgoing email bodies and links written to `email_outbox.log`. Keep it disabled outside local testing because auth links contain sensitive one-time tokens.
 
 Run the Flask application:
 

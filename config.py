@@ -35,3 +35,6 @@ class Config:
     SMTP_APP_PASSWORD = os.environ.get("SMTP_APP_PASSWORD", "")
     FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://127.0.0.1:5000")
     EMAIL_FROM = os.environ.get("EMAIL_FROM", SMTP_USER)
+    EMAIL_OUTBOX_ENABLED = (
+        os.environ.get("EMAIL_OUTBOX_ENABLED", "false").lower() == "true"
+    )

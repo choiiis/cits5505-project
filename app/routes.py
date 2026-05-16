@@ -141,7 +141,7 @@ def send_email(to_email, subject, body):
     smtp_host = current_app.config["SMTP_HOST"]
     smtp_port = current_app.config["SMTP_PORT"]
     smtp_user = current_app.config["SMTP_USER"]
-    smtp_password = current_app.config["SMTP_APP_PASSWORD"]
+    smtp_password = current_app.config["SMTP_APP_PASSWORD"].replace(" ", "")
     email_from = current_app.config["EMAIL_FROM"] or smtp_user
 
     if (
@@ -177,6 +177,9 @@ def send_email(to_email, subject, body):
 
 
 def write_local_email_copy(to_email, subject, body):
+    if not current_app.config.get("EMAIL_OUTBOX_ENABLED"):
+        return
+
     outbox_path = os.path.join(current_app.root_path, "..", "email_outbox.log")
 
     with open(outbox_path, "a", encoding="utf-8") as outbox:
