@@ -62,12 +62,34 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function updateVisibilityLabel(label, visibility) {
+        if (!label) {
+            return;
+        }
+
+        label.textContent = visibility;
+        label.classList.toggle("is-public", visibility === "Public");
+    }
+
+    function escapeHtml(value) {
+        const element = document.createElement("div");
+
+        element.textContent = value;
+        return element.innerHTML;
+    }
+
     document.querySelectorAll("[data-open-collection]").forEach((button) => {
         button.addEventListener("click", () => {
             const collectionId = button.dataset.openCollection;
             const modal = document.getElementById(`collectionModal-${collectionId}`);
 
             openModal(modal);
+        });
+    });
+
+    document.querySelectorAll("[data-open-create-collection]").forEach((button) => {
+        button.addEventListener("click", () => {
+            openModal(document.getElementById("createCollectionModal"));
         });
     });
 
@@ -128,7 +150,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (card && nextName) {
                 card.querySelector("[data-collection-name-label]").textContent = nextName;
-                card.querySelector("[data-collection-visibility-label]").textContent = visibilityInput.value;
+                updateVisibilityLabel(
+                    card.querySelector("[data-collection-visibility-label]"),
+                    visibilityInput.value
+                );
             }
 
             modal.querySelector("h2").textContent = nextName || modal.querySelector("h2").textContent;
@@ -138,6 +163,54 @@ document.addEventListener("DOMContentLoaded", () => {
                 button.textContent = "Save settings";
             }, 1400);
         });
+    });
+
+    document.querySelector("[data-create-collection-submit]")?.addEventListener("click", () => {
+        const modal = document.getElementById("createCollectionModal");
+        const nameInput = modal.querySelector("[data-create-collection-name]");
+        const visibilityInput = modal.querySelector("[data-create-collection-visibility]");
+        const grid = document.querySelector("[data-collections-grid]");
+        const name = nameInput.value.trim();
+        const safeName = escapeHtml(name);
+        const visibility = visibilityInput.value;
+
+        if (!name) {
+            nameInput.focus();
+            return;
+        }
+
+        const firstImage = document.querySelector(".collection-card__image")?.getAttribute("src") || "";
+        const collectionId = `created-${Date.now()}`;
+        const card = document.createElement("article");
+
+        card.className = "collection-card";
+        card.dataset.collectionCard = "";
+        card.dataset.collectionId = collectionId;
+        card.innerHTML = `
+            <button class="collection-card__settings" type="button" aria-label="Open ${safeName} settings">
+                ⚙
+            </button>
+            <button class="collection-card__main" type="button" aria-label="Open ${safeName}">
+                <div class="collection-card__media">
+                    <img class="collection-card__image" src="${firstImage}" alt="${safeName} cover image">
+                    <div class="collection-card__badges">
+                        <span data-collection-visibility-label>${visibility}</span>
+                        <span>0 places</span>
+                    </div>
+                </div>
+                <div class="collection-card__body">
+                    <h3 data-collection-name-label>${safeName}</h3>
+                    <p>Start adding saved restaurants to this collection.</p>
+                    <span class="collection-card__code">Code: NEW-${Math.floor(1000 + Math.random() * 9000)}</span>
+                </div>
+            </button>
+        `;
+
+        updateVisibilityLabel(card.querySelector("[data-collection-visibility-label]"), visibility);
+        grid.prepend(card);
+        nameInput.value = "";
+        visibilityInput.value = "Public";
+        closeModal(modal);
     });
 
     document.querySelectorAll("[data-open-share-import]").forEach((button) => {
@@ -157,10 +230,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        const visibilityText = collection.visibility === "Private" ? " · Private" : "";
+
         preview.innerHTML = `
             <div class="collection-share-preview__eyebrow">Matched collection</div>
             <h3>${collection.name}</h3>
-            <p>${collection.restaurant_count} places · ${collection.visibility}</p>
+            <p>${collection.restaurant_count} places${visibilityText}</p>
             <div class="collection-share-preview__actions">
                 <button class="btn btn-success" type="button" data-subscribe-shared-collection>
                     Subscribe

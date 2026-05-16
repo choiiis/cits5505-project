@@ -66,12 +66,17 @@
                         Group saved restaurants into shareable lists.
                     </p>
                 </div>
-                <button class="btn btn-outline-success collection-share-open" type="button" data-open-share-import>
-                    Use share code
-                </button>
+                <div class="collections-heading-actions">
+                    <button class="btn btn-success" type="button" data-open-create-collection>
+                        Create collection
+                    </button>
+                    <button class="btn btn-outline-success collection-share-open" type="button" data-open-share-import>
+                        Share code
+                    </button>
+                </div>
             </div>
 
-            <div class="collections-grid">
+            <div class="collections-grid" data-collections-grid>
                 {% for collection in bookmark_collections %}
                 <article class="collection-card" data-collection-card data-collection-id="{{ collection.id }}">
                     <button class="collection-card__settings" type="button"
@@ -85,7 +90,10 @@
                             <img class="collection-card__image" src="{{ collection.cover_image }}"
                                 alt="{{ collection.name }} cover image">
                             <div class="collection-card__badges">
-                                <span data-collection-visibility-label>{{ collection.visibility }}</span>
+                                <span class="{% if collection.visibility == 'Public' %}is-public{% endif %}"
+                                    data-collection-visibility-label>
+                                    {{ collection.visibility }}
+                                </span>
                                 <span>{{ collection.restaurant_count }} places</span>
                             </div>
                         </div>
@@ -113,7 +121,7 @@
             <div class="collection-modal-header">
                 <div>
                     <p class="collection-modal-header__meta mb-2">
-                        {{ collection.visibility }} · {{ collection.restaurant_count }} places
+                        {% if collection.visibility == "Private" %}Private · {% endif %}{{ collection.restaurant_count }} places
                     </p>
                     <h2 class="h4 fw-bold mb-2" id="collectionTitle-{{ collection.id }}">
                         {{ collection.name }}
@@ -209,6 +217,41 @@
         </section>
     </div>
     {% endfor %}
+
+    <div class="bookmark-modal" id="createCollectionModal" data-create-collection-modal aria-hidden="true">
+        <div class="bookmark-modal__overlay" data-close-modal></div>
+        <section class="bookmark-modal__panel collection-settings-panel" role="dialog" aria-modal="true"
+            aria-labelledby="createCollectionTitle">
+            <button class="bookmark-modal__close" type="button" data-close-modal aria-label="Close create collection">
+                ×
+            </button>
+
+            <div class="collection-settings-header">
+                <p class="collection-modal-header__meta mb-2">New collection</p>
+                <h2 class="h4 fw-bold mb-0" id="createCollectionTitle">
+                    Create collection
+                </h2>
+            </div>
+
+            <div class="collection-settings-form">
+                <label class="form-label" for="newCollectionName">Collection name</label>
+                <input class="form-control" id="newCollectionName" type="text" placeholder="Weekend ideas"
+                    data-create-collection-name>
+
+                <label class="form-label" for="newCollectionVisibility">Visibility</label>
+                <select class="form-select" id="newCollectionVisibility" data-create-collection-visibility>
+                    <option value="Public" selected>Public</option>
+                    <option value="Private">Private</option>
+                </select>
+            </div>
+
+            <div class="collection-settings-actions">
+                <button class="btn btn-success" type="button" data-create-collection-submit>
+                    Create collection
+                </button>
+            </div>
+        </section>
+    </div>
 
     <div class="bookmark-modal" id="shareImportModal" data-share-import-modal aria-hidden="true">
         <div class="bookmark-modal__overlay" data-close-modal></div>
