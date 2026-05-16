@@ -1045,6 +1045,28 @@ def update_review_records():
 
     return redirect_back_to_admin()
 
+@app.route("/admin/reviews/<int:review_id>/status", methods=["POST"])
+def update_single_review_status(review_id):
+    current_user, response = get_admin_user_or_redirect()
+
+    if response:
+        return response
+
+    review = Review.query.get_or_404(review_id)
+    allowed_statuses = ["active", "reported", "hidden"]
+    status = request.form.get("status", "").strip()
+
+    if status not in allowed_statuses:
+        flash("Invalid review status.", "danger")
+        return redirect_back_to_admin()
+
+    review.status = status
+    review.updated_at = datetime.utcnow()
+
+    db.session.commit()
+
+    flash("Review status updated successfully.", "success")
+    return redirect_back_to_admin()
 
 @app.route("/admin/reviews/<int:review_id>/delete", methods=["POST"])
 def delete_review_record(review_id):
