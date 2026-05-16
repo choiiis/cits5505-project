@@ -20,13 +20,14 @@
     <!-- Not logged in -->
     <div class="review-login-message" id="reviewLoginMessage">
         <p>Please log in to write a review.</p>
-        <a href="#" class="btn btn-success rounded-pill fw-bold px-4">
+        <a href="{{ url_for('login') }}" class="btn btn-success rounded-pill fw-bold px-4">
             Log in
         </a>
     </div>
 
     <!-- Logged in -->
-    <form class="review-form" id="reviewForm" method="post" action="#">
+    <form class="review-form" id="reviewForm" method="post"
+        action="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
         <div class="review-user-preview">
             <img src="{{ current_user.profile_image if current_user and current_user.profile_image else default_profile_image }}"
                 alt="User profile">
@@ -362,5 +363,8 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+    window.tableTrailIsLoggedIn = {{ is_logged_in|tojson }};
+</script>
 <script src="{{ url_for('static', filename='js/restaurant_detail.js') }}"></script>
 {% endblock %}

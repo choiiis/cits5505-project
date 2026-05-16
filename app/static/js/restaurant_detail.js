@@ -4,8 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeReviewPanelButton = document.getElementById("closeReviewPanel");
     const reviewOverlay = document.getElementById("reviewOverlay");
     const reviewSlidePanel = document.getElementById("reviewSlidePanel");
-    // login mock test (true : logged in / false: guest)
-    const isLoggedIn = true;
+    const isLoggedIn = Boolean(window.tableTrailIsLoggedIn);
     const reviewLoginMessage = document.getElementById("reviewLoginMessage");
     const reviewForm = document.getElementById("reviewForm");
 
@@ -43,7 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (reviewOverlay) {
         reviewOverlay.addEventListener("click", closeReviewPanel);
     }
-    // login mock test
     if (reviewLoginMessage && reviewForm) {
         if (isLoggedIn) {
             reviewLoginMessage.style.display = "none";

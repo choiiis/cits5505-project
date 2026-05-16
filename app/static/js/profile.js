@@ -13,22 +13,17 @@ document.addEventListener("DOMContentLoaded", () => {
         input.classList.toggle("is-valid", isValid && input.value.trim() !== "");
     }
 
-    function isOptionalUrl(value) {
-        if (!value.trim()) {
+    function isOptionalImageFile(input) {
+        if (!input.files || input.files.length === 0) {
             return true;
         }
 
-        try {
-            new URL(value);
-            return true;
-        } catch {
-            return false;
-        }
+        return ["image/png", "image/jpeg", "image/gif", "image/webp"].includes(input.files[0].type);
     }
 
     function validateForm() {
         const usernameIsValid = usernameInput.value.trim().length > 0;
-        const profileImageIsValid = isOptionalUrl(profileImageInput.value);
+        const profileImageIsValid = isOptionalImageFile(profileImageInput);
 
         setFieldState(usernameInput, usernameIsValid);
         setFieldState(profileImageInput, profileImageIsValid);
@@ -42,6 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
             message.classList.remove("is-error");
             validateForm();
         });
+    });
+
+    profileImageInput.addEventListener("change", () => {
+        message.textContent = "";
+        message.classList.remove("is-error");
+        validateForm();
     });
 
     form.addEventListener("submit", (event) => {

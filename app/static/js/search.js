@@ -1,33 +1,111 @@
 function initBookmarks() {
     const bookmarkButtons = document.querySelectorAll("[data-bookmark]");
+    const pickerModal = document.getElementById("collectionPickerModal");
+    const pickerRestaurant = document.getElementById("collectionPickerRestaurant");
+    const pickerOptions = document.querySelectorAll("[data-picker-collection]");
+    const saveButton = document.querySelector("[data-save-to-collections]");
+    let activeRestaurantId = null;
+    let activeBookmarkButton = null;
+
+    function getCollectionSaves() {
+        return JSON.parse(localStorage.getItem("tableTrailCollectionSaves") || "{}");
+    }
+
+    function setCollectionSaves(saves) {
+        localStorage.setItem("tableTrailCollectionSaves", JSON.stringify(saves));
+    }
+
+    function getRestaurantCollections(restaurantId) {
+        const saves = getCollectionSaves();
+
+        return saves[restaurantId] || [];
+    }
+
+    function setModalOpen(isOpen) {
+        if (!pickerModal) {
+            return;
+        }
+
+        pickerModal.classList.toggle("is-open", isOpen);
+        pickerModal.setAttribute("aria-hidden", String(!isOpen));
+        document.body.classList.toggle("modal-open", isOpen);
+    }
 
     bookmarkButtons.forEach(button => {
         const restaurantId = button.dataset.bookmark;
 
         function updateButtonState() {
-            const savedIds = JSON.parse(localStorage.getItem("tableTrailBookmarks") || "[]");
-            const isSaved = savedIds.includes(restaurantId);
+            const savedCollections = getRestaurantCollections(restaurantId);
+            const isSaved = savedCollections.length > 0;
 
             button.textContent = isSaved ? "♥" : "♡";
             button.classList.toggle("active", isSaved);
             button.setAttribute(
                 "aria-label",
-                isSaved ? "Remove from saved restaurants" : "Save restaurant"
+                isSaved ? "Edit saved collections" : "Save restaurant to collection"
             );
         }
 
         updateButtonState();
 
         button.addEventListener("click", () => {
-            const savedIds = JSON.parse(localStorage.getItem("tableTrailBookmarks") || "[]");
+            activeRestaurantId = restaurantId;
+            activeBookmarkButton = button;
 
-            const nextSavedIds = savedIds.includes(restaurantId)
-                ? savedIds.filter(id => id !== restaurantId)
-                : [...savedIds, restaurantId];
+            if (pickerRestaurant) {
+                pickerRestaurant.textContent = `Save ${button.dataset.restaurantName} to one or more collections.`;
+            }
 
-            localStorage.setItem("tableTrailBookmarks", JSON.stringify(nextSavedIds));
-            updateButtonState();
+            const selectedCollections = getRestaurantCollections(restaurantId);
+
+            pickerOptions.forEach(option => {
+                option.classList.toggle(
+                    "is-selected",
+                    selectedCollections.includes(option.dataset.pickerCollection)
+                );
+            });
+
+            setModalOpen(true);
         });
+    });
+
+    pickerOptions.forEach(option => {
+        option.addEventListener("click", () => {
+            option.classList.toggle("is-selected");
+        });
+    });
+
+    document.querySelectorAll("[data-close-collection-picker]").forEach(button => {
+        button.addEventListener("click", () => {
+            setModalOpen(false);
+        });
+    });
+
+    saveButton?.addEventListener("click", () => {
+        if (!activeRestaurantId || !activeBookmarkButton) {
+            return;
+        }
+
+        const selectedCollections = [...pickerOptions]
+            .filter(option => option.classList.contains("is-selected"))
+            .map(option => option.dataset.pickerCollection);
+        const saves = getCollectionSaves();
+
+        if (selectedCollections.length) {
+            saves[activeRestaurantId] = selectedCollections;
+        } else {
+            delete saves[activeRestaurantId];
+        }
+
+        setCollectionSaves(saves);
+        activeBookmarkButton.textContent = selectedCollections.length ? "♥" : "♡";
+        activeBookmarkButton.classList.toggle("active", selectedCollections.length > 0);
+        saveButton.textContent = "Saved";
+
+        window.setTimeout(() => {
+            saveButton.textContent = "Save";
+            setModalOpen(false);
+        }, 700);
     });
 }
 
