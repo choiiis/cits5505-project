@@ -995,7 +995,6 @@ def update_review_records():
     if response:
         return response
 
-    allowed_statuses = ["active", "reported", "hidden"]
 
     for key, value in request.form.items():
         if not key.startswith("review_status_"):
@@ -1006,7 +1005,7 @@ def update_review_records():
         if not review_id.isdigit():
             continue
 
-        if value not in allowed_statuses:
+        if not is_valid_admin_option(value, ADMIN_REVIEW_STATUSES):
             continue
 
         review = Review.query.get(int(review_id))
