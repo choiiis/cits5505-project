@@ -131,9 +131,6 @@ def is_valid_login(user, password):
     if not user or not password:
         return False
 
-    if user.password_hash == "dev-password-hash":
-        return password == "password"
-
     return check_password_hash(user.password_hash, password)
 
 
