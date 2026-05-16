@@ -275,6 +275,67 @@
                     </table>
                 </div>
             </section>
+
+            <section class="owner-card">
+                <div class="owner-card__heading">
+                    <h2>Review Reports</h2>
+                    <p>Report reviews that may be inappropriate or require admin attention.</p>
+                </div>
+
+                <div class="owner-table-wrap">
+                    <table class="owner-table owner-review-table">
+                        <thead>
+                            <tr>
+                                <th>Reviewer</th>
+                                <th>Rating</th>
+                                <th>Review</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for review in reviews %}
+                            <tr>
+                                <td>{{ review.user.username if review.user else 'Unknown user' }}</td>
+                                <td>{{ review.rating }} / 5</td>
+                                <td>{{ review.content }}</td>
+                                <td>
+                                    <span class="owner-status owner-status--{{ review.status }}">{{
+                                        review.status.title() }}</span>
+                                </td>
+                                <td>
+                                    {% if review.status == 'reported' %}
+                                    <form method="post"
+                                        action="{{ url_for('cancel_owner_review_report', review_id=review.id) }}"
+                                        class="owner-report-form">
+                                        <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
+                                        <button type="submit" class="owner-table-button">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <form method="post"
+                                        action="{{ url_for('report_owner_review', review_id=review.id) }}"
+                                        class="owner-report-form">
+                                        <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
+                                        <button type="submit" class="owner-table-button owner-table-button--danger"
+                                            onclick="return confirm('Report this review to admin?');">
+                                            Report
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5">No reviews found for this restaurant.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     </section>
 </main>

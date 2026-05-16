@@ -458,20 +458,26 @@
   color: #dc2626;
 }
 
+.owner-status {
+  background: transparent;
+  border-radius: 0;
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0;
+}
+
 .owner-status--active,
 .owner-status--approved {
-  background: var(--brand-mint);
   color: var(--brand-green);
 }
 
 .owner-status--reported,
 .owner-status--pending {
-  background: #fff7ed;
   color: #c2410c;
 }
 
 .owner-status--hidden {
-  background: #fee2e2;
   color: #dc2626;
 }
 

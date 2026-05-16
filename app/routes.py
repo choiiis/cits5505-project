@@ -1652,6 +1652,12 @@ def owner_dashboard():
         reverse=True,
     )
 
+    reviews = sorted(
+        restaurant.reviews,
+        key=lambda item: item.created_at or datetime.min,
+        reverse=True,
+    )
+
     owner_stats = [
         {"label": "Restaurant", "value": restaurant.name},
         {"label": "Listing Status", "value": restaurant.status.title()},
@@ -1664,6 +1670,7 @@ def owner_dashboard():
         restaurant=restaurant,
         owner_restaurants=owner_restaurants,
         owner_stats=owner_stats,
+        reviews=reviews,
         restaurant_info=build_owner_restaurant_info(restaurant),
         opening_hours=build_owner_opening_hours(restaurant),
         menu_items=menu_items,
@@ -1849,4 +1856,54 @@ def delete_owner_menu_item(menu_item_id):
     db.session.commit()
 
     flash("Menu item deleted.", "success")
+    return redirect_back_to_owner(restaurant.id)
+
+
+@app.route("/owner/reviews/<int:review_id>/report", methods=["POST"])
+def report_owner_review(review_id):
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    review = Review.query.filter_by(
+        id=review_id,
+        restaurant_id=restaurant.id,
+    ).first_or_404()
+
+    review.status = "reported"
+    review.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    flash("Review reported to admin.", "success")
+    return redirect_back_to_owner(restaurant.id)
+
+
+@app.route("/owner/reviews/<int:review_id>/cancel-report", methods=["POST"])
+def cancel_owner_review_report(review_id):
+    current_user, response = get_owner_user_or_redirect()
+
+    if response:
+        return response
+
+    restaurant, response = get_selected_owner_restaurant(current_user)
+
+    if response:
+        return response
+
+    review = Review.query.filter_by(
+        id=review_id,
+        restaurant_id=restaurant.id,
+    ).first_or_404()
+
+    review.status = "active"
+    review.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    flash("Review report cancelled.", "success")
     return redirect_back_to_owner(restaurant.id)
