@@ -398,6 +398,30 @@
         </section>
     </div>
 
+    <div class="bookmark-modal" id="removeConfirmModal" data-remove-confirm-modal aria-hidden="true">
+        <div class="bookmark-modal__overlay" data-remove-confirm-cancel></div>
+        <section class="bookmark-modal__panel remove-confirm-panel" role="dialog" aria-modal="true"
+            aria-labelledby="removeConfirmTitle">
+            <div class="remove-confirm-icon" aria-hidden="true">!</div>
+            <div class="remove-confirm-content">
+                <h2 class="h5 fw-bold mb-2" id="removeConfirmTitle" data-remove-confirm-title>
+                    Remove restaurant?
+                </h2>
+                <p class="text-secondary mb-0" data-remove-confirm-message>
+                    This restaurant will be removed from the selected list.
+                </p>
+            </div>
+            <div class="remove-confirm-actions">
+                <button class="btn btn-outline-dark" type="button" data-remove-confirm-cancel>
+                    Cancel
+                </button>
+                <button class="btn btn-danger" type="button" data-remove-confirm-action>
+                    Remove
+                </button>
+            </div>
+        </section>
+    </div>
+
     <script id="bookmarkCollectionsData" type="application/json">{{ bookmark_collections|tojson }}</script>
 </main>
 {% endblock %}
