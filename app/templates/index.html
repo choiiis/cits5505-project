@@ -48,7 +48,10 @@
         <div class="container">
             <div class="category-pills-wrap" id="categoryMount" aria-label="Restaurant categories">
                 {% for category in home_categories %}
-                <div class="category-pill-placeholder">{{ category }}</div>
+                <a class="category-pill-placeholder"
+                    href="{{ url_for('search', category=category) }}">
+                    {{ category }}
+                </a>
                 {% endfor %}
             </div>
         </div>
