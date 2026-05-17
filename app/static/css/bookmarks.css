@@ -242,6 +242,13 @@
   visibility: hidden;
 }
 
+.collection-card__badges span.is-subscribed {
+  background: rgba(219, 234, 254, 0.92);
+  border-color: rgba(147, 197, 253, 0.78);
+  color: #1d4ed8;
+  visibility: visible;
+}
+
 .collection-card__body {
   display: flex;
   flex: 1;

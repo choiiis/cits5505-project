@@ -90,20 +90,22 @@
                 {% for collection in bookmark_collections %}
                 <article class="collection-card" data-collection-card data-collection-id="{{ collection.id }}"
                     data-search-text="{{ collection.name }} {{ collection.visibility }} {{ collection.share_code }} {{ collection.description }}">
+                    {% if not collection.is_subscribed %}
                     <button class="collection-card__settings" type="button"
                         data-open-collection-settings="{{ collection.id }}"
                         aria-label="Open {{ collection.name }} settings">
                         ⚙
                     </button>
+                    {% endif %}
                     <button class="collection-card__main" type="button" data-open-collection="{{ collection.id }}"
                         aria-label="Open {{ collection.name }}">
                         <div class="collection-card__media">
                             <img class="collection-card__image" src="{{ collection.cover_image }}"
                                 alt="{{ collection.name }} cover image">
                             <div class="collection-card__badges">
-                                <span class="{% if collection.visibility == 'Public' %}is-public{% endif %}"
+                                <span class="{% if collection.is_subscribed %}is-subscribed{% elif collection.visibility == 'Public' %}is-public{% endif %}"
                                     data-collection-visibility-label>
-                                    {{ collection.visibility }}
+                                    {{ "Subscribed" if collection.is_subscribed else collection.visibility }}
                                 </span>
                                 <span>{{ collection.restaurant_count }} places</span>
                             </div>
@@ -149,9 +151,16 @@
                             </span>
                         </div>
                     </button>
-                    <button class="btn btn-outline-success public-collection-card__subscribe" type="button"
-                        data-subscribe-public-collection>
+                    <button class="btn {% if collection.is_subscribed %}btn-success{% else %}btn-outline-success{% endif %} public-collection-card__subscribe"
+                        type="button" data-subscribe-public-collection="{{ collection.id }}"
+                        {% if collection.is_subscribed or collection.is_owner %}disabled{% endif %}>
+                        {% if collection.is_owner %}
+                        Your collection
+                        {% elif collection.is_subscribed %}
+                        Subscribed
+                        {% else %}
                         Subscribe
+                        {% endif %}
                     </button>
                 </article>
                 {% endfor %}
@@ -242,8 +251,15 @@
                         by {{ collection.creator }} · {{ collection.description }}
                     </p>
                 </div>
-                <button class="btn btn-success" type="button" data-subscribe-public-collection>
+                <button class="btn btn-success" type="button" data-subscribe-public-collection="{{ collection.id }}"
+                    {% if collection.is_subscribed or collection.is_owner %}disabled{% endif %}>
+                    {% if collection.is_owner %}
+                    Your collection
+                    {% elif collection.is_subscribed %}
+                    Subscribed
+                    {% else %}
                     Subscribe
+                    {% endif %}
                 </button>
             </div>
 
@@ -268,7 +284,7 @@
     </div>
     {% endfor %}
 
-    {% for collection in bookmark_collections %}
+    {% for collection in bookmark_collections if not collection.is_subscribed %}
     <div class="bookmark-modal" id="collectionSettings-{{ collection.id }}" data-collection-settings-modal
         aria-hidden="true">
         <div class="bookmark-modal__overlay" data-close-modal></div>

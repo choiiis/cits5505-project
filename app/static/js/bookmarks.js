@@ -352,9 +352,48 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (subscribePublicCollectionButton) {
-            subscribePublicCollectionButton.textContent = "Subscribed";
-            subscribePublicCollectionButton.classList.remove("btn-outline-success");
-            subscribePublicCollectionButton.classList.add("btn-success");
+            const collectionId = subscribePublicCollectionButton.dataset.subscribePublicCollection;
+
+            if (!collectionId) {
+                return;
+            }
+
+            subscribePublicCollectionButton.disabled = true;
+            subscribePublicCollectionButton.textContent = "Subscribing...";
+
+            fetch(`/collections/${collectionId}/subscribe`, {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                credentials: "same-origin",
+            })
+                .then((response) => response.json().then((data) => ({
+                    ok: response.ok,
+                    data,
+                })))
+                .then(({ ok, data }) => {
+                    if (!ok) {
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                            return;
+                        }
+
+                        throw new Error(data.message || "Subscription failed.");
+                    }
+
+                    subscribePublicCollectionButton.textContent = "Subscribed";
+                    subscribePublicCollectionButton.classList.remove("btn-outline-success");
+                    subscribePublicCollectionButton.classList.add("btn-success");
+
+                    window.location.href = data.redirect_url;
+                })
+                .catch(() => {
+                    subscribePublicCollectionButton.disabled = false;
+                    subscribePublicCollectionButton.textContent = "Subscribe";
+                });
+
+            return;
         }
     });
 

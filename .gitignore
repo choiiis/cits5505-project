@@ -6,3 +6,5 @@ __pycache__/
 app.db
 email_outbox.log
 app/static/uploads/
+.DS_Store
+app/.DS_Store
