@@ -285,9 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const modal = document.getElementById("createCollectionModal");
             const nameInput = modal.querySelector("[data-create-collection-name]");
             const visibilityInput = modal.querySelector("[data-create-collection-visibility]");
-            const grid = document.querySelector("[data-collections-grid]");
             const name = nameInput.value.trim();
-            const safeName = escapeHtml(name);
             const visibility = visibilityInput.value;
 
             if (!name) {
@@ -295,46 +293,41 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const firstImage = document.querySelector(".collection-card__image")?.getAttribute("src") || "";
-            const collectionId = `created-${Date.now()}`;
-            const shareCode = `NEW-${Math.floor(1000 + Math.random() * 9000)}`;
-            const card = document.createElement("article");
+            createCollectionButton.disabled = true;
+            createCollectionButton.textContent = "Creating...";
 
-            card.className = "collection-card";
-            card.dataset.collectionCard = "";
-            card.dataset.collectionId = collectionId;
-            card.dataset.searchText = `${name} ${visibility} ${shareCode} new collection`;
-            card.innerHTML = `
-                <button class="collection-card__settings" type="button"
-                    data-open-collection-settings="${collectionId}"
-                    aria-label="Open ${safeName} settings">
-                    ⚙
-                </button>
-                <button class="collection-card__main" type="button" data-open-collection="${collectionId}"
-                    aria-label="Open ${safeName}">
-                    <div class="collection-card__media">
-                        <img class="collection-card__image" src="${firstImage}" alt="${safeName} cover image">
-                        <div class="collection-card__badges">
-                            <span data-collection-visibility-label>${visibility}</span>
-                            <span>0 places</span>
-                        </div>
-                    </div>
-                    <div class="collection-card__body">
-                        <h3 data-collection-name-label>${safeName}</h3>
-                        <p>Start adding saved restaurants to this collection.</p>
-                        <span class="collection-card__code">Code: ${shareCode}</span>
-                    </div>
-                </button>
-            `;
+            fetch("/collections/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                credentials: "same-origin",
+                body: JSON.stringify({
+                    name,
+                    visibility,
+                }),
+            })
+                .then((response) => response.json().then((data) => ({
+                    ok: response.ok,
+                    data,
+                })))
+                .then(({ ok, data }) => {
+                    if (!ok) {
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                            return;
+                        }
 
-            updateVisibilityLabel(card.querySelector("[data-collection-visibility-label]"), visibility);
-            createCollectionDetailModal(collectionId, safeName, visibility, shareCode);
-            createCollectionSettingsModal(collectionId, safeName, visibility, shareCode);
-            grid.prepend(card);
-            nameInput.value = "";
-            visibilityInput.value = "Public";
-            closeModal(modal);
-            applyBookmarkSearch();
+                        throw new Error(data.message || "Collection could not be created.");
+                    }
+
+                    window.location.href = data.redirect_url || "/bookmarks#collectionsTitle";
+                })
+                .catch((error) => {
+                    createCollectionButton.disabled = false;
+                    createCollectionButton.textContent = error.message || "Create collection";
+                });
             return;
         }
 
