@@ -16,7 +16,6 @@
                 <h1 class="h3 fw-bold mb-2">My Profile</h1>
                 <p class="text-secondary">Manage your account details, reviews, and account settings.</p>
             </div>
-            <a class="btn btn-success align-self-start align-self-md-center" href="{{ url_for('home') }}">Write a review</a>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -109,6 +108,13 @@
                                 <div class="review-card__rating">{{ review.rating }} / 5</div>
                             </div>
                             <p class="review-card__body">{{ review.content }}</p>
+                            {% if review.photos %}
+                            <div class="review-card__photos">
+                                {% for photo in review.photos %}
+                                <img src="{{ photo.image_url }}" alt="Review photo for {{ review.restaurant.name }}">
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                             <div class="review-card__actions">
                                 <button class="btn btn-outline-success btn-sm" type="button" disabled>Edit</button>
                                 <button class="btn btn-outline-danger btn-sm" type="button" disabled>Delete</button>
