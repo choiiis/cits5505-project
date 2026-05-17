@@ -28,6 +28,7 @@
     <!-- Logged in -->
     <form class="review-form" id="reviewForm" method="post" enctype="multipart/form-data"
         action="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="review-user-preview">
             <img src="{{ current_user.profile_image if current_user and current_user.profile_image else default_profile_image }}"
                 alt="User profile">
@@ -51,11 +52,13 @@
 
         <label for="reviewPhotos">Photos</label>
         <input type="file" id="reviewPhotos" name="review_photos" class="form-control" accept="image/*" multiple>
+
         <button type="submit" class="btn btn-success rounded-pill fw-bold py-2 mt-3">
             Submit review
         </button>
     </form>
 </aside>
+
 <main>
     <!-- Hero Banner -->
     {% set hero_image = restaurant.hero_image or restaurant.thumbnail_image %}
@@ -69,6 +72,7 @@
         <button class="restaurant-bookmark-btn" type="button">
             ♡
         </button>
+
         <div class="restaurant-hero-overlay">
             <div class="container">
                 <p class="restaurant-category" id="categoryBadge">{{ restaurant.category }}</p>
@@ -77,12 +81,14 @@
 
                 <p class="restaurant-rating-line">
                     <span id="starText">{{ star_text }}</span>
-                    <span id="ratingText">{{ review_summary.average_rating }} · {{ review_summary.total_reviews }}
-                        reviews</span>
+                    <span id="ratingText">
+                        {{ review_summary.average_rating }} · {{ review_summary.total_reviews }} reviews
+                    </span>
                 </p>
             </div>
         </div>
     </section>
+
     <!-- Restaurant Info Content -->
     <section class="restaurant-info-section">
         <div class="container py-4 restaurant-detail-layout">
@@ -96,14 +102,14 @@
 
                     <div class="location-hours-grid">
 
-                            <!-- Map and Address -->
-                            <div class="location-column">
-                                <div class="map-placeholder">
-                                    <iframe class="restaurant-map-preview" src="{{ restaurant_map_embed_url }}"
-                                        title="Map for {{ restaurant.name }}" loading="lazy"></iframe>
-                                </div>
+                        <!-- Map and Address -->
+                        <div class="location-column">
+                            <div class="map-placeholder">
+                                <iframe class="restaurant-map-preview" src="{{ restaurant_map_embed_url }}"
+                                    title="Map for {{ restaurant.name }}" loading="lazy"></iframe>
+                            </div>
 
-                                <div class="address-card">
+                            <div class="address-card">
                                 <div class="address-icon">
                                     📍
                                 </div>
@@ -122,6 +128,7 @@
                             <div class="open-badge">
                                 ● Open now
                             </div>
+
                             <div class="hours-list">
                                 {% for item in opening_hours %}
                                 <div class="{% if item.day_of_week == today_day_of_week %}today{% endif %}">
@@ -140,6 +147,7 @@
 
                     </div>
                 </section>
+
                 <!-- Mobile only contact panel -->
                 <section class="detail-section contact-review-panel-mobile">
                     <div class="section-heading-row">
@@ -150,11 +158,15 @@
                     <a href="tel:{{ restaurant.phone|replace(' ', '') }}" class="contact-link">
                         {{ restaurant.phone }}
                     </a>
+
+                    {% if restaurant.website %}
                     <p class="contact-label">Website</p>
                     <a href="{{ restaurant.website }}" target="_blank" class="contact-link">
                         {{ restaurant.website }}
                     </a>
+                    {% endif %}
                 </section>
+
                 <!-- Menu -->
                 <section class="detail-section" id="menu-section">
                     <div class="section-heading-row" id="menu-section-heading">
@@ -184,6 +196,7 @@
                                 <div class="card-body">
                                     <h3 class="card-title h5 fw-bold">{{ item.name }}</h3>
                                     <p class="card-text mb-2">{{ item.description }}</p>
+
                                     {% if item.price is not none %}
                                     <span class="fw-bold text-success">${{ "%.2f"|format(item.price) }}</span>
                                     {% endif %}
@@ -193,8 +206,9 @@
                         {% endfor %}
                     </div>
                 </section>
+
                 <!-- Reviews -->
-                <section class="detail-section reviews-section">
+                <section class="detail-section reviews-section" id="reviews">
                     <div class="section-heading-row">
                         <h2>Reviews</h2>
                         <button
@@ -202,6 +216,7 @@
                             Write a review
                         </button>
                     </div>
+
                     <!-- Review summary / distribution / filters -->
                     <div class="review-summary">
                         <div class="review-score-box">
@@ -222,121 +237,91 @@
                             {% endfor %}
                         </div>
                     </div>
+
                     <div class="reviews-content-layout">
-                        <div class="review-filter-panel">
+                        <form class="review-filter-panel" id="reviewFilterForm" method="get"
+                            action="{{ url_for('restaurant_reviews_partial', restaurant_id=restaurant.id) }}">
                             <h3>Filter reviews</h3>
 
                             <div class="filter-group">
                                 <p>Stars</p>
 
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="star-5" name="review-stars"
-                                        value="5">
+                                    <input class="form-check-input" type="checkbox" id="star-5" name="review_stars"
+                                        value="5" {% if "5" in selected_review_stars %}checked{% endif %}>
                                     <label class="form-check-label" for="star-5">5 stars</label>
                                 </div>
 
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="star-4" name="review-stars"
-                                        value="4">
+                                    <input class="form-check-input" type="checkbox" id="star-4" name="review_stars"
+                                        value="4" {% if "4" in selected_review_stars %}checked{% endif %}>
                                     <label class="form-check-label" for="star-4">4 stars</label>
                                 </div>
 
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="star-3" name="review-stars"
-                                        value="3">
+                                    <input class="form-check-input" type="checkbox" id="star-3" name="review_stars"
+                                        value="3" {% if "3" in selected_review_stars %}checked{% endif %}>
                                     <label class="form-check-label" for="star-3">3 stars</label>
                                 </div>
 
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="star-2" name="review-stars"
-                                        value="2">
+                                    <input class="form-check-input" type="checkbox" id="star-2" name="review_stars"
+                                        value="2" {% if "2" in selected_review_stars %}checked{% endif %}>
                                     <label class="form-check-label" for="star-2">2 stars</label>
                                 </div>
 
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="star-1" name="review-stars"
-                                        value="1">
+                                    <input class="form-check-input" type="checkbox" id="star-1" name="review_stars"
+                                        value="1" {% if "1" in selected_review_stars %}checked{% endif %}>
                                     <label class="form-check-label" for="star-1">1 star</label>
                                 </div>
                             </div>
+
                             <div class="filter-group">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="with-photos" name="with-photos"
-                                        value="photos">
+                                    <input class="form-check-input" type="checkbox" id="with-photos" name="with_photos"
+                                        value="1" {% if with_photos %}checked{% endif %}>
                                     <label class="form-check-label" for="with-photos">With photos</label>
                                 </div>
                             </div>
 
                             <div class="filter-group">
                                 <p>Sort by</p>
-                                <select id="sort-review" name="sort-review" class="form-select form-select-sm">
-                                    <option value="newest">Newest</option>
-                                    <option value="oldest">Oldest</option>
-                                    <option value="highest">Highest rated</option>
-                                    <option value="lowest">Lowest rated</option>
+                                <select id="sort-review" name="review_sort" class="form-select form-select-sm">
+                                    <option value="newest" {% if review_sort=="newest" %}selected{% endif %}>
+                                        Newest
+                                    </option>
+                                    <option value="oldest" {% if review_sort=="oldest" %}selected{% endif %}>
+                                        Oldest
+                                    </option>
+                                    <option value="highest" {% if review_sort=="highest" %}selected{% endif %}>
+                                        Highest rated
+                                    </option>
+                                    <option value="lowest" {% if review_sort=="lowest" %}selected{% endif %}>
+                                        Lowest rated
+                                    </option>
                                 </select>
                             </div>
-                        </div>
+
+                            <button type="submit" class="btn btn-success rounded-pill w-100 fw-bold mt-2">
+                                Apply filters
+                            </button>
+
+                            <a href="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}#reviews"
+                                id="clearReviewFilters" class="btn btn-outline-secondary rounded-pill w-100 mt-2">
+                                Clear filters
+                            </a>
+                        </form>
+
                         <div class="review-main-content">
-                            <div class="review-list">
-                                {% for review in reviews %}
-                                <article class="review-item">
-                                    <div class="review-top-row">
-                                        <div class="review-user">
-                                            <img src="{{ review.user.profile_image or default_profile_image }}"
-                                                alt="{{ review.user.username }} profile">
-                                            <div class="review-user-info">
-                                                <div class="review-name-row">
-                                                    <h3>{{ review.user.username }}</h3>
-                                                    <!-- TODO: issue #58  -->
-                                                    <!-- {% if review.is_author %}
-                                                    <span class="my-review-label">Your review</span>
-                                                    {% endif %} -->
-                                                </div>
-                                                <!-- TODO: issue #58 : review_count  -->
-                                                <p>{{ review.created_at.strftime("%d %b %Y") }} · (n) reviews</p>
-                                            </div>
-                                        </div>
-                                        <!-- TODO: issue #58  -->
-                                        <!-- {% if review.is_author %}
-                                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                                            Delete
-                                        </button>
-                                        {% endif %} -->
-                                    </div>
-
-                                    <div class="review-rating-row">
-                                        <span class="review-stars">
-                                            {{ "★" * review.rating }}{{ "☆" * (5 - review.rating) }}
-                                        </span>
-                                    </div>
-
-                                    <p class="review-text">
-                                        {{ review.content }}
-                                    </p>
-
-                                    {% if review.photos %}
-                                    <div class="review-photos">
-                                        {% for photo in review.photos %}
-                                        <img src="{{ photo.image_url }}" alt="Review photo for {{ restaurant.name }}">
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </article>
-                                {% endfor %}
-                            </div>
-                            <div class="review-pagination">
-                                <button type="button" class="page-arrow disabled">‹</button>
-                                <button type="button" class="page-number active">1</button>
-                                <button type="button" class="page-number">2</button>
-                                <button type="button" class="page-number">3</button>
-                                <button type="button" class="page-number">4</button>
-                                <button type="button" class="page-arrow">›</button>
+                            <div class="review-list" id="reviewList">
+                                {% include "_restaurant_review_list.html" %}
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
+
             <aside class="contact-review-panel">
                 <h3>Contact</h3>
 
@@ -350,6 +335,7 @@
                     Visit website ↗
                 </a>
                 {% endif %}
+
                 <div class="contact-divider"></div>
 
                 <button class="btn btn-success rounded-pill fw-bold w-100 py-2 open-review-panel">
@@ -358,13 +344,12 @@
             </aside>
         </div>
     </section>
-
 </main>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    window.tableTrailIsLoggedIn = {{ is_logged_in|tojson }};
+    window.tableTrailIsLoggedIn = JSON.parse('{{ is_logged_in|tojson }}');
 </script>
 <script src="{{ url_for('static', filename='js/restaurant_detail.js') }}"></script>
 {% endblock %}

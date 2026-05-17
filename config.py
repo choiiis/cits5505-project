@@ -1,4 +1,5 @@
 import os
+import secrets
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -23,8 +24,31 @@ def load_local_env():
 load_local_env()
 
 
+def require_env(name):
+    value = os.environ.get(name)
+
+    if not value:
+        raise RuntimeError(
+            f"{name} must be set in the environment or a private .env file."
+        )
+
+    return value
+
+
+def get_secret_key():
+    value = os.environ.get("SECRET_KEY")
+
+    if value:
+        return value
+
+    if os.environ.get("FLASK_ENV") == "production":
+        return require_env("SECRET_KEY")
+
+    return secrets.token_hex(32)
+
+
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
+    SECRET_KEY = get_secret_key()
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL", "sqlite:///" + os.path.join(basedir, "app.db")
     )

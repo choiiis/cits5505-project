@@ -1,0 +1,44 @@
+{% for review in reviews %}
+<article class="review-item">
+    <div class="review-top-row">
+        <div class="review-user">
+            <img src="{{ review.user.profile_image or default_profile_image }}"
+                alt="{{ review.user.username }} profile">
+
+            <div class="review-user-info">
+                <div class="review-name-row">
+                    <h3>{{ review.user.username }}</h3>
+
+                    {% if current_user and review.user_id == current_user.id %}
+                    <span class="my-review-label">Your review</span>
+                    {% endif %}
+                </div>
+
+                <p>{{ review.created_at.strftime("%d %b %Y") }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="review-rating-row">
+        <span class="review-stars">
+            {{ "★" * review.rating }}{{ "☆" * (5 - review.rating) }}
+        </span>
+    </div>
+
+    <p class="review-text">
+        {{ review.content }}
+    </p>
+
+    {% if review.photos %}
+    <div class="review-photos">
+        {% for photo in review.photos %}
+        <img src="{{ photo.image_url }}" alt="Review photo for {{ restaurant.name }}">
+        {% endfor %}
+    </div>
+    {% endif %}
+</article>
+{% else %}
+<div class="review-item">
+    <p class="mb-0 text-secondary">No reviews match the selected filters.</p>
+</div>
+{% endfor %}

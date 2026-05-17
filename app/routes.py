@@ -329,6 +329,7 @@ def build_review_summary(reviews):
         "distribution": distribution,
     }
 
+
 def refresh_restaurant_rating_summary(restaurant):
     visible_reviews = Review.query.filter(
         Review.restaurant_id == restaurant.id,
@@ -344,6 +345,7 @@ def refresh_restaurant_rating_summary(restaurant):
     )
     restaurant.updated_at = datetime.utcnow()
 
+
 def get_profile_review_or_redirect(review_id):
     user_id = session.get("user_id")
 
@@ -358,6 +360,7 @@ def get_profile_review_or_redirect(review_id):
         return None, redirect(url_for("profile"))
 
     return review, None
+
 
 def make_initials(username):
     parts = username.split()
@@ -584,6 +587,7 @@ def login():
 
             session["user_id"] = user.id
             session["username"] = user.username
+            session["role"] = user.role
             flash(f"Welcome back, {user.username}.", "success")
             return redirect(url_for("restaurant_detail", restaurant_id=1))
 
@@ -818,7 +822,7 @@ def signup():
     return render_template("signup.html")
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
 def logout():
     session.clear()
     flash("You have been logged out.", "info")
@@ -1001,6 +1005,7 @@ def verify_email_change():
         message=message,
     )
 
+
 @app.route("/profile/reviews/<int:review_id>/edit", methods=["POST"])
 def edit_profile_review(review_id):
     review, response = get_profile_review_or_redirect(review_id)
@@ -1031,6 +1036,7 @@ def edit_profile_review(review_id):
     flash("Review updated successfully.", "success")
     return redirect(url_for("profile"))
 
+
 @app.route("/profile/reviews/<int:review_id>/delete", methods=["POST"])
 def delete_profile_review(review_id):
     review, response = get_profile_review_or_redirect(review_id)
@@ -1060,6 +1066,7 @@ def delete_profile_review(review_id):
 
     flash("Review updated successfully.", "success")
     return redirect(url_for("profile"))
+
 
 @app.route("/search")
 def search():
@@ -1230,7 +1237,9 @@ def bookmarks():
         ]
 
     bookmark_collections = [
-        format_bookmark_collection(collection, current_user_id=user.id if user else None)
+        format_bookmark_collection(
+            collection, current_user_id=user.id if user else None
+        )
         for collection in user_collections
     ]
     bookmark_collections.extend(
@@ -1256,25 +1265,31 @@ def create_collection():
     user_id = session.get("user_id")
 
     if not user_id:
-        return jsonify(
-            {
-                "success": False,
-                "message": "Please log in to create a collection.",
-                "redirect_url": url_for("login"),
-            }
-        ), 401
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "message": "Please log in to create a collection.",
+                    "redirect_url": url_for("login"),
+                }
+            ),
+            401,
+        )
 
     data = request.get_json(silent=True) or request.form
     name = data.get("name", "").strip()
     visibility = data.get("visibility", "Public").strip()
 
     if not name:
-        return jsonify(
-            {
-                "success": False,
-                "message": "Please enter a collection name.",
-            }
-        ), 400
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "message": "Please enter a collection name.",
+                }
+            ),
+            400,
+        )
 
     if visibility not in {"Public", "Private"}:
         visibility = "Public"
@@ -1285,12 +1300,15 @@ def create_collection():
     ).first()
 
     if existing_collection:
-        return jsonify(
-            {
-                "success": False,
-                "message": "You already have a collection with that name.",
-            }
-        ), 409
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "message": "You already have a collection with that name.",
+                }
+            ),
+            409,
+        )
 
     collection = BookmarkCollection(
         user_id=user_id,
@@ -1320,13 +1338,16 @@ def update_restaurant_collections(restaurant_id):
     user_id = session.get("user_id")
 
     if not user_id:
-        return jsonify(
-            {
-                "success": False,
-                "message": "Please log in to save restaurants.",
-                "redirect_url": url_for("login"),
-            }
-        ), 401
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "message": "Please log in to save restaurants.",
+                    "redirect_url": url_for("login"),
+                }
+            ),
+            401,
+        )
 
     Restaurant.query.get_or_404(restaurant_id)
     data = request.get_json(silent=True) or {}
@@ -1340,10 +1361,14 @@ def update_restaurant_collections(restaurant_id):
     owned_collection_ids = {collection.id for collection in owned_collections}
     selected_collection_ids = selected_collection_ids & owned_collection_ids
 
-    existing_bookmarks = Bookmark.query.filter(
-        Bookmark.restaurant_id == restaurant_id,
-        Bookmark.collection_id.in_(owned_collection_ids),
-    ).all() if owned_collection_ids else []
+    existing_bookmarks = (
+        Bookmark.query.filter(
+            Bookmark.restaurant_id == restaurant_id,
+            Bookmark.collection_id.in_(owned_collection_ids),
+        ).all()
+        if owned_collection_ids
+        else []
+    )
     existing_collection_ids = {
         bookmark.collection_id for bookmark in existing_bookmarks
     }
@@ -1376,23 +1401,29 @@ def subscribe_collection(collection_id):
     user_id = session.get("user_id")
 
     if not user_id:
-        return jsonify(
-            {
-                "success": False,
-                "message": "Please log in to subscribe to a collection.",
-                "redirect_url": url_for("login"),
-            }
-        ), 401
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "message": "Please log in to subscribe to a collection.",
+                    "redirect_url": url_for("login"),
+                }
+            ),
+            401,
+        )
 
     collection = BookmarkCollection.query.get_or_404(collection_id)
 
     if not collection.is_public:
-        return jsonify(
-            {
-                "success": False,
-                "message": "Only public collections can be subscribed to.",
-            }
-        ), 403
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "message": "Only public collections can be subscribed to.",
+                }
+            ),
+            403,
+        )
 
     if collection.user_id == user_id:
         return jsonify(
@@ -1423,9 +1454,7 @@ def subscribe_collection(collection_id):
             "success": True,
             "message": "Collection subscribed.",
             "subscriber_count": len(collection.subscriptions),
-            "redirect_url": url_for(
-                "bookmarks", subscribed_collection=collection.id
-            )
+            "redirect_url": url_for("bookmarks", subscribed_collection=collection.id)
             + "#collectionsTitle",
         }
     )
@@ -1469,7 +1498,9 @@ def restaurant_detail(restaurant_id):
                     "Please choose PNG, JPG, JPEG, GIF, or WebP review photos.",
                     "danger",
                 )
-                return redirect(url_for("restaurant_detail", restaurant_id=restaurant.id))
+                return redirect(
+                    url_for("restaurant_detail", restaurant_id=restaurant.id)
+                )
 
         review = Review(
             restaurant_id=restaurant.id,
@@ -1517,21 +1548,69 @@ def restaurant_detail(restaurant_id):
     # restaurant menu highlights
     menu_items = MenuItem.query.filter_by(restaurant_id=restaurant.id).all()
 
-    reviews = (
-        Review.query.filter(
+    selected_review_stars = request.args.getlist("review_stars")
+    with_photos = request.args.get("with_photos") == "1"
+    review_sort = request.args.get("review_sort", "newest").strip()
+
+    selected_review_star_values = []
+
+    for star in selected_review_stars:
+        if star.isdigit():
+            star_value = int(star)
+
+            if 1 <= star_value <= 5:
+                selected_review_star_values.append(star_value)
+
+    all_visible_reviews = (
+        Review.query.options(
+            joinedload(Review.user),
+            joinedload(Review.photos),
+        )
+        .filter(
             Review.restaurant_id == restaurant.id,
             Review.status != "hidden",
         )
-        .order_by(Review.created_at.desc())
         .all()
     )
+
+    review_query = Review.query.options(
+        joinedload(Review.user),
+        joinedload(Review.photos),
+    ).filter(
+        Review.restaurant_id == restaurant.id,
+        Review.status != "hidden",
+    )
+
+    if selected_review_star_values:
+        review_query = review_query.filter(
+            Review.rating.in_(selected_review_star_values)
+        )
+
+    if with_photos:
+        review_query = review_query.filter(Review.photos.any())
+
+    if review_sort == "oldest":
+        review_query = review_query.order_by(Review.created_at.asc())
+    elif review_sort == "highest":
+        review_query = review_query.order_by(
+            Review.rating.desc(), Review.created_at.desc()
+        )
+    elif review_sort == "lowest":
+        review_query = review_query.order_by(
+            Review.rating.asc(), Review.created_at.desc()
+        )
+    else:
+        review_sort = "newest"
+        review_query = review_query.order_by(Review.created_at.desc())
+
+    reviews = review_query.all()
 
     current_user = None
 
     if session.get("user_id"):
         current_user = User.query.get(session["user_id"])
 
-    review_summary = build_review_summary(reviews)
+    review_summary = build_review_summary(all_visible_reviews)
     star_text = make_star_text(review_summary["average_rating"])
     restaurant_map_embed_url = build_openstreetmap_embed_url(restaurant)
 
@@ -1550,6 +1629,9 @@ def restaurant_detail(restaurant_id):
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
         default_menu_image=DEFAULT_MENU_IMAGE,
         restaurant_map_embed_url=restaurant_map_embed_url,
+        selected_review_stars=[str(star) for star in selected_review_star_values],
+        with_photos=with_photos,
+        review_sort=review_sort,
     )
 
 
@@ -1998,6 +2080,69 @@ def owner_dashboard():
         opening_hours=build_owner_opening_hours(restaurant),
         menu_items=menu_items,
         default_menu_image=DEFAULT_MENU_IMAGE,
+    )
+
+
+@app.route("/restaurants/<int:restaurant_id>/reviews")
+def restaurant_reviews_partial(restaurant_id):
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+
+    selected_review_stars = request.args.getlist("review_stars")
+    with_photos = request.args.get("with_photos") == "1"
+    review_sort = request.args.get("review_sort", "newest").strip()
+
+    selected_review_star_values = []
+
+    for star in selected_review_stars:
+        if star.isdigit():
+            star_value = int(star)
+
+            if 1 <= star_value <= 5:
+                selected_review_star_values.append(star_value)
+
+    review_query = Review.query.options(
+        joinedload(Review.user),
+        joinedload(Review.photos),
+    ).filter(
+        Review.restaurant_id == restaurant.id,
+        Review.status != "hidden",
+    )
+
+    if selected_review_star_values:
+        review_query = review_query.filter(
+            Review.rating.in_(selected_review_star_values)
+        )
+
+    if with_photos:
+        review_query = review_query.filter(Review.photos.any())
+
+    if review_sort == "oldest":
+        review_query = review_query.order_by(Review.created_at.asc())
+    elif review_sort == "highest":
+        review_query = review_query.order_by(
+            Review.rating.desc(), Review.created_at.desc()
+        )
+    elif review_sort == "lowest":
+        review_query = review_query.order_by(
+            Review.rating.asc(), Review.created_at.desc()
+        )
+    else:
+        review_sort = "newest"
+        review_query = review_query.order_by(Review.created_at.desc())
+
+    reviews = review_query.all()
+
+    current_user = None
+
+    if session.get("user_id"):
+        current_user = User.query.get(session["user_id"])
+
+    return render_template(
+        "_restaurant_review_list.html",
+        restaurant=restaurant,
+        reviews=reviews,
+        current_user=current_user,
+        default_profile_image=DEFAULT_PROFILE_IMAGE,
     )
 
 

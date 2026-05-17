@@ -56,6 +56,7 @@
 
             <section class="owner-card">
                 <form method="post" action="{{ url_for('update_owner_restaurant_info') }}" class="owner-section-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
 
                     <div class="owner-card__heading owner-card__heading--with-action">
@@ -114,6 +115,7 @@
 
             <section class="owner-card">
                 <form method="post" action="{{ url_for('update_owner_opening_hours') }}" class="owner-section-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
 
                     <div class="owner-card__heading owner-card__heading--with-action">
@@ -191,6 +193,7 @@
                         <form id="menuItemForm" method="post" enctype="multipart/form-data"
                             action="{{ url_for('add_owner_menu_item') }}"
                             data-add-url="{{ url_for('add_owner_menu_item') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
                             <input type="hidden" id="menuItemId" name="menu_item_id" value="">
                             <input type="hidden" id="menuFormAction" name="form_action" value="add">
@@ -269,6 +272,7 @@
                                 <form method="post"
                                     action="{{ url_for('delete_owner_menu_item', menu_item_id=item.id) }}"
                                     class="owner-delete-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
                                     <button type="submit" class="owner-table-button owner-table-button--danger"
                                         onclick="return confirm('Delete this menu item?');">
@@ -317,6 +321,7 @@
                                     <form method="post"
                                         action="{{ url_for('cancel_owner_review_report', review_id=review.id) }}"
                                         class="owner-report-form">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
                                         <button type="submit" class="owner-table-button">
                                             Cancel
@@ -326,6 +331,7 @@
                                     <form method="post"
                                         action="{{ url_for('report_owner_review', review_id=review.id) }}"
                                         class="owner-report-form">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
                                         <button type="submit" class="owner-table-button owner-table-button--danger"
                                             onclick="return confirm('Report this review to admin?');">
