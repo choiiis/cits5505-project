@@ -200,6 +200,7 @@
                                         data-bookmark="{{ restaurant.id }}"
                                         data-restaurant-name="{{ restaurant.name }}"
                                         data-restaurant-category="{{ restaurant.category }}"
+                                        data-saved-collections="{{ saved_collection_ids_by_restaurant.get(restaurant.id, [])|tojson|forceescape }}"
                                         type="button" aria-label="Save {{ restaurant.name }} to collection">
                                         ♡
                                     </button>

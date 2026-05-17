@@ -7,18 +7,12 @@ function initBookmarks() {
     let activeRestaurantId = null;
     let activeBookmarkButton = null;
 
-    function getCollectionSaves() {
-        return JSON.parse(localStorage.getItem("tableTrailCollectionSaves") || "{}");
-    }
-
-    function setCollectionSaves(saves) {
-        localStorage.setItem("tableTrailCollectionSaves", JSON.stringify(saves));
-    }
-
-    function getRestaurantCollections(restaurantId) {
-        const saves = getCollectionSaves();
-
-        return saves[restaurantId] || [];
+    function getRestaurantCollections(button) {
+        try {
+            return JSON.parse(button.dataset.savedCollections || "[]").map(String);
+        } catch (error) {
+            return [];
+        }
     }
 
     function setModalOpen(isOpen) {
@@ -35,7 +29,7 @@ function initBookmarks() {
         const restaurantId = button.dataset.bookmark;
 
         function updateButtonState() {
-            const savedCollections = getRestaurantCollections(restaurantId);
+            const savedCollections = getRestaurantCollections(button);
             const isSaved = savedCollections.length > 0;
 
             button.textContent = isSaved ? "♥" : "♡";
@@ -56,7 +50,7 @@ function initBookmarks() {
                 pickerRestaurant.textContent = `Save ${button.dataset.restaurantName} to one or more collections.`;
             }
 
-            const selectedCollections = getRestaurantCollections(restaurantId);
+            const selectedCollections = getRestaurantCollections(button);
 
             pickerOptions.forEach(option => {
                 option.classList.toggle(
@@ -89,23 +83,52 @@ function initBookmarks() {
         const selectedCollections = [...pickerOptions]
             .filter(option => option.classList.contains("is-selected"))
             .map(option => option.dataset.pickerCollection);
-        const saves = getCollectionSaves();
 
-        if (selectedCollections.length) {
-            saves[activeRestaurantId] = selectedCollections;
-        } else {
-            delete saves[activeRestaurantId];
-        }
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
 
-        setCollectionSaves(saves);
-        activeBookmarkButton.textContent = selectedCollections.length ? "♥" : "♡";
-        activeBookmarkButton.classList.toggle("active", selectedCollections.length > 0);
-        saveButton.textContent = "Saved";
+        fetch(`/restaurants/${activeRestaurantId}/collections`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({
+                collection_ids: selectedCollections,
+            }),
+        })
+            .then(response => response.json().then(data => ({
+                ok: response.ok,
+                data,
+            })))
+            .then(({ ok, data }) => {
+                if (!ok) {
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                        return;
+                    }
 
-        window.setTimeout(() => {
-            saveButton.textContent = "Save";
-            setModalOpen(false);
-        }, 700);
+                    throw new Error(data.message || "Restaurant could not be saved.");
+                }
+
+                const savedCollections = (data.collection_ids || []).map(String);
+
+                activeBookmarkButton.dataset.savedCollections = JSON.stringify(savedCollections);
+                activeBookmarkButton.textContent = savedCollections.length ? "♥" : "♡";
+                activeBookmarkButton.classList.toggle("active", savedCollections.length > 0);
+                saveButton.textContent = "Saved";
+
+                window.setTimeout(() => {
+                    saveButton.textContent = "Save";
+                    saveButton.disabled = false;
+                    setModalOpen(false);
+                }, 700);
+            })
+            .catch(error => {
+                saveButton.disabled = false;
+                saveButton.textContent = error.message || "Save";
+            });
     });
 }
 
