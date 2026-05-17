@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const removeConfirmTitle = removeConfirmModal?.querySelector("[data-remove-confirm-title]");
     const removeConfirmMessage = removeConfirmModal?.querySelector("[data-remove-confirm-message]");
     const removeConfirmAction = removeConfirmModal?.querySelector("[data-remove-confirm-action]");
+    const csrfToken = document.querySelector("meta[name='csrf-token']")?.content || "";
     let resolveRemoveConfirm = null;
 
     if (shell) {
@@ -369,6 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 headers: {
                     "Content-Type": "application/json",
                     "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": csrfToken,
                 },
                 credentials: "same-origin",
                 body: JSON.stringify({
@@ -426,6 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": csrfToken,
                 },
                 credentials: "same-origin",
             })

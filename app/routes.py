@@ -822,7 +822,7 @@ def signup():
     return render_template("signup.html")
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
 def logout():
     session.clear()
     flash("You have been logged out.", "info")

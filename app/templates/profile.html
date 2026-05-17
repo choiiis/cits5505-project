@@ -47,6 +47,7 @@
                     {% endif %}
 
                     <form id="profileForm" method="post" action="{{ url_for('profile') }}" enctype="multipart/form-data" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">
                             <label class="form-label" for="usernameInput">Username</label>
                             <input
@@ -80,7 +81,10 @@
                     <h2 class="h5 fw-bold mb-3" id="accountActionsTitle">Account Actions</h2>
                     <div class="d-grid gap-2">
                         <a class="btn btn-outline-success" href="{{ url_for('change_email') }}">Change email</a>
-                        <a class="btn btn-outline-success" href="{{ url_for('logout') }}">Logout</a>
+                        <form method="post" action="{{ url_for('logout') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-outline-success w-100" type="submit">Logout</button>
+                        </form>
                         <button class="btn btn-outline-danger" type="button" disabled>Delete account</button>
                     </div>
                 </section>
@@ -126,6 +130,7 @@
     class="d-inline js-review-delete-form"
     method="post"
     action="{{ url_for('delete_profile_review', review_id=review.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
 </form>
 </div>
@@ -136,6 +141,7 @@
     method="post"
     action="{{ url_for('edit_profile_review', review_id=review.id) }}"
     data-review-edit-form="{{ review.id }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="mb-2">
         <label class="form-label" for="reviewRating{{ review.id }}">Rating</label>
         <select class="form-select form-select-sm" id="reviewRating{{ review.id }}" name="rating" required>

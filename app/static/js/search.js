@@ -4,6 +4,7 @@ function initBookmarks() {
     const pickerRestaurant = document.getElementById("collectionPickerRestaurant");
     const pickerOptions = document.querySelectorAll("[data-picker-collection]");
     const saveButton = document.querySelector("[data-save-to-collections]");
+    const csrfToken = document.querySelector("meta[name='csrf-token']")?.content || "";
     let activeRestaurantId = null;
     let activeBookmarkButton = null;
 
@@ -92,6 +93,7 @@ function initBookmarks() {
             headers: {
                 "Content-Type": "application/json",
                 "X-Requested-With": "XMLHttpRequest",
+                "X-CSRFToken": csrfToken,
             },
             credentials: "same-origin",
             body: JSON.stringify({

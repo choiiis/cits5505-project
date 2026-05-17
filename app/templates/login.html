@@ -25,6 +25,7 @@
         {% endwith %}
 
         <form id="loginForm" method="post" action="{{ url_for('login') }}" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="mb-3">
                 <label class="form-label" for="emailInput">Email</label>
                 <input
@@ -57,6 +58,7 @@
 
         {% if unverified_email %}
         <form class="mt-3" method="post" action="{{ url_for('resend_verification') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="email" value="{{ unverified_email }}">
             <button class="btn btn-outline-success w-100" type="submit">Resend verification email</button>
         </form>
