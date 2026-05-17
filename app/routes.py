@@ -27,8 +27,10 @@ from app.models import (
     MenuItem,
     OpeningHour,
     Review,
+    ReviewPhoto,
     User,
 )
+from sqlalchemy.orm import joinedload
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
@@ -39,8 +41,10 @@ PROFILE_IMAGE_UPLOAD_FOLDER = os.path.join(
     app.static_folder, "uploads", "profile_images"
 )
 OWNER_MENU_UPLOAD_FOLDER = os.path.join(app.static_folder, "uploads", "menu_items")
+REVIEW_PHOTO_UPLOAD_FOLDER = os.path.join(app.static_folder, "uploads", "review_photos")
 ALLOWED_PROFILE_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 ALLOWED_MENU_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+ALLOWED_REVIEW_PHOTO_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 
 SEARCH_MAP_COORDINATES = {
     "Perth CBD": {"lat": -31.9523, "lng": 115.8613},
@@ -420,6 +424,13 @@ def is_allowed_menu_image(filename):
     )
 
 
+def is_allowed_review_photo(filename):
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED_REVIEW_PHOTO_EXTENSIONS
+    )
+
+
 def save_menu_image(file_storage):
     if not file_storage or not file_storage.filename:
         return ""
@@ -437,6 +448,17 @@ def save_menu_image(file_storage):
     file_storage.save(os.path.join(OWNER_MENU_UPLOAD_FOLDER, filename))
 
     return f"uploads/menu_items/{filename}"
+
+
+def save_review_photo(file_storage):
+    original_filename = secure_filename(file_storage.filename)
+    extension = original_filename.rsplit(".", 1)[1].lower()
+    filename = f"{uuid4().hex}.{extension}"
+
+    os.makedirs(REVIEW_PHOTO_UPLOAD_FOLDER, exist_ok=True)
+    file_storage.save(os.path.join(REVIEW_PHOTO_UPLOAD_FOLDER, filename))
+
+    return url_for("static", filename=f"uploads/review_photos/{filename}")
 
 
 def format_restaurant_card(restaurant, is_saved=True):
@@ -861,7 +883,13 @@ def profile():
         return redirect(url_for("profile"))
 
     reviews = (
-        Review.query.filter_by(user_id=user.id).order_by(Review.created_at.desc()).all()
+        Review.query.options(
+            joinedload(Review.restaurant),
+            joinedload(Review.photos),
+        )
+        .filter_by(user_id=user.id)
+        .order_by(Review.created_at.desc())
+        .all()
     )
     pending_email_token = (
         AuthToken.query.filter_by(
@@ -1185,6 +1213,22 @@ def restaurant_detail(restaurant_id):
             flash("Please choose a rating and write your review.", "danger")
             return redirect(url_for("restaurant_detail", restaurant_id=restaurant.id))
 
+        review_photo_files = [
+            file_storage
+            for file_storage in request.files.getlist("review_photos")
+            if file_storage and file_storage.filename
+        ]
+
+        for file_storage in review_photo_files:
+            original_filename = secure_filename(file_storage.filename)
+
+            if not is_allowed_review_photo(original_filename):
+                flash(
+                    "Please choose PNG, JPG, JPEG, GIF, or WebP review photos.",
+                    "danger",
+                )
+                return redirect(url_for("restaurant_detail", restaurant_id=restaurant.id))
+
         review = Review(
             restaurant_id=restaurant.id,
             user_id=user_id,
@@ -1194,6 +1238,14 @@ def restaurant_detail(restaurant_id):
 
         db.session.add(review)
         db.session.flush()
+
+        for file_storage in review_photo_files:
+            db.session.add(
+                ReviewPhoto(
+                    review_id=review.id,
+                    image_url=save_review_photo(file_storage),
+                )
+            )
 
         visible_reviews = Review.query.filter(
             Review.restaurant_id == restaurant.id,

@@ -109,6 +109,13 @@
                                 <div class="review-card__rating">{{ review.rating }} / 5</div>
                             </div>
                             <p class="review-card__body">{{ review.content }}</p>
+                            {% if review.photos %}
+                            <div class="review-card__photos">
+                                {% for photo in review.photos %}
+                                <img src="{{ photo.image_url }}" alt="Review photo for {{ review.restaurant.name }}">
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                             <div class="review-card__actions">
                                 <button class="btn btn-outline-success btn-sm" type="button" disabled>Edit</button>
                                 <button class="btn btn-outline-danger btn-sm" type="button" disabled>Delete</button>
