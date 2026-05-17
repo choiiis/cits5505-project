@@ -496,6 +496,17 @@ def edit_profile_review(review_id):
         flash("Please choose a rating and write your review.", "danger")
         return redirect(url_for("profile"))
 
+    review.rating = rating
+    review.content = content
+    review.updated_at = datetime.utcnow()
+
+    refresh_restaurant_rating_summary(review.restaurant)
+
+    db.session.commit()
+
+    flash("Review updated successfully.", "success")
+    return redirect(url_for("profile"))
+
 @app.route("/profile/reviews/<int:review_id>/delete", methods=["POST"])
 def delete_profile_review(review_id):
     review, response = get_profile_review_or_redirect(review_id)
