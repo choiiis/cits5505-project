@@ -26,7 +26,7 @@
     </div>
 
     <!-- Logged in -->
-    <form class="review-form" id="reviewForm" method="post"
+    <form class="review-form" id="reviewForm" method="post" enctype="multipart/form-data"
         action="{{ url_for('restaurant_detail', restaurant_id=restaurant.id) }}">
         <div class="review-user-preview">
             <img src="{{ current_user.profile_image if current_user and current_user.profile_image else default_profile_image }}"
