@@ -5,7 +5,6 @@
 {% block body_attrs %}class="search-body"{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}?v=collection-picker-1">
 {% endblock %}
 
@@ -147,33 +146,7 @@
                             </p>
                         </div>
 
-                        <div class="search-results-actions">
-                            <div class="form-check form-switch search-map-toggle">
-                                <input class="form-check-input" type="checkbox" role="switch" id="mapToggle">
-                                <label class="form-check-label" for="mapToggle">Show map</label>
-                            </div>
-                        </div>
                     </div>
-
-                    <section id="mapPreview" class="search-map-panel mb-3 position-relative"
-                        data-map-restaurants='{{ search_map_markers|tojson }}'>
-                        <div id="restaurantMap" class="search-leaflet-map" role="img"
-                            aria-label="Map preview for matching restaurants near {{ search_map_label }}"></div>
-
-                        <div class="search-map-content">
-                            <span class="search-map-eyebrow">Matched results</span>
-                            <h2>{{ search_map_label }}</h2>
-                            <p>{{ restaurants|length }} restaurants from this search</p>
-                        </div>
-
-                        <div class="search-map-empty" id="mapFallbackEmpty">
-                            No matching restaurants to map.
-                        </div>
-
-                        <a class="search-map-link" href="{{ search_map_search_url }}" target="_blank" rel="noopener">
-                            Open map
-                        </a>
-                    </section>
 
                     <div class="search-results-list row g-3" id="resultsList">
                         {% for restaurant in restaurants %}
@@ -311,6 +284,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{{ url_for('static', filename='js/search.js') }}?v=collection-picker-1"></script>
 {% endblock %}
