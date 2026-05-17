@@ -19,7 +19,7 @@ The application is built with:
 
 | UWA ID | Name | GitHub username |
 | --- | --- | --- |
-| 24761125 | Heamin Choi | choiiis |
+| 24761125 | Haemin Choi | choiiis |
 | 24806485 | Hongzhen Li | Max-Hongzhen2026 |
 | 24577125 | Ashish Hareshbhai Narola | ashishreact |
 | 24714078 | Celine Xu | 1031Celinela |
