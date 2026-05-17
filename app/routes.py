@@ -69,18 +69,6 @@ SEARCH_MAP_COORDINATES = {
     "Belmont": {"lat": -31.9638, "lng": 115.9345},
     "Hillarys": {"lat": -31.8064, "lng": 115.7405},
 }
-SEARCH_MAP_LOCATION_COLORS = [
-    "#15803d",
-    "#2563eb",
-    "#dc2626",
-    "#9333ea",
-    "#ea580c",
-    "#0891b2",
-    "#be123c",
-    "#4f46e5",
-    "#65a30d",
-    "#c2410c",
-]
 EMAIL_PATTERN = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 EMAIL_VERIFICATION_HOURS = 24
 PASSWORD_RESET_HOURS = 1
@@ -273,23 +261,6 @@ def send_change_email_verification(user, new_email):
     return send_email(new_email, "Confirm your new TableTrail email", body)
 
 
-def build_openstreetmap_url(restaurants):
-    if not restaurants:
-        return "https://www.openstreetmap.org/#map=12/-31.9523/115.8613"
-
-    coordinates = SEARCH_MAP_COORDINATES.get(restaurants[0].suburb or "")
-
-    if not coordinates:
-        coordinates = {"lat": -31.9523, "lng": 115.8613}
-
-    query = quote_plus(f"{restaurants[0].name}, {restaurants[0].address}, Australia")
-    return (
-        "https://www.openstreetmap.org/search"
-        f"?query={query}"
-        f"#map=14/{coordinates['lat']}/{coordinates['lng']}"
-    )
-
-
 def build_openstreetmap_embed_url(restaurant):
     coordinates = SEARCH_MAP_COORDINATES.get(restaurant.suburb or "")
 
@@ -309,44 +280,6 @@ def build_openstreetmap_embed_url(restaurant):
         "&layer=mapnik"
         f"&marker={lat}%2C{lng}"
     )
-
-
-def build_search_map_markers(restaurants):
-    markers = []
-    location_colors = {}
-
-    for index, restaurant in enumerate(restaurants):
-        location_key = restaurant.suburb or "Other"
-        coordinates = SEARCH_MAP_COORDINATES.get(location_key)
-
-        if not coordinates:
-            coordinates = {
-                "lat": -31.9523 + (((restaurant.id * 17) % 40) - 20) / 1000,
-                "lng": 115.8613 + (((restaurant.id * 29) % 40) - 20) / 1000,
-            }
-
-        if location_key not in location_colors:
-            color_index = len(location_colors) % len(SEARCH_MAP_LOCATION_COLORS)
-            location_colors[location_key] = SEARCH_MAP_LOCATION_COLORS[color_index]
-
-        markers.append(
-            {
-                "id": restaurant.id,
-                "name": restaurant.name,
-                "category": restaurant.category,
-                "address": restaurant.address,
-                "suburb": restaurant.suburb,
-                "location_color": location_colors[location_key],
-                "rating": round(restaurant.average_rating or 0, 1),
-                "review_count": restaurant.review_count,
-                "marker_number": index + 1,
-                "latitude": coordinates["lat"],
-                "longitude": coordinates["lng"],
-                "detail_url": url_for("restaurant_detail", restaurant_id=restaurant.id),
-            }
-        )
-
-    return markers
 
 
 def is_valid_login(user, password):
@@ -1050,16 +983,6 @@ def search():
 
     restaurants = query.all()
 
-    if active_location:
-        search_map_label = active_location
-    elif restaurants:
-        search_map_label = restaurants[0].suburb or restaurants[0].address
-    else:
-        search_map_label = "Perth"
-
-    search_map_markers = build_search_map_markers(restaurants)
-    search_map_search_url = build_openstreetmap_url(restaurants)
-
     summary_parts = [keyword if keyword else "restaurants"]
 
     if active_location:
@@ -1111,9 +1034,6 @@ def search():
         categories=categories,
         locations=locations,
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
-        search_map_markers=search_map_markers,
-        search_map_search_url=search_map_search_url,
-        search_map_label=search_map_label,
         search_summary_label=search_summary_label,
         collection_choices=collection_choices,
     )
