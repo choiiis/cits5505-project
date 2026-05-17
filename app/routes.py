@@ -23,6 +23,7 @@ from app import app, db
 from app.utils import make_star_text
 from app.models import (
     AuthToken,
+    Bookmark,
     BookmarkCollection,
     CollectionSubscription,
     Restaurant,
@@ -1063,8 +1064,13 @@ def search():
     ]
     user = get_demo_user()
     collection_choices = []
+    saved_collection_ids_by_restaurant = {}
 
     if user:
+        user_collection_ids = [
+            collection.id
+            for collection in BookmarkCollection.query.filter_by(user_id=user.id).all()
+        ]
         collection_choices = [
             {
                 "id": collection.id,
@@ -1076,6 +1082,16 @@ def search():
             .all()
         ]
 
+        if user_collection_ids:
+            bookmarks = Bookmark.query.filter(
+                Bookmark.collection_id.in_(user_collection_ids)
+            ).all()
+            for bookmark in bookmarks:
+                saved_collection_ids_by_restaurant.setdefault(
+                    bookmark.restaurant_id,
+                    [],
+                ).append(bookmark.collection_id)
+
     return render_template(
         "search.html",
         restaurants=restaurants,
@@ -1084,6 +1100,7 @@ def search():
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
         search_summary_label=search_summary_label,
         collection_choices=collection_choices,
+        saved_collection_ids_by_restaurant=saved_collection_ids_by_restaurant,
     )
 
 
@@ -1206,6 +1223,62 @@ def create_collection():
                 current_user_id=user_id,
             ),
             "redirect_url": url_for("bookmarks") + "#collectionsTitle",
+        }
+    )
+
+
+@app.route("/restaurants/<int:restaurant_id>/collections", methods=["POST"])
+def update_restaurant_collections(restaurant_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify(
+            {
+                "success": False,
+                "message": "Please log in to save restaurants.",
+                "redirect_url": url_for("login"),
+            }
+        ), 401
+
+    Restaurant.query.get_or_404(restaurant_id)
+    data = request.get_json(silent=True) or {}
+    selected_collection_ids = {
+        int(collection_id)
+        for collection_id in data.get("collection_ids", [])
+        if str(collection_id).isdigit()
+    }
+
+    owned_collections = BookmarkCollection.query.filter_by(user_id=user_id).all()
+    owned_collection_ids = {collection.id for collection in owned_collections}
+    selected_collection_ids = selected_collection_ids & owned_collection_ids
+
+    existing_bookmarks = Bookmark.query.filter(
+        Bookmark.restaurant_id == restaurant_id,
+        Bookmark.collection_id.in_(owned_collection_ids),
+    ).all() if owned_collection_ids else []
+    existing_collection_ids = {
+        bookmark.collection_id for bookmark in existing_bookmarks
+    }
+
+    for collection_id in selected_collection_ids - existing_collection_ids:
+        db.session.add(
+            Bookmark(
+                collection_id=collection_id,
+                restaurant_id=restaurant_id,
+            )
+        )
+
+    for bookmark in existing_bookmarks:
+        if bookmark.collection_id not in selected_collection_ids:
+            db.session.delete(bookmark)
+
+    db.session.commit()
+
+    return jsonify(
+        {
+            "success": True,
+            "message": "Restaurant collections updated.",
+            "collection_ids": sorted(selected_collection_ids),
         }
     )
 
