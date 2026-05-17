@@ -1548,21 +1548,69 @@ def restaurant_detail(restaurant_id):
     # restaurant menu highlights
     menu_items = MenuItem.query.filter_by(restaurant_id=restaurant.id).all()
 
-    reviews = (
-        Review.query.filter(
+    selected_review_stars = request.args.getlist("review_stars")
+    with_photos = request.args.get("with_photos") == "1"
+    review_sort = request.args.get("review_sort", "newest").strip()
+
+    selected_review_star_values = []
+
+    for star in selected_review_stars:
+        if star.isdigit():
+            star_value = int(star)
+
+            if 1 <= star_value <= 5:
+                selected_review_star_values.append(star_value)
+
+    all_visible_reviews = (
+        Review.query.options(
+            joinedload(Review.user),
+            joinedload(Review.photos),
+        )
+        .filter(
             Review.restaurant_id == restaurant.id,
             Review.status != "hidden",
         )
-        .order_by(Review.created_at.desc())
         .all()
     )
+
+    review_query = Review.query.options(
+        joinedload(Review.user),
+        joinedload(Review.photos),
+    ).filter(
+        Review.restaurant_id == restaurant.id,
+        Review.status != "hidden",
+    )
+
+    if selected_review_star_values:
+        review_query = review_query.filter(
+            Review.rating.in_(selected_review_star_values)
+        )
+
+    if with_photos:
+        review_query = review_query.filter(Review.photos.any())
+
+    if review_sort == "oldest":
+        review_query = review_query.order_by(Review.created_at.asc())
+    elif review_sort == "highest":
+        review_query = review_query.order_by(
+            Review.rating.desc(), Review.created_at.desc()
+        )
+    elif review_sort == "lowest":
+        review_query = review_query.order_by(
+            Review.rating.asc(), Review.created_at.desc()
+        )
+    else:
+        review_sort = "newest"
+        review_query = review_query.order_by(Review.created_at.desc())
+
+    reviews = review_query.all()
 
     current_user = None
 
     if session.get("user_id"):
         current_user = User.query.get(session["user_id"])
 
-    review_summary = build_review_summary(reviews)
+    review_summary = build_review_summary(all_visible_reviews)
     star_text = make_star_text(review_summary["average_rating"])
     restaurant_map_embed_url = build_openstreetmap_embed_url(restaurant)
 
@@ -1581,6 +1629,9 @@ def restaurant_detail(restaurant_id):
         default_restaurant_image=DEFAULT_RESTAURANT_IMAGE,
         default_menu_image=DEFAULT_MENU_IMAGE,
         restaurant_map_embed_url=restaurant_map_embed_url,
+        selected_review_stars=[str(star) for star in selected_review_star_values],
+        with_photos=with_photos,
+        review_sort=review_sort,
     )
 
 
@@ -2029,6 +2080,69 @@ def owner_dashboard():
         opening_hours=build_owner_opening_hours(restaurant),
         menu_items=menu_items,
         default_menu_image=DEFAULT_MENU_IMAGE,
+    )
+
+
+@app.route("/restaurants/<int:restaurant_id>/reviews")
+def restaurant_reviews_partial(restaurant_id):
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+
+    selected_review_stars = request.args.getlist("review_stars")
+    with_photos = request.args.get("with_photos") == "1"
+    review_sort = request.args.get("review_sort", "newest").strip()
+
+    selected_review_star_values = []
+
+    for star in selected_review_stars:
+        if star.isdigit():
+            star_value = int(star)
+
+            if 1 <= star_value <= 5:
+                selected_review_star_values.append(star_value)
+
+    review_query = Review.query.options(
+        joinedload(Review.user),
+        joinedload(Review.photos),
+    ).filter(
+        Review.restaurant_id == restaurant.id,
+        Review.status != "hidden",
+    )
+
+    if selected_review_star_values:
+        review_query = review_query.filter(
+            Review.rating.in_(selected_review_star_values)
+        )
+
+    if with_photos:
+        review_query = review_query.filter(Review.photos.any())
+
+    if review_sort == "oldest":
+        review_query = review_query.order_by(Review.created_at.asc())
+    elif review_sort == "highest":
+        review_query = review_query.order_by(
+            Review.rating.desc(), Review.created_at.desc()
+        )
+    elif review_sort == "lowest":
+        review_query = review_query.order_by(
+            Review.rating.asc(), Review.created_at.desc()
+        )
+    else:
+        review_sort = "newest"
+        review_query = review_query.order_by(Review.created_at.desc())
+
+    reviews = review_query.all()
+
+    current_user = None
+
+    if session.get("user_id"):
+        current_user = User.query.get(session["user_id"])
+
+    return render_template(
+        "_restaurant_review_list.html",
+        restaurant=restaurant,
+        reviews=reviews,
+        current_user=current_user,
+        default_profile_image=DEFAULT_PROFILE_IMAGE,
     )
 
 

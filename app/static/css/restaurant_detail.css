@@ -295,6 +295,11 @@
     flex-direction: column;
 }
 
+.review-list.is-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 .review-item {
     position: relative;
     padding: 28px 0;
