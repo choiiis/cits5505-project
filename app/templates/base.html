@@ -26,17 +26,50 @@
                 <div class="collapse navbar-collapse" id="headerNav">
                     <ul class="navbar-nav ms-auto mb-3 mb-md-0 gap-md-3 me-md-4">
                         <li class="nav-item">
-                            <a class="nav-link site-header__link active" href="{{ url_for('home') }}">Home</a>
+                            <a class="nav-link site-header__link {% if request.endpoint in ['home', 'index'] %}active{% endif %}"
+                                href="{{ url_for('home') }}">
+                                Home
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link site-header__link" href="{{ url_for('search') }}">Search</a>
+                            <a class="nav-link site-header__link {% if request.endpoint == 'search' %}active{% endif %}"
+                                href="{{ url_for('search') }}">
+                                Search
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link site-header__link" href="{{ url_for('bookmarks') }}">Bookmarks</a>
+                            <a class="nav-link site-header__link {% if request.endpoint == 'bookmarks' %}active{% endif %}"
+                                href="{{ url_for('bookmarks') }}">
+                                Bookmarks
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link site-header__link" href="{{ url_for('profile') }}">Profile</a>
+                            <a class="nav-link site-header__link {% if request.endpoint == 'profile' %}active{% endif %}"
+                                href="{{ url_for('profile') }}">
+                                Profile
+                            </a>
                         </li>
+
+                        {% if session.get("role") == "admin" %}
+                        <li class="nav-item">
+                            <a class="nav-link site-header__link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}"
+                                href="{{ url_for('admin_dashboard') }}">
+                                Admin
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% if session.get("role") == "owner" %}
+                        <li class="nav-item">
+                            <a class="nav-link site-header__link {% if request.endpoint == 'owner_dashboard' %}active{% endif %}"
+                                href="{{ url_for('owner_dashboard') }}">
+                                Owner
+                            </a>
+                        </li>
+                        {% endif %}
                     </ul>
 
                     {% if session.get("user_id") %}
