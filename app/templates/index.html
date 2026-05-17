@@ -25,7 +25,7 @@
             </div>
 
             <div class="search-bar hero-search mt-4">
-                <form class="row g-2 align-items-center" action="search.html" method="get">
+                <form class="row g-2 align-items-center" action="{{ url_for('search') }}" method="get">
                     <div class="col-lg-5">
                         <label class="visually-hidden" for="keywordSearch">Search restaurants</label>
                         <input class="form-control form-control-lg" id="keywordSearch" name="q"
@@ -62,7 +62,7 @@
                     <p class="text-secondary mb-0">Explore highlighted dining spots from different cuisines and
                         locations.</p>
                 </div>
-                <a class="btn btn-success align-self-md-center" href="search.html">Explore More</a>
+                <a class="btn btn-success align-self-md-center" href="{{ url_for('search') }}">Explore More</a>
             </div>
 
             <div class="row g-3" id="featuredMount">
