@@ -13,7 +13,7 @@ function updateMapLink() {
 
     const mapLink = document.getElementById("mapLink");
     if (mapLink) {
-        mapLink.href = `search.html?${params.toString()}`;
+        mapLink.href = `/search?${params.toString()}`;
     }
 }
 
