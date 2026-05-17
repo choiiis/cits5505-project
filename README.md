@@ -29,7 +29,7 @@ The application is built with:
 1. Clone the public GitHub repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/choiiis/cits5505-project
 cd cits5505-project
 ```
 
