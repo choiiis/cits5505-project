@@ -38,9 +38,19 @@ main {
   border: 1px solid var(--brand-line);
   border-radius: 999px;
   color: var(--brand-ink);
+  display: inline-flex;
   font-size: 0.95rem;
   font-weight: 500;
   padding: 0.5rem 1rem;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.category-pill-placeholder:hover,
+.category-pill-placeholder:focus {
+  border-color: var(--brand-green);
+  color: var(--brand-green);
+  transform: translateY(-1px);
 }
 
 .featured-section {
