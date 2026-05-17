@@ -34,6 +34,7 @@
             {% endwith %}
 
             <form id="changeEmailForm" method="post" action="{{ url_for('change_email') }}" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="mb-3">
                     <label class="form-label" for="newEmailInput">New email</label>
                     <input

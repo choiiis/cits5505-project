@@ -48,6 +48,7 @@
 
             <section class="admin-card">
                 <form method="post" action="{{ url_for('update_restaurant_records') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="admin-card__heading admin-card__heading--with-action">
                         <div class="admin-card__title-row">
                             <div class="admin-section-icon">🏪</div>
@@ -173,6 +174,7 @@
 
             <section class="admin-card">
                 <form method="post" action="{{ url_for('update_user_records') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="admin-card__heading admin-card__heading--with-action">
                         <div class="admin-card__title-row">
                             <div class="admin-section-icon">👤</div>
@@ -298,6 +300,7 @@
 
             <section class="admin-card">
                 <form method="post" action="{{ url_for('update_review_records') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="admin-card__heading admin-card__heading--with-action">
                         <div class="admin-card__title-row">
                             <div class="admin-section-icon">🛡</div>
@@ -425,7 +428,9 @@
 
                 {% for review in reviews %}
                 <form id="deleteReviewForm{{ review.id }}" method="post"
-                    action="{{ url_for('delete_review_record', review_id=review.id) }}"></form>
+                    action="{{ url_for('delete_review_record', review_id=review.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                </form>
                 {% endfor %}
 
                 <form id="reviewFilterForm" method="get" action="{{ url_for('admin_dashboard') }}">

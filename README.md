@@ -29,6 +29,8 @@ EMAIL_FROM=your-gmail-address@gmail.com
 EMAIL_OUTBOX_ENABLED=false
 ```
 
+Use a long random value for `SECRET_KEY`; it protects sessions and CSRF tokens. The application will create a temporary development key if this value is missing, but that key changes on every restart and must not be used for deployment.
+
 ### Gmail App Password setup
 
 The app sends email verification, password reset, and email-change links through Gmail SMTP.
