@@ -116,9 +116,59 @@
                             </div>
                             {% endif %}
                             <div class="review-card__actions">
-                                <button class="btn btn-outline-success btn-sm" type="button" disabled>Edit</button>
-                                <button class="btn btn-outline-danger btn-sm" type="button" disabled>Delete</button>
-                            </div>
+    <button
+        class="btn btn-outline-success btn-sm js-review-edit-toggle"
+        type="button"
+        data-review-id="{{ review.id }}">
+        Edit
+    </button>
+    <form
+    class="d-inline js-review-delete-form"
+    method="post"
+    action="{{ url_for('delete_profile_review', review_id=review.id) }}">
+    <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+</form>
+</div>
+
+<form
+    class="review-edit-form d-none mt-3"
+    id="reviewEditForm{{ review.id }}"
+    method="post"
+    action="{{ url_for('edit_profile_review', review_id=review.id) }}"
+    data-review-edit-form="{{ review.id }}">
+    <div class="mb-2">
+        <label class="form-label" for="reviewRating{{ review.id }}">Rating</label>
+        <select class="form-select form-select-sm" id="reviewRating{{ review.id }}" name="rating" required>
+            {% for score in range(1, 6) %}
+            <option value="{{ score }}" {% if review.rating == score %}selected{% endif %}>
+                {{ score }} / 5
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-2">
+        <label class="form-label" for="reviewContent{{ review.id }}">Review</label>
+        <textarea
+            class="form-control"
+            id="reviewContent{{ review.id }}"
+            name="content"
+            rows="3"
+            required>{{ review.content }}</textarea>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button class="btn btn-success btn-sm" type="submit">Save changes</button>
+        <button
+    class="btn btn-outline-success btn-sm js-review-edit-toggle"
+    type="button"
+    data-review-id="{{ review.id }}"
+    aria-expanded="false"
+    aria-controls="reviewEditForm{{ review.id }}">
+    Edit
+</button>
+    </div>
+</form>
                         </article>
                         {% endfor %}
                     </div>

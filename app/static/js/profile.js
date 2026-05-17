@@ -52,4 +52,45 @@ document.addEventListener("DOMContentLoaded", () => {
             message.classList.add("is-error");
         }
     });
+        document.querySelectorAll(".js-review-edit-toggle").forEach((button) => {
+        button.addEventListener("click", () => {
+            const reviewId = button.dataset.reviewId;
+            const editForm = document.querySelector(`[data-review-edit-form="${reviewId}"]`);
+
+            if (!editForm) {
+                return;
+            }
+
+        const isHidden = editForm.classList.toggle("d-none");
+        button.setAttribute("aria-expanded", String(!isHidden));
+        });
+    });
+
+    document.querySelectorAll(".js-review-edit-cancel").forEach((button) => {
+        button.addEventListener("click", () => {
+            const reviewId = button.dataset.reviewId;
+            const editForm = document.querySelector(`[data-review-edit-form="${reviewId}"]`);
+
+            if (!editForm) {
+                return;
+            }
+
+            editForm.classList.add("d-none");
+            const toggleButton = document.querySelector(`.js-review-edit-toggle[data-review-id="${reviewId}"]`);
+
+if (toggleButton) {
+    toggleButton.setAttribute("aria-expanded", "false");
+}
+        });
+    });
+
+    document.querySelectorAll(".js-review-delete-form").forEach((deleteForm) => {
+        deleteForm.addEventListener("submit", (event) => {
+            const confirmed = window.confirm("Are you sure you want to delete this review?");
+
+            if (!confirmed) {
+                event.preventDefault();
+            }
+        });
+    });
 });

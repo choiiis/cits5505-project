@@ -329,6 +329,35 @@ def build_review_summary(reviews):
         "distribution": distribution,
     }
 
+def refresh_restaurant_rating_summary(restaurant):
+    visible_reviews = Review.query.filter(
+        Review.restaurant_id == restaurant.id,
+        Review.status != "hidden",
+    ).all()
+
+    review_count = len(visible_reviews)
+    restaurant.review_count = review_count
+    restaurant.average_rating = (
+        round(sum(review.rating for review in visible_reviews) / review_count, 1)
+        if review_count
+        else 0.0
+    )
+    restaurant.updated_at = datetime.utcnow()
+
+def get_profile_review_or_redirect(review_id):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        flash("Please log in to manage your reviews.", "info")
+        return None, redirect(url_for("login"))
+
+    review = Review.query.get_or_404(review_id)
+
+    if review.user_id != user_id:
+        flash("You can only manage your own reviews.", "danger")
+        return None, redirect(url_for("profile"))
+
+    return review, None
 
 def make_initials(username):
     parts = username.split()
@@ -972,6 +1001,65 @@ def verify_email_change():
         message=message,
     )
 
+@app.route("/profile/reviews/<int:review_id>/edit", methods=["POST"])
+def edit_profile_review(review_id):
+    review, response = get_profile_review_or_redirect(review_id)
+
+    if response:
+        return response
+
+    rating_text = request.form.get("rating", "").strip()
+    content = request.form.get("content", "").strip()
+
+    try:
+        rating = int(rating_text)
+    except ValueError:
+        rating = 0
+
+    if rating < 1 or rating > 5 or not content:
+        flash("Please choose a rating and write your review.", "danger")
+        return redirect(url_for("profile"))
+
+    review.rating = rating
+    review.content = content
+    review.updated_at = datetime.utcnow()
+
+    refresh_restaurant_rating_summary(review.restaurant)
+
+    db.session.commit()
+
+    flash("Review updated successfully.", "success")
+    return redirect(url_for("profile"))
+
+@app.route("/profile/reviews/<int:review_id>/delete", methods=["POST"])
+def delete_profile_review(review_id):
+    review, response = get_profile_review_or_redirect(review_id)
+
+    if response:
+        return response
+
+    restaurant = review.restaurant
+
+    db.session.delete(review)
+    db.session.flush()
+
+    refresh_restaurant_rating_summary(restaurant)
+
+    db.session.commit()
+
+    flash("Review deleted successfully.", "success")
+    return redirect(url_for("profile"))
+
+    review.rating = rating
+    review.content = content
+    review.updated_at = datetime.utcnow()
+
+    refresh_restaurant_rating_summary(review.restaurant)
+
+    db.session.commit()
+
+    flash("Review updated successfully.", "success")
+    return redirect(url_for("profile"))
 
 @app.route("/search")
 def search():
