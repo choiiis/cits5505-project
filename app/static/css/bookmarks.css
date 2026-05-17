@@ -574,6 +574,42 @@
   padding: 1rem;
 }
 
+.remove-confirm-panel {
+  align-items: flex-start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: auto 1fr;
+  max-width: 460px;
+}
+
+.remove-confirm-icon {
+  align-items: center;
+  background: #fee2e2;
+  border-radius: 999px;
+  color: #b91c1c;
+  display: inline-flex;
+  font-size: 1rem;
+  font-weight: 800;
+  height: 2.5rem;
+  justify-content: center;
+  width: 2.5rem;
+}
+
+.remove-confirm-content {
+  min-width: 0;
+}
+
+.remove-confirm-actions {
+  display: flex;
+  gap: 0.65rem;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
+.remove-confirm-actions .btn {
+  border-radius: 8px;
+}
+
 .collection-share-preview__eyebrow {
   color: #6b7280;
   font-size: 0.76rem;

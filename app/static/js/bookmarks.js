@@ -3,6 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const emptyState = document.getElementById("bookmarkEmptyState");
     const collectionsData = document.getElementById("bookmarkCollectionsData");
     const bookmarkCollections = collectionsData ? JSON.parse(collectionsData.textContent) : [];
+    const removeConfirmModal = document.getElementById("removeConfirmModal");
+    const removeConfirmTitle = removeConfirmModal?.querySelector("[data-remove-confirm-title]");
+    const removeConfirmMessage = removeConfirmModal?.querySelector("[data-remove-confirm-message]");
+    const removeConfirmAction = removeConfirmModal?.querySelector("[data-remove-confirm-action]");
+    let resolveRemoveConfirm = null;
 
     if (shell) {
         shell.setAttribute("data-stage", "jinja");
@@ -33,17 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelector("[data-bookmark-search]")?.addEventListener("input", applyBookmarkSearch);
 
-    document.querySelectorAll("[data-remove-bookmark]").forEach((button) => {
-        button.addEventListener("click", () => {
-            const card = button.closest("[data-bookmark-card]");
-
-            if (card) {
-                card.classList.add("d-none");
-                updateEmptyState();
-            }
-        });
-    });
-
     function openModal(modal) {
         if (!modal) {
             return;
@@ -63,6 +57,59 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.setAttribute("aria-hidden", "true");
         document.body.classList.remove("modal-open");
     }
+
+    function requestRemoveConfirmation({ title, message, actionText = "Remove" }) {
+        if (!removeConfirmModal) {
+            return Promise.resolve(true);
+        }
+
+        if (removeConfirmTitle) {
+            removeConfirmTitle.textContent = title;
+        }
+
+        if (removeConfirmMessage) {
+            removeConfirmMessage.textContent = message;
+        }
+
+        if (removeConfirmAction) {
+            removeConfirmAction.textContent = actionText;
+        }
+
+        openModal(removeConfirmModal);
+
+        return new Promise((resolve) => {
+            resolveRemoveConfirm = resolve;
+        });
+    }
+
+    function finishRemoveConfirmation(isConfirmed) {
+        if (resolveRemoveConfirm) {
+            resolveRemoveConfirm(isConfirmed);
+            resolveRemoveConfirm = null;
+        }
+
+        closeModal(removeConfirmModal);
+    }
+
+    document.querySelectorAll("[data-remove-bookmark]").forEach((button) => {
+        button.addEventListener("click", async () => {
+            const confirmed = await requestRemoveConfirmation({
+                title: "Remove from favorites?",
+                message: "This restaurant will be removed from your Favorite collection.",
+            });
+
+            if (!confirmed) {
+                return;
+            }
+
+            const card = button.closest("[data-bookmark-card]");
+
+            if (card) {
+                card.classList.add("d-none");
+                updateEmptyState();
+            }
+        });
+    });
 
     function copyText(text, button) {
         navigator.clipboard.writeText(text).then(() => {
@@ -184,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector(".bookmarks-page").append(modal);
     }
 
-    document.addEventListener("click", (event) => {
+    document.addEventListener("click", async (event) => {
         const closeButton = event.target.closest("[data-close-modal]");
         const openCollectionButton = event.target.closest("[data-open-collection]");
         const openCreateButton = event.target.closest("[data-open-create-collection]");
@@ -197,6 +244,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const openShareButton = event.target.closest("[data-open-share-import]");
         const openPublicCollectionButton = event.target.closest("[data-open-public-collection]");
         const subscribePublicCollectionButton = event.target.closest("[data-subscribe-public-collection]");
+        const confirmCancelButton = event.target.closest("[data-remove-confirm-cancel]");
+        const confirmActionButton = event.target.closest("[data-remove-confirm-action]");
+
+        if (confirmCancelButton) {
+            finishRemoveConfirmation(false);
+            return;
+        }
+
+        if (confirmActionButton) {
+            finishRemoveConfirmation(true);
+            return;
+        }
 
         if (closeButton) {
             closeModal(closeButton.closest(".bookmark-modal"));
@@ -237,6 +296,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (removeRestaurantButton) {
+            const confirmed = await requestRemoveConfirmation({
+                title: "Remove from collection?",
+                message: "This restaurant will be removed from this collection.",
+            });
+
+            if (!confirmed) {
+                return;
+            }
+
             const card = removeRestaurantButton.closest("[data-collection-restaurant]");
 
             if (card) {
@@ -436,6 +504,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.addEventListener("keydown", (event) => {
         if (event.key !== "Escape") {
+            return;
+        }
+
+        if (removeConfirmModal?.classList.contains("is-open")) {
+            finishRemoveConfirmation(false);
             return;
         }
 
